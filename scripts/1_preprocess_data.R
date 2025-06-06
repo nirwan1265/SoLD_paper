@@ -11,208 +11,457 @@
 
 #-------------------------------------------------------------------------------
 ################################################################################
-#### DATA WRANGLE
+#### DATA PREPROCESSING 
 ################################################################################
 #-------------------------------------------------------------------------------
 
 
-###############################################################################
-# REQUIRED LIBRARIES
-###############################################################################
-suppressPackageStartupMessages({
-  library(vroom);   library(dplyr);   library(tidyr);  library(stringr)
-  library(ggplot2); library(viridis); library(gridExtra); library(grid)
-})
+
+################################################################################
+############################# LIBRARIES  #######################################
+################################################################################
+
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(tibble)
+
+################################################################################
+########################## READ THE FILES  #####################################
+################################################################################
+
+
+# Change directory
+setwd("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS")
+
+# Loading datasets
+A <- read.csv("data/SERRF_normalization/SERRF_Result_A/normalized by - SERRF.csv")
+B <- read.csv("data/SERRF_normalization/SERRF_Result_B/normalized by - SERRF.csv")
+
+###### Filtering just the Peak intensities 
+# Find column names that match the pattern "S1_Run" at the end
+selected_columns_A <- grep("S1_Run\\d+", colnames(A), value = TRUE)
+selected_columns_B <- grep("S1_Run\\d+", colnames(B), value = TRUE)
+
+# Select the corresponding columns in your data frame A
+A_filtered <- A[, colnames(A) %in% selected_columns_A]
+B_filtered <- B[, colnames(B) %in% selected_columns_B]
+
+# Rename the columns to contain only the PI numbers
+names(A_filtered) <- gsub(".*_(PI\\d+)", "\\1", names(A_filtered))
+names(B_filtered) <- gsub(".*_(PI\\d+)", "\\1", names(B_filtered))
+
+# Adding colnames
+rownames(A_filtered) <- A[,1]
+rownames(B_filtered) <- B[,1]
+rm(A,B)
+
+# Removing CHECKs (removed in 2)
+#A_filtered <- A_filtered[, !grepl("CHECK", names(A_filtered))]
+#B_filtered <- B_filtered[, !grepl("Check", names(B_filtered))]
+
+
+# Set the threshold for proportion of zeroes you want to remove
+threshold <- 0.5
+
+# Calculate the proportion of zeroes in each column
+zero_proportions_A <- colMeans(A_filtered == 0, na.rm = TRUE)
+zero_proportions_B <- colMeans(B_filtered == 0, na.rm = TRUE)
+
+# Get the column indices to keep (where less than 50% are zeroes)
+columns_to_keep_A <- which(zero_proportions_A < threshold)
+columns_to_keep_B <- which(zero_proportions_B < threshold)
+
+# Subset A_filtered to include only the selected columns
+A_filtered <- A_filtered[, columns_to_keep_A]
+A_filtered$X.Scan. <- rownames(A_filtered)
+B_filtered <- B_filtered[, columns_to_keep_B]
+B_filtered$X.Scan. <- rownames(B_filtered)
 
 
 ################################################################################
-################################################################################
-#### FIGURE 1A
-################################################################################
+####################### OBTAINING LIPID NAMES  #################################
 ################################################################################
 
-### Load the raw files
-control <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
-lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
+##### Filtering based on lipids
+lipid_A <- read.csv("data/lipid_class_A.csv")
+lipid_A$X.Scan. <- as.character(lipid_A$X.Scan.)
+lipid_B <- read.csv("data/lipid_class_B.csv")
+lipid_B$X.Scan. <- as.character(lipid_B$X.Scan.)
+
+# Unique ID's  
+unique_scans_all_lipid_A <- lipid_A %>%
+  dplyr::select(Compound_Name,X.Scan.)
+unique_scans_all_lipid_B <- lipid_B %>%
+  dplyr::select(Compound_Name,X.Scan.)
+
+# Process duplicates
+unique_scans_all_lipid_A$Compound_Name <- with(unique_scans_all_lipid_A, ave(Compound_Name, Compound_Name, FUN = function(x) {
+  if (length(x) > 1) {
+    return(paste0(x, "_", 1:length(x)))
+  } else {
+    return(x)
+  }
+}))
+
+unique_scans_all_lipid_B$Compound_Name <- with(unique_scans_all_lipid_B, ave(Compound_Name, Compound_Name, FUN = function(x) {
+  if (length(x) > 1) {
+    return(paste0(x, "_", 1:length(x)))
+  } else {
+    return(x)
+  }
+}))
 
 
-# Load Lipid class
-lipid_class_info <- vroom::vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SoLD/data/lipid_class.csv", show_col_types = FALSE) %>%
-  dplyr::filter(!is.na(Class))
-lipid_class_info
+# Convert X.Scan. column to character type
+unique_scans_all_lipid_A$X.Scan. <- as.character(unique_scans_all_lipid_A$X.Scan.)
+unique_scans_all_lipid_B$X.Scan. <- as.character(unique_scans_all_lipid_B$X.Scan.)
 
-unique(lipid_class_info$Class)
+# Subset rows in A_filtered using row names from unique_scans
+subset_A <- inner_join(A_filtered, unique_scans_all_lipid_A)
 
-# Matp the lipids to the class
-# Get lipid names from your data (i.e. column names except for the first column 'Compound_Name')
-lipid_names_lowinput <- colnames(lowinput)[-1]
-lipid_names_control <- colnames(control)[-1]
+subset_B <- inner_join(B_filtered, unique_scans_all_lipid_B)
+str(subset_A$X.Scan.)
 
-# Match to the lipid_class_info
-matched_class_info_lowinput <- lipid_class_info %>%
-  filter(Lipids %in% lipid_names_lowinput)
-matched_class_info_control <- lipid_class_info %>%
-  filter(Lipids %in% lipid_names_control)
-
-
-# Group by Class and concatenate lipid names
-lipids_by_class_lowinput <- matched_class_info_lowinput %>%
-  group_by(Class) %>%
-  summarise(
-    Lipids = paste(Lipids, collapse = ", "),
-    Count = n()
-  ) %>%
-  ungroup()
-
-lipids_by_class_control <- matched_class_info_control %>%
-  group_by(Class) %>%
-  summarise(
-    Lipids = paste(Lipids, collapse = ", "),
-    Count = n()
-  ) %>%
-  ungroup()
-
-# View result
-print(lipids_by_class_lowinput, n = 30)
-print(lipids_by_class_control, n = 30)
+# Collapse by X.Scan. and combine Compound_Name values
+subset_A_collapsed <- subset_A %>%
+  dplyr::group_by(X.Scan.) %>%
+  dplyr::summarize(
+    across(where(is.numeric), dplyr::first),  # safely keep numeric values
+    Compound_Name = paste(unique(Compound_Name), collapse = "%"),
+    .groups = "drop"
+  )
 
 
-### Remove Herbicide, Plasticizer, and Surfactant from control and lowinput
-# ── 1.  Classes you want gone ─────────────────────────────────────
-rm_classes <- c("Herbicide", "Plasticizer", "Surfactant")
+subset_B_collapsed <- subset_B %>%
+  dplyr::group_by(X.Scan.) %>%
+  dplyr::summarize(
+    across(where(is.numeric), dplyr::first),  # safely keep numeric values
+    Compound_Name = paste(unique(Compound_Name), collapse = "%"),
+    .groups = "drop"
+  )
 
-# helper: turn the comma-separated column into a clean character vector
-split_names <- function(tbl) {
-  tbl %>%                                           # lipids_by_class_…
-    filter(Class %in% rm_classes) %>%               # keep target classes
-    pull(Lipids) %>%                                # character strings
-    str_split(",\\s*") %>%                          # split on comma + spaces
-    unlist() %>%                                    # flatten
-    str_trim() %>%                                  # remove leading/trailing spaces
-    unique()
+
+# Remove the X.Scan. and order
+subset_A <- subset_A_collapsed %>%
+  dplyr::select(-X.Scan.) %>%
+  dplyr::select(Compound_Name, everything())
+
+subset_B <- subset_B_collapsed %>%
+  dplyr::select(-X.Scan.) %>%
+  dplyr::select(Compound_Name, everything())
+
+
+# Save the subset data
+# write.csv(subset_A, "Control_All_Lipids.csv", row.names = FALSE)
+# write.csv(subset_B, "LowInput_All_Lipids.csv", row.names = FALSE)
+
+# Data wrangle
+# Go to excel and remove Spectra Match to and NIST14
+# Combine the Lipids C and Double bonds
+# Only put 1 name if they have multiple names
+
+
+
+
+
+
+
+################################################################################
+############################# NORMALIZING  #####################################
+################################################################################
+
+# Read the data again
+# subset_A <- read.csv("/Users/nirwantandukar/Documents/Research/results/SAP/Table/Control_All_Lipids.csv")
+# subset_B <- read.csv("/Users/nirwantandukar/Documents/Research/results/SAP/Table/LowInput_All_Lipids.csv")
+# str(subset_A)
+
+subset_A <- read.csv("/Users/nirwantandukar/Documents/Research/results/SAP/Table/Control_all_lipids_raw_final.csv")
+subset_B <- read.csv("/Users/nirwantandukar/Documents/Research/results/SAP/Table/Control_all_lipids_raw_final.csv")
+
+# Averaging the repeats compounds
+subset_A <- subset_A %>%
+  dplyr::group_by(Compound_Name) %>%
+  dplyr::summarize(across(where(is.numeric), mean, na.rm = TRUE), .groups = "drop")
+
+
+subset_B <- subset_B %>%
+  dplyr::group_by(Compound_Name) %>%
+  dplyr::summarize(across(where(is.numeric), mean, na.rm = TRUE), .groups = "drop")
+
+# Save the table
+write.csv(subset_A, "Control_All_Lipids_non_normailzed.csv", row.names = FALSE)
+write.csv(subset_B, "LowInput_All_Lipids_non_normailzed.csv", row.names = FALSE)
+getwd()
+# NOTE GO TO EXCEL AND SEPARATE THE VALUES 
+# Remove Mass, Collission energy and then add the Carbon and bonds for lipids
+
+
+
+
+
+
+
+
+
+
+
+# Z-score normalization
+subset_A_zscore <- subset_A %>%
+  mutate(across(where(is.numeric), ~scale(.)[,1]))
+
+subset_B_zscore <- subset_B %>%
+  mutate(across(where(is.numeric), ~scale(.)[,1]))
+
+
+# Log10 transform and median centering
+subset_A_log10_median <- subset_A %>%
+  mutate(across(where(is.numeric), ~log10(.) - median(log10(.), na.rm = TRUE)))
+
+subset_B_log10_median <- subset_B %>%
+  mutate(across(where(is.numeric), ~log10(.) - median(log10(.), na.rm = TRUE)))
+
+
+
+
+# Define the compound of interest
+compound <- ".beta.-Amyrin acetate"
+
+# --------- Extract values ---------
+# Raw
+A_raw <- subset_A %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name) %>% unlist()
+B_raw <- subset_B %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name) %>% unlist()
+
+# Z-score
+A_z <- subset_A_zscore %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name) %>% unlist()
+B_z <- subset_B_zscore %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name) %>% unlist()
+
+# Log10-median
+A_log <- subset_A_log10_median %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name) %>% unlist()
+B_log <- subset_B_log10_median %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name) %>% unlist()
+
+# --------- Combine for plotting ---------
+combine_for_plot <- function(A, B, label) {
+  data.frame(
+    Value = c(A, B),
+    Group = rep(c("A", "B"), times = c(length(A), length(B))),
+    Type = label
+  )
 }
 
-lipids_to_remove_control  <- split_names(lipids_by_class_control)
-lipids_to_remove_lowinput <- split_names(lipids_by_class_lowinput)
+df_all <- bind_rows(
+  combine_for_plot(A_raw, B_raw, "Raw"),
+  combine_for_plot(A_z, B_z, "Z-score"),
+  combine_for_plot(A_log, B_log, "Log10-Median")
+)
 
-# finally drop them (any_of = safe)
-control  <- control  %>% select(-any_of(lipids_to_remove_control))
-lowinput <- lowinput %>% select(-any_of(lipids_to_remove_lowinput))
+# --------- Boxplot ---------
+quartz()
+ggplot(df_all, aes(x = Group, y = Value, fill = Group)) +
+  geom_boxplot() +
+  facet_wrap(~Type, scales = "free_y") +
+  theme_minimal() +
+  ggtitle(paste("Comparison of", compound)) +
+  ylab("Normalized Intensity") +
+  theme(plot.title = element_text(hjust = 0.5))
 
-# check how many columns went away
-cat(length(lipids_to_remove_control),  "control columns flagged;  kept",
-    ncol(control_clean)  - 1,  "lipid columns.\n")   # minus Compound_Name
-cat(length(lipids_to_remove_lowinput), "low-input columns flagged; kept",
-    ncol(lowinput_clean) - 1,  "lipid columns.\n")
+# --------- T-tests ---------
+t_raw <- t.test(A_raw, B_raw)
+t_z <- t.test(A_z, B_z)
+t_log <- t.test(A_log, B_log)
 
-
-
-## Z SCORE CALCULATION
-
-# 1. Extract the numeric matrix (exclude Compound_Name column)
-lipid_matrix_control <- control %>%
-  column_to_rownames("Compound_Name") %>%  # optional: set sample ID as rowname
-  as.matrix()
-
-lipid_matrix_lowinput <- lowinput %>%
-  column_to_rownames("Compound_Name") %>%  # optional: set sample ID as rowname
-  as.matrix()
-
-# 2. Calculate Z-scores per column (lipid-wise)
-zscore_matrix_control <- scale(lipid_matrix_control, center = TRUE, scale = TRUE)
-zscore_matrix_lowinput <- scale(lipid_matrix_lowinput, center = TRUE, scale = TRUE)
-
-# 3. Turn it back into a tibble with sample names
-zscore_df_control <- as_tibble(zscore_matrix_control, rownames = "Compound_Name")
-zscore_df_lowinput <- as_tibble(zscore_matrix_lowinput, rownames = "Compound_Name")
-
-# 4. View result
-print(zscore_df_control)
+# Print results
+cat("T-test Results for", compound, "\n")
+cat("Raw: p =", t_raw$p.value, "\n")
+cat("Z-score: p =", t_z$p.value, "\n")
+cat("Log10-Median: p =", t_log$p.value, "\n")
 
 
-# Save 
-write_csv(zscore_df_control, "SAP_zscore_control.csv")
-write_csv(zscore_df_lowinput, "SAP_zscore_lowinput.csv")
+compound <- ".beta.-Amyrin acetate"
 
+# Extract and label each set
+dist_df <- bind_rows(
+  data.frame(Value = unlist(subset_A %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name)),
+             Type = "Raw", Group = "A"),
+  data.frame(Value = unlist(subset_B %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name)),
+             Type = "Raw", Group = "B"),
+  
+  data.frame(Value = unlist(subset_A_zscore %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name)),
+             Type = "Z-score", Group = "A"),
+  data.frame(Value = unlist(subset_B_zscore %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name)),
+             Type = "Z-score", Group = "B"),
+  
+  data.frame(Value = unlist(subset_A_log10_median %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name)),
+             Type = "Log10-Median", Group = "A"),
+  data.frame(Value = unlist(subset_B_log10_median %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name)),
+             Type = "Log10-Median", Group = "B")
+)
 
-## LOG₁₀ TRANSFORMATION  ─────────────────────────────────────────────
-
-# Choose a small pseudocount to prevent log10(0); adjust if needed
-pseudo <- 0.5    # or e.g. 0.5 * min(non-zero intensity)
-
-# 1. Extract numeric matrices (as you did for Z-scores)
-lipid_matrix_control  <- control  %>% column_to_rownames("Compound_Name") %>% as.matrix()
-lipid_matrix_lowinput <- lowinput %>% column_to_rownames("Compound_Name") %>% as.matrix()
-
-# 2. Apply log10(x + pseudo) element-wise
-log10_matrix_control  <- log10(lipid_matrix_control  + pseudo)
-log10_matrix_lowinput <- log10(lipid_matrix_lowinput + pseudo)
-
-# 3. Convert back to tibbles with sample IDs
-log10_df_control  <- as_tibble(log10_matrix_control,  rownames = "Compound_Name")
-log10_df_lowinput <- as_tibble(log10_matrix_lowinput, rownames = "Compound_Name")
-
-# 4. Inspect
-print(log10_df_control)
-print(log10_df_lowinput)
-
-# save
-write_csv(log10_df_control, "SAP_log10_control.csv")
-write_csv(log10_df_lowinput, "SAP_log10_lowinput.csv")
+# Plot
+quartz()
+ggplot(dist_df, aes(x = Value, fill = Group)) +
+  geom_density(alpha = 0.5) +
+  facet_wrap(~Type, scales = "free") +
+  theme_minimal() +
+  ggtitle(paste("Density Plot of", compound)) +
+  xlab("Value") +
+  ylab("Density") +
+  theme(plot.title = element_text(hjust = 0.5))
 
 
 
-# # ── Distribution of “gibberellic acid” ────────────────────────────
-# 
-# # This script builds one tibble that holds the **raw**, **log10(+c)**, 
-# # and **Z-score** values for the compound across both conditions, then 
-# # draws faceted histograms (one panel per transformation).
-# 
-# 
-# target  <- "gibberellic acid"   # exact column label
-# pseudo  <- 0.5                    # pseudocount for log10
-# 
-# # 1. Fetch raw intensities from each data frame --------------------
-# if (!target %in% colnames(control)  ||
-#     !target %in% colnames(lowinput)) {
-#   stop("Compound not found in both tables — check the column name.")
-# }
-# 
-# raw_df <- bind_rows(
-#   control  %>% select(Compound_Name, all_of(target)) %>%
-#     mutate(Condition = "Control"),
-#   lowinput %>% select(Compound_Name, all_of(target)) %>%
-#     mutate(Condition = "LowInput")
-# ) %>% 
-#   rename(Raw = !!target)                         # “Raw” column
-# 
-# # 2. Add log10(+pseudo) --------------------------
-# raw_df <- raw_df %>% 
-#   mutate(Log10 = log10(Raw + pseudo))
-# 
-# # 3. Add per-condition Z-scores ------------------
-# z_control  <- scale(control[[target]],  center = TRUE, scale = TRUE)
-# z_lowinput <- scale(lowinput[[target]], center = TRUE, scale = TRUE)
-# 
-# raw_df <- raw_df %>% 
-#   mutate(Z = c(as.vector(z_control), as.vector(z_lowinput)))
-# 
-# # 4. Long format for ggplot ----------------------
-# plot_df <- raw_df %>% 
-#   pivot_longer(c(Raw, Log10, Z), names_to = "Metric", values_to = "Value")
-# 
-# # 5. Draw faceted histograms ---------------------
-# quartz()
-# ggplot(plot_df, aes(Value, fill = Condition)) +
-#   geom_histogram(bins = 30, alpha = 0.55, position = "identity") +
-#   facet_wrap(~ Metric, scales = "free") +
-#   scale_fill_manual(values = c(Control = "#4C72B0",
-#                                LowInput = "#DD8452")) +
-#   labs(title = target,
-#        y      = "Count",
-#        x      = NULL,
-#        fill   = NULL) +
-#   theme_minimal(base_size = 12)
-# 
-# 
-# 
+### QQ plot
+compound <- ".beta.-Amyrin acetate"  # or any compound you want to analyze
+
+# Extract all 6 versions
+raw_A <- unlist(subset_A %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name))
+z_A   <- unlist(subset_A_zscore %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name))
+log_A <- unlist(subset_A_log10_median %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name))
+
+raw_B <- unlist(subset_B %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name))
+z_B   <- unlist(subset_B_zscore %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name))
+log_B <- unlist(subset_B_log10_median %>% dplyr::filter(Compound_Name == compound) %>% dplyr::select(-Compound_Name))
+
+# Open plotting window (macOS/quartz, otherwise use windows() on Windows)
+quartz()
+
+# Set up 3x2 layout
+par(mfrow = c(2, 3))
+
+# Generate QQ plots
+qqnorm(raw_A, main = "QQ Plot - Raw (Group A)"); qqline(raw_A, col = "blue", lwd = 2)
+qqnorm(z_A, main = "QQ Plot - Z-score (Group A)"); qqline(z_A, col = "blue", lwd = 2)
+qqnorm(log_A, main = "QQ Plot - Log10-Median (Group A)"); qqline(log_A, col = "blue", lwd = 2)
+
+qqnorm(raw_B, main = "QQ Plot - Raw (Group B)"); qqline(raw_B, col = "blue", lwd = 2)
+qqnorm(z_B, main = "QQ Plot - Z-score (Group B)"); qqline(z_B, col = "blue", lwd = 2)
+qqnorm(log_B, main = "QQ Plot - Log10-Median (Group B)"); qqline(log_B, col = "blue", lwd = 2)
+
+
+
+
+### Seems Z-scores looks the best from the qqplots
+
+# Save the Z-score data
+# Transform the data
+subset_A_zscore <- as.data.frame(t(subset_A_zscore))
+subset_B_zscore <- as.data.frame(t(subset_B_zscore))
+
+# Add the Compound_Name column
+#subset_A_zscore$Compound_Name <- rownames(subset_A_zscore)
+#subset_B_zscore$Compound_Name <- rownames(subset_B_zscore)
+
+# Change Compound_Name row to Colnames and remove that row
+colnames(subset_A_zscore) <- subset_A_zscore[1,]
+subset_A_zscore <- subset_A_zscore[-1,]
+
+colnames(subset_B_zscore) <- subset_B_zscore[1,]
+subset_B_zscore <- subset_B_zscore[-1,]
+
+
+# Save the data
+# write.csv(subset_A_zscore, "Control_All_Lipids_Zscore.csv", row.names = T)
+# write.csv(subset_B_zscore, "LowInput_All_Lipids_Zscore.csv", row.names = T)
+# REMOVE THE LAST COLUMN
+
+
+################################################################################
+############################# NAME CHANGE  #####################################
+################################################################################
+
+
+### NOTE
+# For raw samples df, use subset_A and B without Z scores
+# this is used for Linex2 
+
+
+# Load the data for the name change
+# done using PubChem
+name_change <- read.csv("/Users/nirwantandukar/Documents/Research/results/SAP/Lipid Class/lipid_class.csv",check.names = FALSE)
+str(name_change)
+
+# Common name binary
+name_map <- name_change %>%
+  dplyr::filter(CommonName != "") %>%
+  dplyr::select(Compound_Name, CommonName) %>%
+  deframe()  # creates named vector: names = old, values = new
+
+# Load subset_A_zcore and subset_B_zscore
+subset_A_zscore <- read.csv("/Users/nirwantandukar/Documents/Research/results/SAP/Table/Control_All_Lipids_Zscore.csv",
+                            check.names = FALSE, header = F)
+subset_A_zscore <- as.data.frame(t(subset_A_zscore))
+colnames(subset_A_zscore) <- subset_A_zscore[1,]
+subset_A_zscore <- subset_A_zscore[-1,]
+colnames(subset_A_zscore)[1] <- "Compound_Name"
+
+
+subset_B_zscore <- read.csv("/Users/nirwantandukar/Documents/Research/results/SAP/Table/LowInput_All_Lipids_Zscore.csv",check.names = FALSE, header = F)
+subset_B_zscore <- as.data.frame(t(subset_B_zscore))
+colnames(subset_B_zscore) <- subset_B_zscore[1,]
+subset_B_zscore <- subset_B_zscore[-1,]
+colnames(subset_B_zscore)[1] <- "Compound_Name"
+
+
+
+# Load the un-normalized raw data
+# For the sake of not changing the names i am just gonna use the _zscore naming system
+subset_A_zscore <- read.csv("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/non_normalized/Control_All_Lipids_non_normailzed.csv",
+                            check.names = FALSE, header = T)
+# subset_A_zscore <- as.data.frame(t(subset_A_zscore))
+# colnames(subset_A_zscore) <- subset_A_zscore[1,]
+# subset_A_zscore <- subset_A_zscore[-1,]
+# colnames(subset_A_zscore)[1] <- "Compound_Name"
+
+subset_B_zscore <- read.csv("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/non_normalized/LowInput_All_Lipids_non_normailzed.csv",check.names = FALSE, header = T)
+# subset_B_zscore <- as.data.frame(t(subset_B_zscore))
+# colnames(subset_B_zscore) <- subset_B_zscore[1,]
+# subset_B_zscore <- subset_B_zscore[-1,]
+# colnames(subset_B_zscore)[1] <- "Compound_Name"
+
+# Rownames NULL
+rownames(subset_A_zscore) <- NULL
+rownames(subset_B_zscore) <- NULL
+
+str(subset_A_zscore)
+
+
+### NOTE
+# For raw samples
+# subset_A_zscore <- subset_A
+# subset_B_zscore <- subset_B
+
+
+# Replace only those that exist in the map
+subset_A_zscore$Compound_Name <- ifelse(
+  subset_A_zscore$Compound_Name %in% names(name_map),
+  name_map[subset_A_zscore$Compound_Name],
+  subset_A_zscore$Compound_Name
+)
+str(subset_A_zscore)
+subset_B_zscore$Compound_Name <- ifelse(
+  subset_B_zscore$Compound_Name %in% names(name_map),
+  name_map[subset_B_zscore$Compound_Name],
+  subset_B_zscore$Compound_Name
+)
+
+# Convert all rows to numeric except the first column
+subset_A_zscore[-1] <- lapply(subset_A_zscore[-1], function(x) as.numeric(as.character(x)))
+subset_B_zscore[-1] <- lapply(subset_B_zscore[-1], function(x) as.numeric(as.character(x)))
+str(subset_A_zscore)
+
+
+# Average the rows with same name in Compound_Name
+subset_A_zscore <- subset_A_zscore %>%
+  dplyr::group_by(Compound_Name) %>%
+  dplyr::summarize(across(where(is.numeric), mean, na.rm = TRUE), .groups = "drop")
+
+subset_B_zscore <- subset_B_zscore %>%
+  dplyr::group_by(Compound_Name) %>%
+  dplyr::summarize(across(where(is.numeric), mean, na.rm = TRUE), .groups = "drop")
+
+
+# Save the data
+write.csv(as.data.frame(t(subset_A_zscore)), "Control_all_lipids_final_non_normalized.csv", row.names = T)
+write.csv(as.data.frame(t(subset_B_zscore)), "Lowinput_all_lipids_final_non_normalized.csv", row.names = T)
+
+getwd()
