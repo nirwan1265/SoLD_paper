@@ -18,8 +18,10 @@ library(ggrepel)
 
 
 # Control
-setwd("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/")
-A <- read.csv("data/SetA_lipid_FLO2019Control.csv")
+#setwd("/Users/nirwantandukar/Documents/Github/SoLD_paper/")
+A <- read.csv("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/SetA_lipid_FLO2019Control.csv")
+
+
 
 # Retention time > 1 min
 A <- A[which(A$row.retention.time >= 1), ]
@@ -78,7 +80,14 @@ get_run_no <- function(x){
 ############  Build the numeric matrix + metadata frame, then RE-ORDER      
 ################################################################################
 
+#for SEERF normalization
+A_serrf  <- vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/SERRF_normalization/SERRF_Result_A/normalized by - SERRF.csv")
+mat <- as.matrix(A_serrf);  mode(mat_A_serrf) <- "numeric"
+
+
 mat <- as.matrix(A_peaks);  mode(mat) <- "numeric"
+
+
 
 qc_meta <- tibble(
   Injection = colnames(mat),
@@ -104,7 +113,7 @@ tic_df <- qc_meta |>
 ################################################################################
 
 quartz()
-ggplot(tic_df, aes(Run, TIC, colour = Type, group = Type)) +
+A_TIC_plot <- ggplot(tic_df, aes(Run, TIC, colour = Type, group = Type)) +
   # Geometries - hollow circles with colored outlines
   geom_line(linewidth = 0.6, alpha = 0.5) +
   geom_point(size = 3, shape = 21, fill = "white", stroke = 1.2) +
@@ -178,6 +187,13 @@ ggplot(tic_df, aes(Run, TIC, colour = Type, group = Type)) +
     )
   )
 
+# Save the plot
+ggsave(
+  "SuppFig_1A_TIC_A.png",
+  plot = A_TIC_plot,
+  width = 12, height = 6, dpi = 300,
+  bg = "white"
+)
 
 ## ------------------------------------------------------------------ ##
 ## 1.  prepare matrices                                               ##
@@ -219,13 +235,13 @@ hulls <- p_df %>%
   ungroup()
 
 quartz()
-ggplot(p_df, aes(PC1, PC2, color = Type, fill = Type)) +
+pca_A <- ggplot(p_df, aes(PC1, PC2, color = Type, fill = Type)) +
   # convex hull areas (transparent fill, no legend)
   geom_polygon(data = hulls, aes(PC1, PC2), alpha = 0.1, show.legend = FALSE) +
   # points (hollow circles with colored border and fill)
   geom_point(size = 4, shape = 21, stroke = 1, alpha = 0.9) +
   # 80% confidence ellipses
-  stat_ellipse(level = 0.8, linewidth = 0.7, linetype = "dashed") +
+  stat_ellipse(level = 0.8, linewidth = 0.7, linetype = "dashed",type="norm") +
   
   # manual colour + fill scale
   scale_color_manual(
@@ -245,6 +261,19 @@ ggplot(p_df, aes(PC1, PC2, color = Type, fill = Type)) +
     y       = sprintf("PC2 (%.1f%% variance)", var_pc2),
     #title   = "Lipidomics PCA: Sample Type Separation",
     caption = "80% confidence ellipses shown"
+  ) +
+  
+  # annotate RSDs in the top‐left corner
+  annotate(
+    "text",
+    x      = min(p_df$PC1) + 0.05 * diff(range(p_df$PC1)),  # 5% in from left
+    y      = max(p_df$PC2) - 0.05 * diff(range(p_df$PC2)),  # 5% down from top
+    label  = "QC RSD: 1.98%\nSample RSD: 0.94%",
+    hjust  = 0, 
+    vjust  = 1,
+    size   = 4,
+    fontface = "bold",
+    color  = "black"
   ) +
   
   # minimal theme with customized text
@@ -277,14 +306,22 @@ ggplot(p_df, aes(PC1, PC2, color = Type, fill = Type)) +
     show.legend   = FALSE
   )
 
+# Save
+ggsave(
+  "SuppFig_1C_PCA_A_serrf.png",
+  plot = pca_A,
+  width = 8, height = 8, dpi = 300,
+  bg = "white"
+)
 
 
-
-
+################################################################################
 ####  For lowinput
+################################################################################
+
 
 # 0. read & pre-filter Set B exactly like Set A …
-B <- read.csv("data/SetB_lipid_FLO2022_lowP.csv")
+B <- read.csv("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/SetB_lipid_FLO2022_lowP.csv")
 
 
 # Retention time > 1 min
@@ -341,7 +378,24 @@ get_run_no <- function(x){
 ## ------------------------------------------------------------------ ##
 ## 4.  build matrix + metadata frame  (sorted by Run)                  ##
 ## ------------------------------------------------------------------ ##
+
+#for SEERF normalization
+B_serrf  <- vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/SERRF_normalization/SERRF_Result_B/normalized by - SERRF.csv")
+
+mat_B <- as.matrix(B_serrf);  mode(mat_B) <- "numeric"
+
+
 mat_B          <- as.matrix(B_peaks);  mode(mat_B) <- "numeric"
+
+
+
+colnames(B_peaks)
+colnames(B_serrf)
+
+S1_Run362_PI0000
+S1_Run362_PI533987
+cor(B_peaks$S1_Run362_PI0000, B_serrf$S1_Run362_PI533987, use = "pairwise.complete.obs")
+
 
 # remove columns 778, 392, and 398 from mat_B
 mat_B <- mat_B[ , -c(778, 392, 398)]  # remove columns with no data
@@ -365,9 +419,8 @@ tic_df_B <- qc_meta_B %>%
   mutate(TIC = colSums(mat_B, na.rm = TRUE))
 
 
-
 quartz()
-ggplot(tic_df_B, aes(Run, TIC, colour = Type, group = Type)) +
+B_TIC <- ggplot(tic_df_B, aes(Run, TIC, colour = Type, group = Type)) +
   # Geometries - hollow circles with colored outlines
   geom_line(linewidth = 0.6, alpha = 0.5) +
   geom_point(size = 3, shape = 21, fill = "white", stroke = 1.2) +
@@ -405,6 +458,8 @@ ggplot(tic_df_B, aes(Run, TIC, colour = Type, group = Type)) +
     labels = scales::scientific
   ) +
   
+ 
+  
   # Theme
   theme_minimal(base_size = 12) +
   theme(
@@ -441,7 +496,13 @@ ggplot(tic_df_B, aes(Run, TIC, colour = Type, group = Type)) +
     )
   )
 
-
+# Save the plot
+ggsave(
+  "SuppFig_2A_TIC_LowInput.png",
+  plot = B_TIC,
+  width = 12, height = 6, dpi = 300,
+  bg = "white"
+)
 
 # ————————————————————————————————————————————————————————————————————— #
 # 1) assume you have already built “mat_B” (numeric, 4418×778 with many NA’s)
@@ -479,13 +540,13 @@ hulls <- p_df %>%
   ungroup()
 
 quartz()
-ggplot(p_df, aes(PC1, PC2, color = Type, fill = Type)) +
+B_PCA <- ggplot(p_df, aes(PC1, PC2, color = Type, fill = Type)) +
   # convex hull areas (transparent fill, no legend)
   geom_polygon(data = hulls, aes(PC1, PC2), alpha = 0.1, show.legend = FALSE) +
   # points (hollow circles with colored border and fill)
   geom_point(size = 4, shape = 21, stroke = 1, alpha = 0.9) +
   # 80% confidence ellipses
-  stat_ellipse(level = 0.8, linewidth = 0.7, linetype = "dashed") +
+  stat_ellipse(level = 0.8, linewidth = 0.7, linetype = "dashed",type="norm") +
   
   # manual colour + fill scale
   scale_color_manual(
@@ -505,6 +566,20 @@ ggplot(p_df, aes(PC1, PC2, color = Type, fill = Type)) +
     y       = sprintf("PC2 (%.1f%% variance)", var_pc2),
     #title   = "Lipidomics PCA: Sample Type Separation",
     caption = "80% confidence ellipses shown"
+  ) +
+  
+  # annotate RSDs in the top‐left corner
+  annotate(
+    "text",
+    x      = min(p_df$PC1) + 0.05 * diff(range(p_df$PC1)),  # 5% in from left
+    y      = max(p_df$PC2) - 0.05 * diff(range(p_df$PC2)),  # 5% down from top
+    label  = "QC RSD: 0.31%\nSample RSD: 0.51%",
+    #label  = "QC RSD: 1.59%\nSample RSD: 1.18%",
+    hjust  = 0, 
+    vjust  = 1,
+    size   = 4,
+    fontface = "bold",
+    color  = "black"
   ) +
   
   # minimal theme with customized text
@@ -536,3 +611,12 @@ ggplot(p_df, aes(PC1, PC2, color = Type, fill = Type)) +
     box.padding   = 0.5,
     show.legend   = FALSE
   )
+
+
+# Save the plot
+ggsave(
+  "SuppFig_2C_PCA_LowInput_serrf.png",
+  plot = B_PCA,
+  width = 8, height = 8, dpi = 300,
+  bg = "white"
+)
