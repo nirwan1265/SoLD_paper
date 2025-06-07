@@ -31,12 +31,9 @@ library(tibble)
 ################################################################################
 
 
-# Change directory
-setwd("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS")
-
 # Loading datasets
-A <- read.csv("data/SERRF_normalization/SERRF_Result_A/normalized by - SERRF.csv")
-B <- read.csv("data/SERRF_normalization/SERRF_Result_B/normalized by - SERRF.csv")
+A <- read.csv("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/SERRF_normalization/SERRF_Result_A/normalized by - SERRF.csv")
+B <- read.csv("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/SERRF_normalization/SERRF_Result_B/normalized by - SERRF.csv")
 
 ###### Filtering just the Peak intensities 
 # Find column names that match the pattern "S1_Run" at the end
