@@ -218,17 +218,27 @@ p_lowP <- make_category_plot(ratios_lowP, ncol_facet = 2)
 quartz()
 print(p_lowP)
 
+# Saave the plot
+ggsave("Fig2_lipid_ratio_linear_lowP.png", p_lowP, width = 8, height = 15, dpi = 300, bg = "white")
+
 p_lowN <- make_category_plot(ratios_lowN, ncol_facet = 2)
 quartz()
 print(p_lowN)
 
+#Save the plot
+ggsave("Fig2_lipid_ratio_linear_lowN.png", p_lowN, width = 8, height = 9, dpi = 300, bg = "white")
+
 p_cold <- make_category_plot(ratios_cold, ncol_facet = 2)
 quartz()
 print(p_cold)
+# Svae the plot
+ggsave("Fig2_lipid_ratio_linear_cold.png", p_cold, width = 8, height = 6, dpi = 300, bg = "white")
 
 p_membrane <- make_category_plot(ratios_membrane, ncol_facet = 2)
 quartz()
 print(p_membrane)
+# Save the plot
+ggsave("Fig2_lipid_ratio_linear_membrane.png", p_membrane, width = 8, height = 3, dpi = 300, bg = "white")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 7) Build one ggplot for each of the four categories (exactly as before)
