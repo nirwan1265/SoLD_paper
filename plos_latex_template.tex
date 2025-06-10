@@ -77,6 +77,7 @@
 % amsmath and amssymb packages, useful for mathematical formulas and symbols
 \usepackage{amsmath,amssymb}
 \usepackage{newunicodechar}
+\newunicodechar{Δ}{\Delta}
 \DeclareUnicodeCharacter{03B2}{\textbeta}
 \newunicodechar{₂}{$_2$}
 \newunicodechar{ }{~}
@@ -397,15 +398,21 @@ In summary, the LI condition marked a redistribution of leaf lipid TIC: the comb
 
 
 \subsection*{Effect of low input condition of lipid composition}
-\subsubsection*{Effect of low Phosphorus on lipids}
 
-Under P-deprived conditions, the leaf lipidome undergoes reorganization, marked by a significant reduction in P-containing lipids accompanied by a compensatory increase in non-P alternatives. A noticeable change in the galactolipid-to-phospholipid ratios is observed, where digalactosyldiacylglycerol (DGDG) and monogalactosyldiacylglycerol (MGDG) become dominant. The DGDG/PC and DGDG/PE ratios rise considerably (median DGDG/PC from ~2 to ~5; DGDG/PE from ~8 to 12; $p < 0.001$), indicating that DGDG, a non-P lipid, replaces PC and PE as the main components of the diacylglycerol pool. Similarly, the MGDG / PC and MGDG / PE ratios increase (from ~3 to 6 and ~12 to 16, respectively; $p < 0.001$), reinforcing the preferential accumulation of galactolipids under P stress. This remodeling suggests a metabolic reroute towards galactolipid synthesis to maintain membrane function while minimizing P dependence.
+\subsubsection*{Phosphorus limitation triggers a lipidome remodeling away from phospholipids}
 
-The lysophospholipid ratios reveal differential regulation of the phospholipid hydrolysis pathways. The LPC/PC ratio declines (from ~0.008 to 0.005; $p < 0.001$), indicting reduced turnover or suppressed PC hydrolysis. In contrast, the LPE/PE ratio exhibits a slight but significant increase (from ~0.003 to 0.004; $p < 0.05$), possibly due to selective degradation of PE or enhanced lyso-PE production under P limitation. These small changes suggest that phospholipid catabolism is selectively modulated, with PC being preserved while PE experiences mild hydrolysis.
+\subsubsection*{Galactolipids dominate the P stress response}
+Under P deprivation, diacylglycerol is redirected away from phospholipids to galactolipid synthesis. The DGDG / PC and DGDG / PE ratios increase strongly ($\Delta Z \gg 0$; $p < 0.001$). MGDG/PC and MGDG/PE increase even more drastically, indicating that DGDG and MGDG become the main structural lipids in sorghum leaf membranes when P is scarce. This reallocation of the diacylglycerol pool to non-P galactolipids helps maintain the membrane architecture without the need for additional P.
 
-A broad shift toward non-P lipids is further evidenced by the $nonP\_P\_total$ ratio, which is the proportion of non-P glycerolipids relative to total glycerolipids. This ratio nearly doubles (from ~4 to 7; $p < 0.001$), confirming a systemic preference for P-free membrane lipids under nutrient stress. Phosphatidylglycerol (PG) shows a contrasting effect: the PG/PC ratio slightly increases (from ~0.03 to 0.05; $p < 0.001$), likely because PG, a critical plastid lipid, is retained to preserve the integrity of the photosynthetic membrane despite the scarcity of P.
+\subsubsection*{Differential handling of lysophospholipids reveals metabolic prioritization}
+Although the Z-score contrast for LPC / PC does not show a significant change $\Delta Z$ - implying that PC turnover relative to LPC remains broadly stable, their TIC proportions show a drop in the share of LPC (from ~90.3\% to ~79.0\% of total lyso signal) and a corresponding increase in LPE (from ~9.7\% to ~21.0\%). In addition, the LPE / PE $\Delta Z$ ratio shows a modest but significant positive change under P limitation, suggesting selective hydrolysis of PE or slower LPE reutilization. Together, these observations point to metabolic prioritization that PC pools are actively preserved (no detectable increase in LPC/PC contrast), while PE undergoes mild deacylation (reflected in both increased LPE / PE $\Delta Z$ and a higher relative LPE fraction of TIC). This allows limited P to be recycled from PE when necessary, while protecting PC to support critical membrane functions.
 
-Although studies show sulfolipids contribute to the substitution of P, their role appears more nuanced in our experimental setup probably due to the fact N deficiency leads to decrease in sulfolipid levels. The SQDG/PC and SQDG/PE ratios decline modestly (from ~0.6 to 0.5 and ~2.5 to 1.5, respectively; $p < 0.001$), suggesting that sulfoquinovosyldiacylglycerol (SQDG) does not compensates for the depletion of phospholipids. This indicates that while sulfolipids participate in membrane adaptation, galactolipids (MGDG and DGDG) serve as the primary phospholipid substitutes under P deficiency (Fig. \ref{fig:2a_ratio_lowP}).
+\subsubsection*{Systemic shift toward P-free lipids with PG retention}
+A composite $\mathrm{nonP\_P\_total}$ metric (sum of $MGDG + DGDG + SQDG$ vs. total phospholipids) shows a large positive $\Delta Z$, confirming a global transition to P-independent membrane composition. PG / PC indicates that PG is relatively conserved even as the overall phospholipid pools shrink, which is consistent with the indispensable role of PG in photosynthetic membranes. Thus, sorghum leaves under P stress broadly replace phospholipids with galactolipids while selectively retaining some PG.
+
+\subsubsection*{Sulfolipids play limited role in P compensation}
+Although during nutrient stress sulfolipids rise and replaces PG, here SQDG/PG as well as SQDG/PC and SQDG/PE ratios shift downward (negative $\Delta Z$; $p < 0.001$), indicating that sulfoquinovosyldiacylglycerol does not significantly compensate for phospholipid depletion in sorghum leaves. Instead, galactolipids are the principal non-P substitutes in this multi-stress environment.
+
 
 %==========================================
 %  Figure 2A – Lipid-class ratios under Low P
@@ -418,11 +425,37 @@ Although studies show sulfolipids contribute to the substitution of P, their rol
 \end{figure}
 
 \subsubsection*{Effect of low Nitrogen on lipids}
-Nitrogen deprivation triggers a distinct remodeling of the leaf lipidome from the P deficiency, shifting carbon flux away from membrane lipids to storage lipids. Under low-N, the DG/PC ratio increases significantly (median ~0.5 → ~0.8, p<0.001), as does DG/Phospho (DG to total phospholipids; ~0.4 → ~0.6, p<0.001). This pattern is consistent with net deacylation of PC—liberating DG backbones that can be re-esterified into triacylglycerol. By contrast, under P deprivation we see replacement of phospholipids by galactolipids, not their breakdown into storage lipids. The DG accumulation under N stress may therefore reflect enhanced phospholipase activity or reduced PC biosynthesis, mechanisms that reroute carbon (and spare nitrogen) when amino acid synthesis is limited.
 
-A key indicator of metabolic reallocation is the stor_vs_photo ratio, which quantifies the balance between storage-lipid precursors and photosynthetic galactolipids. This ratio increases significantly (from ~0.2 to 0.35; *p < 0.001), reflecting a shift away from chloroplast membrane maintenance and toward neutral lipid biosynthesis. Unlike P limitation—where galactolipids (MGDG, DGDG) expand to maintain membrane integrity—N stress favors carbon sequestration into lipid droplets, likely to prevent toxic buildup of photosynthates when protein synthesis (an N-intensive process) is constrained.
+\subsubsection*{Nitrogen Limitation Triggers a Metabolic Shift from Membrane to Storage Lipids}
 
-The most dramatic changes occur in triacylglycerol (TAG) accumulation, as evidenced by the TG/DG and TG/PC ratios. The TG/DG ratio nearly doubles (from ~0.8 to 1.6; *p < 0.001), while TG/PC exhibits a fourfold surge (median ~0.3 to 1.2; *p < 0.001). These increases demonstrate that liberated DG backbones are rapidly esterified into TAG, a hallmark of carbon-storage responses under nutrient stress. The disproportionate rise in TG/PC further underscores the preferential breakdown of membrane PC pools to fuel TAG synthesis. This metabolic shift ensures that excess carbon—which cannot be efficiently utilized for amino acid or nucleotide synthesis under N limitation—is safely stored in lipid droplets rather than lost through futile metabolic cycles.
+Under N deprivation, the plants exhibited a lipidomic reprogramming in which membrane phospholipids are deacylated and carbon is redirected into neutral lipid (TG) synthesis. 
+
+\subsubsection{Membrane phospholipid breakdown fuels neutral lipid synthesis.}
+
+The DG/PC and DG/Phospho (sum of $PC + PG + PI$) ratios change toward positive under low N ($p < 0.001$), indicating enrichment of diacylglycerol relative to phosphatidylcholine and the total of major phospholipids. This indicates enhanced phospholipase activity (or reduced PC biosynthesis) that liberates DG backbones. Subsequently, the TG/DG and TG/PC ratios rise markedly ($p < 0.001$), demonstrating that the freed DG is actively esterified into TG. In other words, membrane phospholipids serve as carbon (and nitrogen) sources: headgroups may recycle nitrogen, while DG is repurposed toward energy storage.
+
+\subsubsection{Photosynthetic vs. storage lipid trade-off}
+
+The stor\_vs\_photo ratio ((TAG + DG)/(MGDG + PC)) increases significantly, signaling a shift away from photosynthetic membrane lipid pools (e.g., MGDG) toward storage-oriented lipids. Under N limitation, expansion of chloroplast membranes is curtailed (less need for new photosynthetic machinery when growth is restricted), and photoassimilate carbon instead accumulates as TAG. This reallocation helps prevent accumulation of excess sugars or carbon intermediates when nitrogen-dependent biosynthesis (e.g. amino acids, nucleotides) is constrained.
+
+\subsubsection*{Cold Acclimation Remodels Galactolipid Composition in Sorghum Leaves}
+
+Under cold treatment, sorghum leaves exhibit a reproducible reshaping of their galactolipid profile, as evidenced by significant shifts in all four ΔZ ratios: DGDG\_total, MGDG\_DGDG, SQDG\_DGDG, and SQDG\_MGDG (all p < 0.001). Because each lipid class sum was first Z-scored across the entire dataset, a positive ΔZ in these contrasts indicates that, in cold-acclimated samples, the numerator class is relatively enriched (in SD units) compared to the denominator class, versus control conditions. The patterns reveal a coordinated rebalancing among the three major non-phosphorous glycerolipids—digalactosyldiacylglycerol (DGDG), monogalactosyldiacylglycerol (MGDG), and sulfoquinovosyldiacylglycerol (SQDG)—that likely underpins membrane adaptation to low temperature.
+
+\paragraph{DGDG enrichment relative to the galactolipid pool (DGDG\_total).}
+The DGDG\_total ratio (DGDG/(MGDG + SQDG)) increases significantly under cold. This suggests that DGDG becomes more prominent relative to the combined pool of MGDG and SQDG. Given that DGDG tends to favor stable bilayer phases, its enrichment may help stabilize thylakoid and other plastid membranes when thermal energy is reduced. Maintaining bilayer integrity at low temperature is critical to prevent adverse phase transitions; thus, upregulating DGDG relative to other galactolipids can be viewed as a protective adjustment.
+
+\paragraph{MGDG versus DGDG balance (MGDG\_DGDG).}
+The MGDG\_DGDG contrast also shifts positively in cold leaves, indicating that MGDG is relatively elevated compared to DGDG under these conditions. Although this seems at first glance counter to the DGDG\_total increase, concurrent positive ΔZ in both ratios can arise if cold triggers a broader expansion of both galactolipids with nuanced relative magnitudes. MGDG promotes non-bilayer (hexagonal II) phases and membrane curvature, facilitating dynamic remodeling of thylakoid architecture during cold acclimation (e.g., adjusting grana stacking or membrane fusion). Thus, increased MGDG relative to DGDG may support membrane fluidity and curvature remodeling even as overall DGDG content also rises to maintain bilayer stability in bulk.
+
+\paragraph{Anionic lipid upregulation (SQDG\_DGDG).}
+The SQDG\_DGDG ratio becomes positive under cold, showing that SQDG is relatively more abundant compared to DGDG in cold-treated leaves. Sulfoquinovosyldiacylglycerol carries a negatively charged headgroup and participates in stabilizing photosystem complexes and charge balance in thylakoid membranes. Its enrichment relative to DGDG suggests that cold acclimation involves bolstering anionic lipid content, possibly to maintain electrostatic interactions with photosynthetic proteins at lower temperatures. This shift may help preserve photosystem II functionality and prevent photodamage when enzymatic repair processes slow down in the cold.
+
+\paragraph{Targeted sulfolipid adjustment (SQDG\_MGDG).}
+The SQDG\_MGDG contrast also increases, indicating SQDG enrichment relative to MGDG under cold. This reinforces that sulfolipid elevation is a distinct facet of the cold response: beyond modulating curvature or bilayer propensity via MGDG and DGDG, the plant increases anionic SQDG to support membrane protein interactions and ionic homeostasis under reduced thermal conditions. Together with the SQDG\_DGDG result, this underscores that SQDG upregulation is not simply a byproduct of galactolipid synthesis but a targeted adjustment in cold-acclimated sorghum.
+
+\paragraph{Integrated galactolipid remodeling and biological implications.}
+Collectively, these four ratio changes paint a coherent picture: cold acclimation triggers a broad remodeling of galactolipid composition, featuring simultaneous increases in DGDG (for bilayer stability), MGDG (for membrane curvature/flexibility), and especially SQDG (for anionic headgroup functions). The narrow interquartile ranges in each violin plot confirm that these shifts are highly consistent across biological replicates. Mechanistically, altering the balance among DGDG, MGDG, and SQDG likely helps the chloroplast adjust thylakoid architecture, maintain membrane fluidity, protect photosynthetic complexes, and preserve electrochemical balance at lower temperatures. Such lipid reprogramming complements known cold-responsive changes in fatty acid desaturation and protein expression, forming an integrated strategy for sorghum to sustain photosynthesis and membrane integrity under chilling stress.
 
 
 %==========================================
