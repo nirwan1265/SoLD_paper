@@ -51,30 +51,34 @@ wide_z <- bind_rows(long_ctrl, long_lowp) %>%
 # ╚══════════════════════════════════════════════════════════════════╝
 z_diff <- wide_z %>% 
   mutate(
-    ## — Low‑P contrasts (10)
+    ## — Low‑P contrasts
     DGDG_PC        = DGDG - PC,
     DGDG_PE        = DGDG - PE,
-    DGDG_PG        = DGDG - PG,
     MGDG_PC        = MGDG - PC,
     MGDG_PE        = MGDG - PE,
-    MGDG_PG        = MGDG - PG,
-    SQDG_PC        = SQDG - PC,
-    SQDG_PE        = SQDG - PE,
-    SQDG_PG        = SQDG - PG,
-    PG_PC          = PG    - PC,
-    LPC_PC         = LPC   - PC,
-    LPE_PE         = LPE   - PE,
-    nonP_P_total   = (MGDG + DGDG + SQDG)/3 - (PC + PE + PG + PA + LPC + LPE)/6,
+
+    PG_retention   = PG - (PC + PE)/2,
     
-    ## — Low‑N contrasts (5)
+    PC_PE          = PC    - PE,
+  
+    Lyso_activity  = (LPC + LPE) - (PC + PE),
+    nonP_P_total   = (MGDG + DGDG) - (PC + PE),
+    
+    # SUPPLEMENTARY FIGURE
+    #SQDG_Spared    = SQDG - (DGDG + MGDG + PG)/3,
+    #LPC_PC         = LPC   - PC,
+    #LPE_PE         = LPE   - PE,
+    
+    
+    ## — Low‑N contrasts
     TG_PC          = TG - PC,
     DG_PC          = DG - PC,
     TG_DG          = TG - DG,
-    DG_Phospho     = DG - (PC + PE + PG)/2,
-    TG_Phospho     = TG - (PC + PE + PG)/2,
+    DG_Phospho     = DG - (PC + PE)/2,
+    TG_Phospho     = TG - (PC + PE)/2,
     stor_vs_photo  = (TG + DG)/2 - (MGDG + PC)/2,
     
-    ## — Cold contrasts (4)
+    ## — Cold contrasts
     MGDG_DGDG      = MGDG - DGDG,
     SQDG_DGDG      = SQDG - DGDG,
     SQDG_MGDG      = SQDG - MGDG,
@@ -97,11 +101,15 @@ z_diff <- wide_z %>%
 # ╚══════════════════════════════════════════════════════════════════╝
 ratio_long <- z_diff %>% 
   select(Sample, Condition,
-         DGDG_PC,MGDG_PC,SQDG_PC,
-         DGDG_PE,MGDG_PE,SQDG_PE,
-         DGDG_PG,MGDG_PG,SQDG_PG,
-         LPC_PC,LPE_PE,PG_PC,
-         nonP_P_total,
+         # Low P
+         DGDG_PC,DGDG_PE,
+         MGDG_PC,MGDG_PE,
+         PG_retention,PC_PE,
+         Lyso_activity,nonP_P_total,
+         
+         # Low P supplementary 
+         #SQDG_Spared,LPC_PC,LPE_PE,
+         
          TG_PC,DG_PC,TG_DG,
          DG_Phospho,TG_Phospho,stor_vs_photo,
          MGDG_DGDG,SQDG_DGDG,SQDG_MGDG,
@@ -200,11 +208,14 @@ make_plot <- function(ratio_vec, ncol_facets){
 
 
 # groupings
-ratios_lowP <- c("DGDG_PC","MGDG_PC","SQDG_PC",
-                 "DGDG_PE","MGDG_PE","SQDG_PE",
-                 "DGDG_PG","MGDG_PG","SQDG_PG",
-                 "LPC_PC","LPE_PE","PG_PC",
-                 "nonP_P_total")
+ratios_lowP <- c("DGDG_PC","DGDG_PE",
+                 "MGDG_PC","MGDG_PE",
+                 "PG_retention","PC_PE",
+                 "Lyso_activity", "nonP_P_total")
+
+# Low P supplementary
+#ratios_lowP <- c("SQDG_Spared","LPC_PC","LPE_PE")
+
 ratios_lowN      <- c("TG_PC","DG_PC","TG_DG",
                       "DG_Phospho","TG_Phospho","stor_vs_photo")
 ratios_cold      <- c("MGDG_DGDG","SQDG_DGDG","SQDG_MGDG",
@@ -216,10 +227,12 @@ ratios_membrane  <- c("PC_PE","PC_PG","PE_PG",
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 5)  DRAW & SAVE  FIGURES                                         ║
 # ╚══════════════════════════════════════════════════════════════════╝
-p_lowP <- make_plot(ratios_lowP,     3)
+p_lowP <- make_plot(ratios_lowP,     2)
 quartz()
 p_lowP
-ggsave("Fig2a_lipid_ratio_linear_lowP.png",  p_lowP,  width = 12, height = 15, dpi = 300, bg = "white")
+ggsave("Fig2a_lipid_ratio_linear_lowP.png",  p_lowP,  width = 6, height = 12, dpi = 300, bg = "white")
+#ggsave("SupFig_lipid_ratio_linear_lowP.png",  p_lowP,  width = 9, height = 3, dpi = 300, bg = "white")
+
 
 p_lowN <- make_plot(ratios_lowN,     3)
 quartz()
