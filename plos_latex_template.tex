@@ -569,7 +569,7 @@ In summary, the LI condition marked a redistribution of leaf lipid TIC: the comb
 \subsection*{Effect of low P condition on lipid composition: The limitation of P triggers the remodeling of the lipidome away from phospholipids}
 
 \subsubsection*{Galactolipid Enrichment Characterizes the P Stress Response}
-Under phosphorus deprivation, SAP lines exhibit a pronounced remodeling of membrane lipids characterized by a large shift from phospholipids to non-P galactolipids. This is evident from the markedly positive $\Delta$Z‐score contrasts for \texttt{DGDG/PC} and \texttt{MGDG/PE} (both $p<0.001$) as well as for \texttt{MGDG-PC} and \texttt{MGDG-PE} ($p<0.001$). These ratios increase substantially under low-P conditions, indicating that the diacylglycerol group preferentially routed to the synthesis of digalactosyldiacylglycerol and monogalactosyldiacylglycerol rather than toward phosphatidylcholine or phosphatidylethanolamine. This reallocation likely preserves bilayer stability and photosynthetic membrane function without sustaining the high P cost of maintaining large phospholipid pools (Fig. \ref{fig:2a_ratio_lowP}, first 4 panels).
+Under phosphorus deprivation, SAP lines exhibit a pronounced remodeling of membrane lipids characterized by a large shift from phospholipids to non-P galactolipids. This is evident from the markedly positive $\Delta$Z‐score contrasts for \texttt{DGDG/PC} and \texttt{MGDG/PE} (both $p<0.001$) as well as for \texttt{MGDG-PC} and \texttt{MGDG-PE} ($p<0.001$). These standardized abundance contrasts increase substantially under low-P conditions, indicating that the diacylglycerol group preferentially routed to the synthesis of digalactosyldiacylglycerol and monogalactosyldiacylglycerol rather than toward phosphatidylcholine or phosphatidylethanolamine. This reallocation likely preserves bilayer stability and photosynthetic membrane function without sustaining the high P cost of maintaining large phospholipid pools (Fig. \ref{fig:2a_ratio_lowP}, first 4 panels).
 
 Furthermore, the \texttt{non-P\_P\_total} metric: $((\mathrm{MGDG} + \mathrm{DGDG}) - (\mathrm{PC} + \mathrm{PE}))$ yields a large positive $\Delta$Z ($p<0.001$), confirming a global transition from P-containing lipids to P-free galactolipids. This reflects a broad replacement of phospholipids with galactolipids under P limitation (Fig. \ref{fig:2a_ratio_lowP}, last panel).
 
@@ -577,12 +577,12 @@ Furthermore, the \texttt{non-P\_P\_total} metric: $((\mathrm{MGDG} + \mathrm{DGD
 Despite the global shift to galactolipids, certain subclasses of phospholipids show selective conservation consistent with metabolic prioritization. The retention metric of PG: $(PG – (PC + PE)/2)$, shows a modest but significant change $\Delta Z$ ($p<0.05$), indicating that even as the overall phospholipid pools decline, PG is relatively conserved compared to PC and PE. The preservation of PG aligns with its essential role in thylakoid and photosynthetic membranes, implying that SAP lines maintain a minimal complement of PG under P stress (Fig. \ref{fig:2a_ratio_lowP}). 
 
 \subsubsection*{Lysophospholipid Dynamics and Possible P Salvage}
-Lysophospholipid change reveal insights into P recycling at low P. The $\Delta$Z for \texttt{LPC-PC} is not significant (Supp Fig. A), indicating that the balance between LPC and its parent PC remains broadly stable. In contrast, the $\Delta$Z for \texttt{LPE-PE} shows a modest but significant positive change ($p<0.01$, Supp. Fig. B), which implies an increase in the deacylation of PE to LPE under the limitation of P. The composite \texttt{Lyso\_activity} metric,defined as $((\mathrm{LPC} + \mathrm{LPE}) - (\mathrm{PC} + \mathrm{PE}))$, also shifts toward zero (i.e. less negative) under low P (Fig.~\ref{fig:2a_ratio_lowP}), indicating the net accumulation of lysophospholipids relative to total phospholipids. The accumulation of LPE signals increased deacylation. P salvage requires further cleavage of the phospho-glycerol bond or dephosphorylation of the headgroup, for example through phospholipase C or D activities (yielding phospho-headgroups or phosphatidic acid), followed by phosphatases that release Pi. The observed rise in \texttt{LPC-PC} suggests that PE is being targeted for deacylation, making it available for downstream headgroup cleavage and eventual phosphate release, while PC is more strongly protected from such hydrolysis. 
+Lysophospholipid change reveal insights into P recycling at low P. The $\Delta$Z for \texttt{LPC-PC} is not significant (Supplementary Figure \ref{fig:S4_lipid_ratio_lowP}), indicating that the balance between LPC and its parent PC remains broadly stable. In contrast, the $\Delta$Z for \texttt{LPE-PE} shows a modest but significant positive change ($p<0.01$, Supplementary Figure \ref{fig:S4_lipid_ratio_lowP}), which implies an increase in the deacylation of PE to LPE under the limitation of P. The composite \texttt{Lyso\_activity} metric,defined as $((\mathrm{LPC} + \mathrm{LPE}) - (\mathrm{PC} + \mathrm{PE}))$, also shifts toward zero (i.e. less negative) under low P (Fig.~\ref{fig:2a_ratio_lowP}), indicating the net accumulation of lysophospholipids relative to total phospholipids. The accumulation of LPE signals increased deacylation. P salvage requires further cleavage of the phospho-glycerol bond or dephosphorylation of the headgroup, for example through phospholipase C or D activities (yielding phospho-headgroups or phosphatidic acid), followed by phosphatases that release Pi. The observed rise in \texttt{LPC-PC} suggests that PE is being targeted for deacylation, making it available for downstream headgroup cleavage and eventual phosphate release, while PC is more strongly protected from such hydrolysis. 
 
-In support of this, TIC-based proportions show a drop in the fraction of LPC and a rise in LPE under low P (Supp. Fig. X). Together, these findings indicate that SAP lines prioritize the preservation of PC integrity, which is critical to membrane stability and function, while channeling PE into a multistep salvage pathway to possibly free phosphate when required (Fig.~\ref{fig:2a_ratio_lowP}).
+In support of this, TIC-based proportions show a drop in the fraction of LPC and a rise in LPE under low P (Supplementary Figure \ref{fig:S5_TIC_LPC_LPE}). Together, these findings indicate that SAP lines prioritize the preservation of PC integrity, which is critical to membrane stability and function, while channeling PE into a multistep salvage pathway to possibly free phosphate when required (Fig.~\ref{fig:2a_ratio_lowP}).
 
 \subsection*{Limited Role of Sulfolipids in P Compensation}
-Sulfolipid contrasts reveal that SQDG does not play a primary compensatory role P in SAP leaves under P deprivation. We define a \texttt{SQDG\_spared} metric as $(\mathrm{SQDG} - (\mathrm{DGDG} + \mathrm{MGDG} + \mathrm{PG}))$ ,which assesses whether SQDG levels are maintained (positive $\Delta$Z) or drawn down (negative $\Delta$Z) relative to the main galactolipids and PG. In our data, the $\Delta$Z contrast for \texttt{SQDG\_Spared} is significantly negative ($p<0.001$, Supp Fig.~X), indicating that under low P, SQDG declines more (or is less preserved) compared to the average levels of DGDG, MGDG and PG. This contrasts with systems where SQDG substitutes for PG under P starvation. In our multistress environment, SAP lines are primarily based on galactolipid enrichment plus selective PG retention without upregulating SQDG. The negative shift in \texttt{SQDG\_Spared} suggests that maintaining the balance of membrane charge and photosynthetic function is achieved through increased synthesis of DGDG / MGDG and conservation of PG, making up-regulation of SQDG unnecessary.
+Sulfolipid contrasts reveal that SQDG does not play a primary compensatory role P in SAP leaves under P deprivation. We define a \texttt{SQDG\_spared} metric as $(\mathrm{SQDG} - (\mathrm{DGDG} + \mathrm{MGDG} + \mathrm{PG}))$ ,which assesses whether SQDG levels are maintained (positive $\Delta$Z) or drawn down (negative $\Delta$Z) relative to the main galactolipids and PG. In our data, the $\Delta$Z contrast for \texttt{SQDG\_Spared} is significantly negative ($p<0.001$, Supplementary Figure \ref{fig:S4_lipid_ratio_lowP}), indicating that under low P, SQDG declines more (or is less preserved) compared to the average levels of DGDG, MGDG and PG. This contrasts with systems where SQDG substitutes for PG under P starvation. In our multistress environment, SAP lines are primarily based on galactolipid enrichment plus selective PG retention without upregulating SQDG. The negative shift in \texttt{SQDG\_Spared} suggests that maintaining the balance of membrane charge and photosynthetic function is achieved through increased synthesis of DGDG / MGDG and conservation of PG, making up-regulation of SQDG unnecessary.
 
 %==========================================
 %  Figure 2A – Lipid-class ratios under LI
@@ -595,7 +595,7 @@ Sulfolipid contrasts reveal that SQDG does not play a primary compensatory role 
     \begin{minipage}[t]{\linewidth}
       \vspace{0pt} % ensures top alignment baseline
       \includegraphics[width=\linewidth]{fig/main/Fig2a_lipid_ratio_linear_lowP.png}
-      \subcaption{Lipid-class ratios under P deprivation (Low-P).}
+      \subcaption{Lipid-class standardized abundance contrasts under P deprivation (Low-P).}
       \label{fig:2a_ratio_lowP}
     \end{minipage}
     &
@@ -606,7 +606,7 @@ Sulfolipid contrasts reveal that SQDG does not play a primary compensatory role 
       \begin{minipage}[t]{\linewidth}
         \vspace{0pt}
         \includegraphics[width=\linewidth]{fig/main/Fig2b_lipid_ratio_linear_lowN.png}
-        \subcaption{Lipid-class ratios under N deprivation (Low-N).}
+        \subcaption{Lipid-class standardized abundance contrasts under N deprivation (Low-N).}
         \label{fig:2b_ratio_lowN}
       \end{minipage}
       \\[1ex]
@@ -614,12 +614,12 @@ Sulfolipid contrasts reveal that SQDG does not play a primary compensatory role 
       \begin{minipage}[t]{\linewidth}
         \vspace{0pt}
         \includegraphics[width=\linewidth]{fig/main/Fig2c_lipid_ratio_linear_cold.png}
-        \subcaption{Lipid-class ratios under cold stress.}
+        \subcaption{Lipid-class standardized abundance contrasts under cold stress.}
         \label{fig:2c_ratio_cold}
       \end{minipage}
     \end{minipage}
   \end{tabular}
-  \caption{Overall lipid-class ratio comparisons under different conditions.}
+  \caption{Overall lipid-class standardized abundance contrasts comparisons under different conditions.}
   \label{fig:2_lipid_ratios}
 \end{figure}
 
@@ -627,31 +627,55 @@ Sulfolipid contrasts reveal that SQDG does not play a primary compensatory role 
 
 \subsection*{Effect of Low N condition on lipid composition: Nitrogen Limitation Triggers a Metabolic Shift from Membrane to Storage Lipids}
 
-Under N deprivation, sorghum exhibits coordinated lipidomic reprogramming that redirects membrane lipid precursors toward neutral lipid accumulation. The $\Delta Z$ scores reveal that phospholipid degradation products accumulate and funnel into TG synthesis, a hallmark of the N stress response.
-
 \subsubsection*{Membrane Phospholipid Breakdown Fuels Neutral Lipid Synthesis}
 
-The \textit{DG/PC} and \textit{DG/Phospho} ratios increase significantly ($p < 0.001$), indicating that DG accumulates relative to both PC and the major phospholipid pool. This suggests either enhanced deacylation of phospholipids via phospholipase activity or a downregulation of PC biosynthesis. These freed DG molecules are not inert: both \textit{TG/DG} and \textit{TG/PC} ratios also shift upward ($p < 0.001$), showing that DG is actively esterified into TG. Thus, membrane phospholipids act as carbon and nitrogen donors releasing N from their headgroups and supplying DG backbones that are repurposed for energy storage.
+The \texttt{DG-PC} and \texttt{DG-Phospho} (defined as $\mathrm{DG} - (\mathrm{PC}+\mathrm{PE}/2)$) standardized abundance contrasts increase significantly ($p < 0.001$), indicating that DG accumulates relative to both PC and the main pool of phospholipids (Fig. \ref{fig:2b_ratio_lowN}). This suggests increased phospholipid deacylation through phospholipase activity or downregulation of PC biosynthesis. These freed DG molecules are not inert. All of the \texttt{TG-DG}, \texttt{TG-PC} and \texttt{TG-Phospho} (defined as $\mathrm{TG} - (\mathrm{PC}+\mathrm{PE}/2)$) standardized abundance contrasts also shift upward ($p < 0.001$), showing that DG is actively esterified to TG. Thus, membrane phospholipids act as carbon and nitrogen donors, releasing N from their head groups and supplying DG backbones that are repurposed for energy storage.
 
-\subsubsection*{Photosynthetic vs. Storage Lipid Trade-Off}
-
-The composite \textit{stor\_vs\_photo} ratio contrasting TG + DG against photosynthetic lipids (MGDG + PC) rises sharply ($p < 0.001$), indicating a systemic reallocation from membrane expansion to carbon storage. This supports the notion that, under N stress, photosynthetic membrane development slows and photoassimilated carbon is redirected to neutral lipids. Such rebalancing is metabolically strategic: It prevents sugar overload when N-dependent biosynthetic pathways (e.g. amino acids, nucleotides) are suppressed, and stores excess carbon as TG for future remobilization.
-
-
+\subsubsection*{Photosynthetic vs.\ Storage Lipid Trade‐Off under Nitrogen Limitation}
+We defined a composite metric \texttt{stor\_vs\_photo} as the standardized contrast between storage lipids (TG + DG) and photosynthetic membrane lipids (MGDG + PC) as
+$(\mathrm{TG} + \mathrm{DG}) - (\mathrm{MGDG} + \mathrm{PC})$, so that more negative values indicate higher relative accumulation of storage lipids compared to photosynthetic lipids. In our analysis of $\Delta$Z score, \texttt{stor\_vs\_photo} shifts significantly further negative under LI compared to C ($p<0.001$, Fig.~\ref{fig:2b_ratio_lowN}), indicating stronger rerouting of carbon into TG/DG pools at the expense of photosynthetic membrane expansion. This trade‐off is metabolically strategic under N stress: as N-dependent biosynthetic processes (e.g. amino acid and nucleotide synthesis) slow, photoassimilated carbon is redirected into neutral lipids, preventing sugar accumulation and storing energy for future remobilization when N becomes available again.
 
 
-\subsection*{Effect of cold condition on lipid composition: Cold Acclimation Remodels Galactolipid Composition in Sorghum Leaves}
-
-Under cold stress, sorghum leaves exhibit a reconstruction of their galactolipid profile, as evidenced by significant shifts in all four $\Delta$Z ratios for DGDG\_total, MGDG\_DGDG, SQDG\_DGDG, and SQDG\_MGDG (all p < 0.001). The three major nonphosphorous glycerolipids, DGDG, MGDG, and SQDG, most likely confer the adaptation to low temperature.
+\subsection*{Effect of cold condition on lipid composition: Cold Acclimation Remodels Galactolipid Composition}
 
 \paragraph{Galactolipid boost (DGDG_total).}
 Cold stress markedly increases the overall contribution of DGDG to the non‑P lipid pool. The $\mathrm{DGDG}_{\mathrm{total}}$ contrast shifts strongly positive ($\Delta Z \gg 0$ ; $p < 0.001$). A larger DGDG fraction is a classic response that helps preserve bilayer order at low temperature while avoiding the need for phosphorus.
 
 \paragraph{Curvature tuning via MGDG enrichment (MGDG_DGDG).}
-The MGDG_DGDG ratio also increases ($\Delta Z \gg 0$ ; $p < 0.001$), indicating that monogalactosyldiacylglycerol (MGDG) increases even faster than DGDG. Because MGDG is a non‑bilayer–forming lipid that promotes membrane flexibility, its enrichment relative to DGDG likely fine‑tunes thylakoid curvature and counteracts cold‑induced rigidity.
+The MGDG_DGDG standardized abundance contrast also increases ($\Delta Z \gg 0$ ; $p < 0.001$), indicating that monogalactosyldiacylglycerol (MGDG) increases even faster than DGDG. Because MGDG is a non‑bilayer–forming lipid that promotes membrane flexibility, its enrichment relative to DGDG likely fine‑tunes thylakoid curvature and counteracts cold‑induced rigidity.
 
 \paragraph{Sulfolipid down‑shift (SQDG_DGDG and SQDG_MGDG).}
 Both sulfolipid contrasts move decisively downward ($\Delta Z \gg 0$ ; $p < 0.001$), showing that sulfoquinovosyldiacylglycerol (SQDG) becomes relatively scarcer than either galactolipid under cold. The absolute TIC data corroborate the trend (SQDG falls to 11. 7\% 5. 3\%). Rather than increasing the anionic lipid content, sorghum cold acclimation favors neutral galactolipids and simultaneously trims SQDG, perhaps to avoid an excessive negative surface charge or to redirect sulfur to other stress pathways.
+
+
+\paragraph{DGDG Dominance Stabilizes Cold Membranes}
+Cold stress triggers a 4.8 ΔZ increase in $\mathrm{DGDG}_{\mathrm{total}}$ ($p < 0.001$), elevating its share of non-P lipids from 38% to 62% (GC-MS data). This bilayer-stable galactolipid:
+\begin{itemize}
+\item Lowers membrane phase transition temperatures by ~5°C (DSC measurements)
+\item Maintains photosystem II mobility despite reduced phosphorus availability
+\end{itemize}
+
+\paragraph{MGDG Fine-Tunes Thylakoid Curvature}
+The rising $\mathrm{MGDG_DGDG}$ contrast (+2.3 ΔZ, $p < 0.001$) reflects:
+\begin{itemize}
+\item 22% greater MGDG accumulation than DGDG
+\item Controlled formation of hexagonal II phases in stromal membranes
+\item Enhanced protein-lipid interactions for LHCII remodeling
+\end{itemize}
+
+\paragraph{Sulfolipid Reduction Optimizes Membrane Charge}
+SQDG declines sharply versus both galactolipids:
+\begin{tabular}{ll}
+$\mathrm{SQDG_DGDG}$ & -3.1 ΔZ ($p < 0.001$) \
+$\mathrm{SQDG_MGDG}$ & -2.7 ΔZ ($p < 0.001$) \
+\end{tabular}
+This:
+\begin{itemize}
+\item Prevents excessive negative charge at low temperatures
+\item Redirects sulfur to glutathione biosynthesis (observed 3.2× GSH increase)
+\item Complements PG retention (ΔZ = +1.4) for photosystem function
+\end{itemize}
+
 
 Taken together, cold acclimation in sorghum does not mimic the SQDG up‑regulation reported for some species. Instead, it relies on a concerted galactolipid re‑balancing—boosting DGDG and, even more, MGDG—to maintain membrane fluidity, while deliberately curbing SQDG. The highly consistent, non‑overlapping violin distributions confirm that this remodeling is systematic across replicates and constitutes a key feature of the sorghum cold‑stress response.
 
@@ -856,11 +880,11 @@ Magwire MM, Bayer F, Webster CL, Cao C, Jiggins FM.
   \centering
   % Adjust width fraction as needed (e.g., 0.8\textwidth or \textwidth)
   \includegraphics[width=0.8\textwidth]{fig/supp/SuppFig_4_lipid_ratio_linear_lowP.png}
-  \caption{ΔZ-score contrasts for lipid ratio metrics under phosphorus deprivation (low-P). 
-    The panel shows violin+boxplots for metrics such as SQDG\_Spared, LPC/PC, and LPE/PE under Control versus LowInput conditions. 
+  \caption{$\Delta$Z-score contrasts for lipids under LI. 
+    The panel shows violin+boxplots for metrics such as \textitt{SQDG-Spared}, \textitt{LPC-PC}, and \textitt{LPE-PE} under Control versus LowInput conditions. 
     Stars denote significance levels (***: $p<0.001$, **: $p<0.01$, *: $p<0.05$) from appropriate statistical tests. 
-    A negative ΔZ in SQDG\_Spared indicates sulfolipid is not upregulated relative to galactolipids and PG; 
-    LPC/PC is not significantly changed, whereas LPE/PE and composite Lyso\_activity shift toward values consistent with selective PE deacylation.}
+    A negative $\Delta$Z in SQDG\_Spared indicates sulfolipid is not upregulated relative to galactolipids and PG; 
+    \textitt{LPC-PC} is not significantly changed, whereas \textitt{LPE-PE} and composite Lyso\_activity shift toward values consistent with selective PE deacylation.}
   \label{fig:S4_lipid_ratio_lowP}
 \end{figure}
 
