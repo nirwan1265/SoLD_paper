@@ -180,7 +180,7 @@ make_plot <- function(ratio_vec, ncol_facets){
     scale_fill_manual(values = condition_cols) +
     scale_colour_manual(values = condition_cols) +
     labs(
-      x = "Condition",
+      x = NULL,
       y = "Δ Z-scores"
     ) +
     nature_theme +
@@ -214,7 +214,7 @@ ratios_lowP <- c("DGDG_PC","DGDG_PE",
                  "Lyso_activity", "nonP_P_total")
 
 # Low P supplementary
-#ratios_lowP <- c("SQDG_Spared","LPC_PC","LPE_PE")
+ratios_lowP <- c("SQDG_Spared","LPC_PC","LPE_PE")
 
 ratios_lowN      <- c("TG_PC","DG_PC","TG_DG",
                       "DG_Phospho","TG_Phospho","stor_vs_photo")
@@ -247,7 +247,12 @@ ggsave("Fig2c_lipid_ratio_linear_cold.png",  p_cold, width = 12, height = 6,  dp
 p_memb <- make_plot(ratios_membrane, 3)
 quartz()
 p_memb
-ggsave("Fig2d_lipid_ratio_linear_membrane.png", p_memb, width = 12, height = 9, dpi = 300, bg = "white")
+ggsave("SuppFig_lipid_ratio_linear_membrane.png", p_memb, width = 12, height = 9, dpi = 300, bg = "white")
+
+
+# ╔═══════════════════════════════════════════════════════════════════╗
+# ║ 6)   MEDIAN ΔZ PER RATIO AND CONDITION                            ║
+# ╚═══════════════════════════════════════════════════════════════════╝
 
 
 
