@@ -70,17 +70,25 @@ z_diff <- wide_z %>%
     TG_PC          = TG - PC,
     DG_PC          = DG - PC,
     TG_DG          = TG - DG,
+    DG_Phospho     = DG - (PC + PE + PG)/2,
+    TG_Phospho     = TG - (PC + PE + PG)/2,
     stor_vs_photo  = (TG + DG)/2 - (MGDG + PC)/2,
-    DG_Phospho     = DG - (PC + PE)/2,
     
     ## — Cold contrasts (4)
     MGDG_DGDG      = MGDG - DGDG,
     SQDG_DGDG      = SQDG - DGDG,
     SQDG_MGDG      = SQDG - MGDG,
     DGDG_total     = DGDG - ((MGDG + SQDG)/2),
+    MGDG_total     = MGDG - ((DGDG + SQDG)/2),
+    SQDG_total     = SQDG - ((DGDG + MGDG)/2),
     
     ## — Membrane integrity (2)
     PC_PE          = PC - PE,
+    PC_PG          = PC - PG,
+    PE_PG          = PE - PG,
+    PC_total       = (PC + PE + PG)/3,
+    PE_total       = (PC + PE + PG)/3,
+    PG_total       = (PC + PE + PG)/3,
     Lyso_ratio     = (LPC + LPE)/2 - (PC + PE + PG)/3
   )
 
@@ -89,11 +97,17 @@ z_diff <- wide_z %>%
 # ╚══════════════════════════════════════════════════════════════════╝
 ratio_long <- z_diff %>% 
   select(Sample, Condition,
-         DGDG_PC, DGDG_PE,DGDG_PG, MGDG_PC, MGDG_PE,MGDG_PG, SQDG_PC, SQDG_PE,SQDG_PG,
-         PG_PC, LPC_PC, LPE_PE, nonP_P_total,
-         TG_PC, DG_PC, TG_DG, stor_vs_photo, DG_Phospho,
-         MGDG_DGDG, SQDG_DGDG, SQDG_MGDG, DGDG_total,
-         PC_PE, Lyso_ratio) %>% 
+         DGDG_PC,MGDG_PC,SQDG_PC,
+         DGDG_PE,MGDG_PE,SQDG_PE,
+         DGDG_PG,MGDG_PG,SQDG_PG,
+         LPC_PC,LPE_PE,PG_PC,
+         nonP_P_total,
+         TG_PC,DG_PC,TG_DG,
+         DG_Phospho,TG_Phospho,stor_vs_photo,
+         MGDG_DGDG,SQDG_DGDG,SQDG_MGDG,
+         DGDG_total,MGDG_total,SQDG_total,
+         PC_PE,PC_PG,PE_PG,Lyso_ratio,
+         PC_total,PE_total,PG_total) %>% 
   pivot_longer(-c(Sample, Condition),
                names_to  = "Ratio",
                values_to = "Value") %>% 
@@ -129,8 +143,10 @@ nature_theme <- theme_minimal(12) +
         legend.position  = "none")
 
 make_plot <- function(ratio_vec, ncol_facets){
-  df_sub   <- filter(ratio_long, Ratio %in% ratio_vec)
-  stat_sub <- filter(stat_df,   Ratio %in% ratio_vec)
+  df_sub <- filter(ratio_long, Ratio %in% ratio_vec) %>%
+    mutate(Ratio = factor(Ratio, levels = ratio_vec))  # set custom facet order
+  stat_sub <- filter(stat_df, Ratio %in% ratio_vec) %>%
+    mutate(Ratio = factor(Ratio, levels = ratio_vec))  # ensure matching factor levels
   
   ggplot(df_sub, aes(x = Condition, y = Value, fill = Condition, colour = Condition)) +
     geom_violin(width = 0.9, alpha = 0.3, trim = TRUE, size = 0) +
@@ -158,12 +174,10 @@ make_plot <- function(ratio_vec, ncol_facets){
     labs(
       x = "Condition",
       y = "Δ Z-scores"
-      
     ) +
     nature_theme +
     theme(
       plot.title         = element_text(face = "bold", hjust = 0.5),
-      # Remove grey background behind facet strip labels:
       strip.background   = element_blank(),
       strip.text         = element_text(face = "bold", size = 10),
       panel.spacing      = unit(0.5, "lines"),
@@ -184,13 +198,20 @@ make_plot <- function(ratio_vec, ncol_facets){
     )
 }
 
+
 # groupings
-ratios_lowP      <- c("DGDG_PC","DGDG_PE","MGDG_PC","MGDG_PE",
-                      "SQDG_PC","SQDG_PE","PG_PC","LPC_PC","LPE_PE","DGDG_PG","MGDG_PG","SQDG_PG",
-                      "nonP_P_total")
-ratios_lowN      <- c("TG_PC","DG_PC","TG_DG","stor_vs_photo","DG_Phospho")
-ratios_cold      <- c("MGDG_DGDG","SQDG_DGDG","SQDG_MGDG","DGDG_total")
-ratios_membrane  <- c("PC_PE","Lyso_ratio")
+ratios_lowP <- c("DGDG_PC","MGDG_PC","SQDG_PC",
+                 "DGDG_PE","MGDG_PE","SQDG_PE",
+                 "DGDG_PG","MGDG_PG","SQDG_PG",
+                 "LPC_PC","LPE_PE","PG_PC",
+                 "nonP_P_total")
+ratios_lowN      <- c("TG_PC","DG_PC","TG_DG",
+                      "DG_Phospho","TG_Phospho","stor_vs_photo")
+ratios_cold      <- c("MGDG_DGDG","SQDG_DGDG","SQDG_MGDG",
+                      "DGDG_total","MGDG_total","SQDG_total")
+ratios_membrane  <- c("PC_PE","PC_PG","PE_PG",
+                      "PC_total","PE_total","PG_total",
+                      "Lyso_ratio")
 
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 5)  DRAW & SAVE  FIGURES                                         ║
@@ -198,20 +219,22 @@ ratios_membrane  <- c("PC_PE","Lyso_ratio")
 p_lowP <- make_plot(ratios_lowP,     3)
 quartz()
 p_lowP
-ggsave("Fig2a_lipid_ratio_linear_lowP.png",  p_lowP,  width = 12, height = 15, dpi = 300)
+ggsave("Fig2a_lipid_ratio_linear_lowP.png",  p_lowP,  width = 12, height = 15, dpi = 300, bg = "white")
 
-p_lowN <- make_plot(ratios_lowN,     2)
+p_lowN <- make_plot(ratios_lowN,     3)
 quartz()
 p_lowN
-ggsave("Fig2b_lipid_ratio_linear_lowN.png",  p_lowN,  width = 8, height = 9,  dpi = 300)
+ggsave("Fig2b_lipid_ratio_linear_lowN.png",  p_lowN,  width = 12, height = 6,  dpi = 300, bg = "white")
 
-p_cold <- make_plot(ratios_cold,     2)
+p_cold <- make_plot(ratios_cold,     3)
 quartz()
 p_cold
-ggsave("Fig2c_lipid_ratio_linear_cold.png",  p_cold, width = 8, height = 6,  dpi = 300)
+ggsave("Fig2c_lipid_ratio_linear_cold.png",  p_cold, width = 12, height = 6,  dpi = 300, bg = "white")
 
-p_memb <- make_plot(ratios_membrane, 2)
-ggsave("Fig2d_lipid_ratio_linear_membrane.png", p_memb, width = 8, height = 3, dpi = 300)
+p_memb <- make_plot(ratios_membrane, 3)
+quartz()
+p_memb
+ggsave("Fig2d_lipid_ratio_linear_membrane.png", p_memb, width = 12, height = 9, dpi = 300, bg = "white")
 
 
 
