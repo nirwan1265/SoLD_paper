@@ -32,7 +32,7 @@ lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normali
 
 valid_classes <- c("TG","DG","MG","PC","PE","PG","PI",
                    "LPC","LPE","DGDG","MGDG","Cer","SM","FA","SQDG","AEG")
-
+valid_classes <- c("PG","SQDG")
 #valid_classes <- c("TG","DG","MG","PC","PE",
 #                   "DGDG","MGDG","SQDG")
 
@@ -187,7 +187,8 @@ grid::grid.draw(fig1a)
 # 8.  SAVE THE PLOT
 ###############################################################################
 
-ggsave("Fig1a_lipid_species.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
+#ggsave("Fig1a_lipid_species.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
+ggsave("SuppFig_TIC_DGDG_MGDG_SQDG.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
 
 
 ################################################################################
@@ -219,8 +220,6 @@ lipid_class_info <- vroom("/Users/nirwantandukar/Library/Mobile Documents/com~ap
   transmute(Lipid = Lipids, SuperClass = Class)
 
 # keep only the five super-classes you want on the pie
-wanted_super <- c("Glycerolipid","Glycerophospholipid",
-                  "Glycoglycerolipid","Terpenoid","Tetrapyrrole")
 wanted_super <- c("Terpenoid",
                   "Glycerophospholipid",
                   "Glycerolipid",
