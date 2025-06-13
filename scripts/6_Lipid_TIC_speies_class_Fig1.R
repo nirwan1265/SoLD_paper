@@ -33,6 +33,7 @@ lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normali
 valid_classes <- c("TG","DG","MG","PC","PE","PG","PI",
                    "LPC","LPE","DGDG","MGDG","Cer","SM","FA","SQDG","AEG","PA","PS")
                    
+valid_classes <- c("LPE","LPC")
 #valid_classes <- c("PC","PE","PA","PG","PS")
 #valid_classes <- c("TG","DG","MG","PC","PE",
 #                   "DGDG","MGDG","SQDG")

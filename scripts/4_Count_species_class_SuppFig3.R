@@ -39,14 +39,48 @@ control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normali
 lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
 
 
- # ------------------------------------------------------------------------------
+# Remove PC(17:0) from control and lowinput (internal standard) from the columns
+control  <- control %>% dplyr::select(-`PC(17:0)`)
+lowinput <- lowinput %>% dplyr::select(-`PC(17:0)`)
+
+#### CHANGE THE NAME TO COMMONNAME
+# Lipid class
+lipid_class_info <- vroom::vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SoLD/data/lipid_class.csv", show_col_types = FALSE) %>%
+  dplyr::filter(!is.na(Class))
+
+
+# Create a named vector of replacements: names = original, values = new names
+name_map <- lipid_class_info %>%
+  filter(!is.na(CommonName)) %>%
+  select(Lipids, CommonName) %>%
+  deframe()  # turns it into a named vector: Lipids -> CommonName
+
+# Function to rename lipid columns in any dataset
+rename_lipid_columns <- function(df, name_map) {
+  original_names <- colnames(df)
+  
+  renamed <- original_names %>%
+    # Replace only if a match exists
+    sapply(function(x) if (x %in% names(name_map)) name_map[[x]] else x)
+  
+  # Apply renamed vector back
+  colnames(df) <- renamed
+  return(df)
+}
+
+# Apply to both control and lowinput
+control  <- rename_lipid_columns(control,  name_map)
+lowinput <- rename_lipid_columns(lowinput, name_map)
+
+colnames(lowinput)
+# ------------------------------------------------------------------------------
 # 3."Traditional” lipid classes and extractor
 # ------------------------------------------------------------------------------
 valid_classes <- c("TG","DG","MG",
                    "PC","PE","PG","PI",
                    "LPC","LPE",
                    "DGDG","MGDG",
-                   "Cer","SM","FA","DGDG","SQDG","AEG")
+                   "Cer","SM","FA","DGDG","SQDG","AEG","GalCer","FA")
 
 class_pattern <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
 
@@ -146,10 +180,16 @@ quartz()
 print(fig1a)
 
 # Save the plot
-ggsave("SuppFig_1A_Lipid_Counts.png",
+ggsave("SuppFig_3A_Lipid_Counts.png",
        plot = fig1a,
        width = 6, height = 6, dpi = 300,
        units = "in", bg = "white")  # white background for publication quality
+
+
+
+
+
+
 
 
 
@@ -160,82 +200,98 @@ ggsave("SuppFig_1A_Lipid_Counts.png",
 # Lipid class
 lipid_class_info <- vroom::vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SoLD/data/lipid_class.csv", show_col_types = FALSE) %>%
   dplyr::filter(!is.na(Class))
-unique(lipid_class_info$Class)
-unique(lipid_class_info$SubClass)
 
-# Select which class you want to work with. Here I took class
-lookup_tbl <- lipid_class_info %>%
-  dplyr::select(Lipid = Lipids, Class) %>%
-  dplyr::mutate(Lipid = str_trim(Lipid))
+# Lipid class Traditional lipids
+traditional_lipid_classes <- c("Glycerolipid", "Glycerophospholipid", "Glycoglycerolipid",
+                         "Sphingolipid", "Sterol", "Betaine lipid", "Fatty acid and derivative")
+lipid_class_traditional <- lipid_class_info %>% 
+  dplyr::filter(Class %in% traditional_lipid_classes)
 
-# Remove duplicates in the lookup table
-lookup_tbl <- lookup_tbl %>%
-  dplyr::select(Lipid, Class) %>%      # keep only mapping columns
-  dplyr::distinct(Lipid, .keep_all = TRUE)   # drop duplicates
+# Lipid class Traditional lipids
+nontraditional_lipid_class <- c("N-acylethanolamine","Terpenoid","Prenol","Tetrapyrrole","Vitamin")
+
+lipid_class_nontraditional <- lipid_class_info %>% 
+  dplyr::filter(Class %in% nontraditional_lipid_class)
 
 
-# Any lipid not in list will be tagged "Other"
-lookup_fun <- function(nms) {
-  tibble(Lipid = str_trim(nms)) %>%
-    left_join(lookup_tbl, by = "Lipid") %>%
-    mutate(Class = replace_na(Class, "Other"))
-}
+# Use this updated lipid_class_info
+lipid_class_info <- lipid_class_info %>%
+  mutate(final_name = ifelse(is.na(CommonName), Lipids, CommonName))
 
-# Count lipids per class per condition
-count_classes <- function(df, cond_label) {
-  # Extract all lipid names (all column names except the first one)
-  lipid_names <- names(df)[-1]
-  
-  # Map each lipid name to its Class, then group & summarize
-  lookup_fun(lipid_names) %>%
-    group_by(Class) %>%
-    summarise(
-      Count  = n(),
-      Lipids = paste(Lipid, collapse = ", "),
-      .groups = "drop"
+# Redefine traditional and nontraditional sets
+lipid_class_traditional <- lipid_class_info %>%
+  filter(Class %in% traditional_lipid_classes)
+
+lipid_class_nontraditional <- lipid_class_info %>%
+  filter(Class %in% nontraditional_lipid_class)
+
+# Use final_name column now
+traditional_lipids     <- lipid_class_traditional$final_name
+nontraditional_lipids  <- lipid_class_nontraditional$final_name
+
+# Assuming you renamed control/lowinput already
+trad_cols_control     <- intersect(traditional_lipids, colnames(control))
+nontrad_cols_control  <- intersect(nontraditional_lipids, colnames(control))
+
+trad_cols_lowinput    <- intersect(traditional_lipids, colnames(lowinput))
+nontrad_cols_lowinput <- intersect(nontraditional_lipids, colnames(lowinput))
+
+# Subset
+control_traditional     <- control  %>% select(Compound_Name, all_of(trad_cols_control))
+control_nontraditional  <- control  %>% select(Compound_Name, all_of(nontrad_cols_control))
+lowinput_traditional    <- lowinput %>% select(Compound_Name, all_of(trad_cols_lowinput))
+lowinput_nontraditional <- lowinput %>% select(Compound_Name, all_of(nontrad_cols_lowinput))
+
+colnames(control_traditional)
+
+# — 1. Build a lookup table from your final_name → Class
+lookup <- lipid_class_info %>%
+  mutate(final_name = ifelse(is.na(CommonName), Lipids, CommonName)) %>%
+  select(final_name, Class)
+
+# — 2. Function to count lipids by Class for any subset df
+count_classes <- function(df, cond_label, set_label) {
+  tibble(final_name = setdiff(names(df), "Compound_Name")) %>%
+    left_join(lookup, by = "final_name") %>%
+    mutate(
+      Class     = replace_na(Class, "Other"),
+      Condition = cond_label,
+      Set       = set_label
     ) %>%
-    mutate(Condition = cond_label) %>%
-    select(Class, Count, Lipids, Condition)
+    group_by(Set, Class, Condition) %>%
+    summarise(Count = n(), .groups = "drop")
 }
 
-counts_ctrl <- count_classes(control,  "Control")
-counts_low  <- count_classes(lowinput, "LowInput")
+# — 3. Get counts for all four combinations
+counts_trad     <- count_classes(control_traditional,    "Control",  "Traditional")
+counts_nontrad  <- count_classes(control_nontraditional, "Control",  "Nontraditional")
+counts_trad_L   <- count_classes(lowinput_traditional,  "LowInput", "Traditional")
+counts_nontrad_L<- count_classes(lowinput_nontraditional,"LowInput", "Nontraditional")
 
-class_counts <- bind_rows(counts_ctrl, counts_low)
-
-# Order bars by total (#Control + #LowInput)
-class_counts <- class_counts %>%
-  group_by(Class) %>%
+class_counts <- bind_rows(counts_trad, counts_trad_L,
+                          counts_nontrad, counts_nontrad_L) %>%
+  group_by(Set, Class) %>%
   mutate(total = sum(Count)) %>%
   ungroup() %>%
-  arrange(desc(total))
+  arrange(Set, desc(total)) %>%
+  mutate(Class = fct_inorder(Class))
 
+# — 4. Draw the figure, exactly in your Figure 1B style, but with one facet per Set
+offset <- max(class_counts$Count) * 0.04
 
-
-# Remove Plasticizer, Herbicide, and Surfactant from  class_counts Class column
-class_counts <- class_counts %>%
-  filter(!Class %in% c("Plasticizer", "Herbicide", "Surfactant","Functional compound","Functional agent","Organic Compound","Lipid binding protein","Phenethylamine", "Alkaloid-like compound", "Psychoactive compound","Lipid-like compound","Prenol","Dicarboxylic acid","Phenylpropanoid","Flavonoid","Organic compound","Phenol derivative","Other"))
-unique(class_counts$Class)
-# 6. Plot Figure 1B 
-# How far the numbers sit
-offset <- max(class_counts$Count) * 0.04   # 3 % of the axis length
-
-fig1b <- ggplot(class_counts,
-                aes(x = fct_reorder(Class, total, .desc = TRUE),
-                    y = Count,
-                    fill = Condition)) +
+fig1b_updated <- ggplot(class_counts,
+                        aes(x = fct_reorder(Class, total, .desc = TRUE),
+                            y = Count,
+                            fill = Condition)) +
   geom_col(position = position_dodge(width = 0.8),
            width    = 0.6,
            colour   = "black",
            linewidth = 0.25) +
-  # ---------- COUNT LABELS ---------------------------------------------------
-geom_text(aes(x = fct_reorder(Class, total, .desc = TRUE),
-              y = Count + offset,                # little nudge outside bar
-              label = Count),
-          position = position_dodge(width = 0.8),
-          hjust     = 0,
-          size      = 3.3) +
-  coord_flip(clip = "off") +                       # allow text past plotting area
+  geom_text(aes(y = Count + offset, label = Count),
+            position = position_dodge(width = 0.8),
+            hjust     = 0,
+            size      = 3.3) +
+  coord_flip(clip = "off") +
   scale_fill_manual(values = condition_colors) +
   labs(x = NULL,
        y = "Number of lipids detected") +
@@ -251,86 +307,95 @@ geom_text(aes(x = fct_reorder(Class, total, .desc = TRUE),
     legend.key.size    = unit(0.25, "cm"),
     legend.title       = element_blank(),
     axis.text.y        = element_text(face = "bold")
-  )
+  ) +
+  facet_wrap(~ Set, scales = "free_y", ncol = 1)
 
+# — 5. Display / save
 quartz()
-print(fig1b)
+print(fig1b_updated)
 
-# Save the plot
-ggsave("SuppFig_1B_Lipid_Class_Counts.png",
-       plot = fig1b,
-       width = 6, height = 6, dpi = 300,
-       units = "in", bg = "white")  # white background for publication quality
+ggsave("SuppFig3B_trad_nontrad_counts.png",
+       plot = fig1b_updated,
+       width = 6, height = 8, dpi = 300, bg = "white")
 
 
 
 
-# -------------------------------------------------------------------------------
-# 7. Supplementary Figure 3 – Common Lipids - Venn Diagram
-# -------------------------------------------------------------------------------
+
+#### VENN DIAGRAM
 
 
 
-# 1) Filter for Control, extract the “Lipids” column, split each comma‐sep string,
-#    and then unlist + unique() to get one vector of all unique lipid names
-ctrl_names <- class_counts %>%
-  filter(Condition == "Control") %>%    # keep only Control rows
-  pull(Lipids) %>%                       # extract the “Lipids” column (each element is one comma‐sep string)
-  str_split("\\s*,\\s*") %>%             # split each element on commas (allow optional spaces around “,”)
-  unlist() %>%                           # flatten into one long character vector
-  unique()                               # drop any duplicates
+library(ggvenn)
+library(patchwork)
 
-# 2) Do the same for LowInput:
-low_names <- class_counts %>%
-  filter(Condition == "LowInput") %>%
-  pull(Lipids) %>%
-  str_split("\\s*,\\s*") %>%
-  unlist() %>%
-  unique()
-
-# 2) Prepare your two vectors of lipid‐feature names:
-#    (just replace these with your actual character vectors)
-ctrl_names  <- ctrl_names   # e.g. c("LipidA","LipidB","LipidC",…)
-low_names   <- low_names    # e.g. c("LipidX","LipidY","LipidZ",…)
-
-
-fill_color <- c("Control" = "#440154FF", "LowInput" = "#FDE725FF") 
-
-# 3) Put them into a named list for ggvenn:
-venn_list <- list(
-  Control  = ctrl_names,
-  LowInput = low_names
+# 1) Build the two named lists for ggvenn()
+venn_trad <- list(
+  Control  = setdiff(names(control_traditional),    "Compound_Name"),
+  LowInput = setdiff(names(lowinput_traditional),   "Compound_Name")
 )
 
-# 4) Call ggvenn with show_percentage = TRUE, plus custom blues:
-# (3) Call ggvenn with an unnamed fill_color vector (first color → Control, second → LowInput):
-library(ggvenn)
-p <- ggvenn(
-  venn_list,
-  fill_color      = c("#440154FF", "#FDE725FF"),  # first = Control, second = LowInput
-  stroke_size     = 0.8,    # thickness of the black outlines
-  set_name_size   = 6,      # font size for “Control” / “LowInput”
-  text_size       = 5,      # font size for the region labels (counts/percentages)
-  show_percentage = TRUE    # automatically draws “count\n(XX%)” in each region
+venn_nontrad <- list(
+  Control  = setdiff(names(control_nontraditional), "Compound_Name"),
+  LowInput = setdiff(names(lowinput_nontraditional),"Compound_Name")
+)
+
+# 2) Traditional lipids Venn
+p_trad <- ggvenn(
+  venn_trad,
+  fill_color      = c("#440154FF", "#FDE725FF"),
+  stroke_size     = 0.8,
+  set_name_size   = 6,
+  text_size       = 5,
+  show_percentage = TRUE
 ) +
-  # 5) Add a title and increase margins so nothing gets clipped:
-  #ggtitle("Lipid Feature Overlap Between Conditions") +
+  ggtitle("Traditional Lipids") +
   theme(
-    plot.title      = element_text(face = "bold", hjust = 0.5, size = 14),
-    plot.margin     = margin(20, 20, 20, 20),  # extra space on all sides
+    # push circles down by adding bottom space *under* the title
+    plot.title      = element_text(
+      face   = "bold",
+      hjust  = 0.5,
+      size   = 14,
+      margin = margin(b = 20)    # <— 20 pts of space *below* the title
+    ),
+    plot.margin     = margin(t = 10, r = 20, b = 5, l = 20),
     legend.position = "none"
   )
 
-# 6) Print
-quartz()
-print(p)
+p_nontrad <- ggvenn(
+  venn_nontrad,
+  fill_color      = c("#440154FF", "#FDE725FF"),
+  stroke_size     = 0.8,
+  set_name_size   = 6,
+  text_size       = 5,
+  show_percentage = TRUE
+) +
+  ggtitle("Non-Traditional Lipids") +
+  theme(
+    plot.title      = element_text(
+      face   = "bold",
+      hjust  = 0.5,
+      size   = 14,
+      margin = margin(b = 20)    # <— same trick here
+    ),
+    plot.margin     = margin(t = 10, r = 20, b = 5, l = 20),
+    legend.position = "none"
+  )
+quartz(); print(p_trad)
+
+# 6) (Optional) Save
+# ggsave("Fig_venn_trad_nontrad.png", venn_figure, width = 10, height = 5, dpi = 300)
 
 # Save the plot
-ggsave("SuppFig_1C_Lipid_Overlap_Venn.png",
-       plot = p,
-       width = 6, height = 6, dpi = 300,
+ggsave("SuppFig_3C_Lipid_Overlap_Venn_traditional.png",
+       plot = p_trad,
+       width = 10, height = 10, dpi = 300,
        units = "in", bg = "white")  # white background for publication quality
-
+# Save the plot
+ggsave("SuppFig_3D_Lipid_Overlap_Venn_nontraditional.png",
+       plot = p_nontrad,
+       width = 10, height = 10, dpi = 300,
+       units = "in", bg = "white")  # white background for publication quality
 
 
 

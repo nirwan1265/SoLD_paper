@@ -37,7 +37,7 @@ library(viridis)
 control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
 
 lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
-colnames(control)
+colnames(lowinput)
 
 
 # Remove PC(17:0) from control and lowinput (internal standard) from the columns
@@ -122,57 +122,48 @@ lowinput_nontraditional <- lowinput %>% select(Compound_Name, all_of(nontrad_col
 
 
 
+# 1) First, make sure you have a lookup from final_name → Class:
+lookup <- lipid_class_info %>%
+  mutate(final_name = ifelse(is.na(CommonName), Lipids, CommonName)) %>%
+  select(final_name, Class)
 
-# ────────────────────────────────────────────────────────────────
-# 1.  Helper: merge two matrices that share `Compound_Name`
-#     and then log-transform all numeric columns
-# ────────────────────────────────────────────────────────────────
-make_log10_matrix <- function(df_trad, df_non, outfile, pseudo = NULL) {
-  
-  # a) merge (keeps every lipid column, no duplication of Compound_Name)
-  merged <- full_join(df_trad, df_non, by = "Compound_Name")
-  
-  # b) pick a pseudocount: half of the smallest positive value if not supplied
-  if (is.null(pseudo)) {
-    min_pos <- merged %>%
-      select(-Compound_Name) %>%
-      unlist(use.names = FALSE) %>%
-      .[. > 0] %>%
-      min(na.rm = TRUE)
-    
-    pseudo <- min_pos / 2
-  }
-  
-  # c) log10-transform every numeric column
-  log_mat <- merged %>%
-    mutate(across(-Compound_Name, ~ log10(.x + pseudo)))
-  
-  # d) save
-  write.csv(log_mat, outfile, row.names = FALSE)
-  message("✓ wrote ", outfile, "  ( pseudocount = ", signif(pseudo, 3), " )")
-  
-  invisible(log_mat)
+# 2) Grab the lipid‐column names (minus the sample ID) for each condition/set
+ctr_trad_cols   <- setdiff(names(control_traditional),    "Compound_Name")
+low_trad_cols   <- setdiff(names(lowinput_traditional),   "Compound_Name")
+ctr_non_cols    <- setdiff(names(control_nontraditional), "Compound_Name")
+low_non_cols    <- setdiff(names(lowinput_nontraditional),"Compound_Name")
+
+# 3) A helper that, for a vector of classes, builds the summary table
+make_summary <- function(classes, ctrl_cols, low_cols){
+  lapply(classes, function(cl){
+    # which lipids in this class?
+    members <- lookup %>% filter(Class == cl) %>% pull(final_name)
+    in_ctrl <- intersect(ctrl_cols, members)
+    in_low  <- intersect(low_cols,  members)
+    tibble(
+      Class            = cl,
+      Shared           = paste0(intersect(in_ctrl, in_low), collapse = "; "),
+      Unique_Control   = paste0(setdiff(in_ctrl, in_low), collapse = "; "),
+      Unique_Lowinput  = paste0(setdiff(in_low,  in_ctrl), collapse = "; ")
+    )
+  }) %>% bind_rows()
 }
 
-# ────────────────────────────────────────────────────────────────
-# 2.  Apply to your four data frames
-#     (these were created earlier in your script)
-# ────────────────────────────────────────────────────────────────
-log_control  <- make_log10_matrix(
-  control_traditional,
-  control_nontraditional,
-  "control_allLipids_log10.csv"        # <- output path
+# 4) Build both tables
+trad_summary <- make_summary(
+  traditional_lipid_classes,
+  ctr_trad_cols, low_trad_cols
 )
 
-log_lowinput <- make_log10_matrix(
-  lowinput_traditional,
-  lowinput_nontraditional,
-  "lowinput_allLipids_log10.csv"
+nontrad_summary <- make_summary(
+  nontraditional_lipid_class,
+  ctr_non_cols, low_non_cols
 )
 
+# 5) Inspect
+print(trad_summary)
+print(nontrad_summary)
 
-# Save the data
-write.csv(log_control, "Control_allLipids_log10_GWAS.csv", row.names = FALSE)
-write.csv(log_lowinput, "Lowinput_allLipids_log10_GWAS.csv", row.names = FALSE)
-
-
+# 6) (Optional) write out
+write.csv(trad_summary,    "SuppTable_1_traditional_lipid_overlap.csv",    row.names = FALSE)
+write.csv(nontrad_summary, "SuppTable_2_nontraditional_lipid_overlap.csv", row.names = FALSE)
