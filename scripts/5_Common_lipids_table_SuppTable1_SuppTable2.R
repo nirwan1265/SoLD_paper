@@ -37,7 +37,7 @@ library(viridis)
 control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
 
 lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
-colnames(lowinput)
+colnames(control)
 
 
 # Remove PC(17:0) from control and lowinput (internal standard) from the columns
