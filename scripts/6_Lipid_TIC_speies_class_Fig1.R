@@ -22,8 +22,11 @@ suppressPackageStartupMessages({
 ################################################################################
 # 1.  LOAD DATA  (Control & LowInput)
 ################################################################################
-control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
-lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
+#control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
+#lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
+control <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/control/control_all_lipids_fitted_phenotype_non_normalized.csv")
+
+lowinput <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/lowinput/lowinput_all_lipids_fitted_phenotype_non_normalized.csv")
 
 
 ################################################################################
@@ -33,7 +36,7 @@ lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normali
 valid_classes <- c("TG","DG","MG","PC","PE","PG","PI",
                    "LPC","LPE","DGDG","MGDG","Cer","SM","FA","SQDG","AEG","PA","PS")
                    
-valid_classes <- c("LPE","LPC")
+#valid_classes <- c("LPE","LPC")
 #valid_classes <- c("PC","PE","PA","PG","PS")
 #valid_classes <- c("TG","DG","MG","PC","PE",
 #                   "DGDG","MGDG","SQDG")
@@ -116,22 +119,23 @@ p_bar <- ggplot(pct_mean,
         axis.text.y    = element_text(face = "bold", size = 14),  # enlarge y‐axis tick labels
         axis.title.x   = element_text(face = "bold", size = 16)   # enlarge x‐axis label
   ) 
+
 ###############################################################################
 # 6.  NUMERIC TABLE  +  COLOUR SWATCH COLUMN FOR LEGENDS
 ###############################################################################
 
 tbl <- pct_mean %>%
   # Keep the raw numeric pct_mean so we can test < 0.05:
-  mutate(pct_numeric = pct_mean) %>%
+  dplyr::mutate(pct_numeric = pct_mean) %>%
   
   # Convert numeric → string, with "<0.1 %" whenever pct_numeric < 0.05
-  mutate(pct = case_when(
+  dplyr::mutate(pct = case_when(
     pct_numeric < 0.05 ~ "<0.1 %",
     TRUE               ~ sprintf("%.1f %%", pct_numeric)
   )) %>%
   
   # Now drop the helper column and rename Class → Species
-  select(Species = Class, Condition, pct) %>%
+  dplyr::select(Species = Class, Condition, pct) %>%
   
   # Pivot so that each row is one Species, with separate Control/LowInput columns
   pivot_wider(
@@ -141,7 +145,7 @@ tbl <- pct_mean %>%
   ) %>%
   
   # Arrange rows in the same order as classes_all (your existing palette order)
-  arrange(match(Species, classes_all))
+  dplyr::arrange(match(Species, classes_all))
 
 # ── 2. Prepend an empty “Swatch” column so we can draw coloured squares later
 tbl <- tibble(Swatch = "", !!!tbl)
@@ -189,8 +193,8 @@ grid::grid.draw(fig1a)
 # 8.  SAVE THE PLOT
 ###############################################################################
 
-#ggsave("Fig1a_lipid_species.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
-ggsave("SuppFig_TIC_PC_PA_PE_PG_PS.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
+ggsave("Fig1a_lipid_species.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
+#ggsave("SuppFig_TIC_PC_PA_PE_PG_PS.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
 
 
 ################################################################################
@@ -212,8 +216,13 @@ suppressPackageStartupMessages({
 # 2.  LOAD THE DATA
 ###############################################################################
 
-control   <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
-lowinput  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
+#control   <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
+#lowinput  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
+
+control <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/control/control_all_lipids_fitted_phenotype_non_normalized.csv")
+
+lowinput <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/lowinput/lowinput_all_lipids_fitted_phenotype_non_normalized.csv")
+
 
 
 lipid_class_info <- vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SoLD/data/lipid_class.csv",
@@ -305,15 +314,15 @@ p_sc <- ggplot(pct_SC_mean,
 ###############################################################################
 
 tbl_sc <- pct_SC_mean %>%
-  group_by(SuperClass, Condition) %>%
-  summarise(pct = mean(pct_mean), .groups = "drop") %>%
+  dplyr::group_by(SuperClass, Condition) %>%
+  dplyr::summarise(pct = mean(pct_mean), .groups = "drop") %>%
   tidyr::pivot_wider(
     names_from  = Condition,
     values_from = pct,
     values_fill = 0
   ) %>%
   # Format each numeric percentage, replacing anything < 0.05 (~0.0%) with "<0.1 %"
-  mutate(across(
+  dplyr::mutate(across(
     Control:LowInput,
     ~ case_when(
       . < 0.05 ~ "<0.1 %",
@@ -321,11 +330,11 @@ tbl_sc <- pct_SC_mean %>%
     )
   )) %>%
   # Arrange in your desired order, then rename SuperClass → Class
-  arrange(match(SuperClass, classes_all)) %>%
-  rename(Class = SuperClass) %>%
+  dplyr::arrange(match(SuperClass, classes_all)) %>%
+  dplyr::rename(Class = SuperClass) %>%
   # Add blank Swatch column and reorder
-  mutate(Swatch = "") %>%
-  select(Swatch, Class, Control, LowInput)
+  dplyr::mutate(Swatch = "") %>%
+  dplyr::select(Swatch, Class, Control, LowInput)
 
 tg_sc <- tableGrob(
   tbl_sc, rows = NULL,
@@ -481,13 +490,13 @@ make_panel <- function(df_long, super_name,
   
   ## 1-C  numeric table
   tbl <- dat %>%
-    select(SubClass, Condition, pct_mean) %>%
-    mutate(pct = sprintf("%.1f %%", pct_mean)) %>%
-    select(-pct_mean) %>%
+    dplyr::select(SubClass, Condition, pct_mean) %>%
+    dplyr::mutate(pct = sprintf("%.1f %%", pct_mean)) %>%
+    dplyr::select(-pct_mean) %>%
     pivot_wider(names_from = Condition, values_from = pct) %>%
-    arrange(match(SubClass, sub_levels)) %>%
-    mutate(Swatch = "") %>%
-    select(Swatch, SubClass, Control, LowInput)
+    dplyr::arrange(match(SubClass, sub_levels)) %>%
+    dplyr::mutate(Swatch = "") %>%
+    dplyr::select(Swatch, SubClass, Control, LowInput)
   
   tg <- tableGrob(tbl, rows = NULL,
                   theme = ttheme_minimal(base_size = 14,

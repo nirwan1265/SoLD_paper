@@ -36,8 +36,8 @@ library(viridis)
 # ------------------------------------------------------------------------------
 control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
 
-lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
-
+#lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
+lowinput <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/lowinput/lowinput_all_lipids_fitted_phenotype_non_normalized.csv")
 
 # Remove PC(17:0) from control and lowinput (internal standard) from the columns
 control  <- control %>% dplyr::select(-`PC(17:0)`)
@@ -51,8 +51,8 @@ lipid_class_info <- vroom::vroom("/Users/nirwantandukar/Library/Mobile Documents
 
 # Create a named vector of replacements: names = original, values = new names
 name_map <- lipid_class_info %>%
-  filter(!is.na(CommonName)) %>%
-  select(Lipids, CommonName) %>%
+  dplyr::filter(!is.na(CommonName)) %>%
+  dplyr::select(Lipids, CommonName) %>%
   deframe()  # turns it into a named vector: Lipids -> CommonName
 
 # Function to rename lipid columns in any dataset
