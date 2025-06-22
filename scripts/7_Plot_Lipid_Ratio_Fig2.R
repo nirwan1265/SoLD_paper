@@ -119,12 +119,12 @@ ratio_tbl <- wide_log %>%
     
     ### Lipid Turnover and Signaling
     
-    ## 1. Lysophospholipids
+    ## 1. Lysophospholipids Remodeling
     LPC_PC       = LPC - PC,
     LPE_PE       = LPE - PE,
     Lyso_activity = (LPC + LPE) - (PC + PE), # Global phospholipase activity
     
-    ## 2. Diacylglycerol_Flux Hub
+    ## 2. Diacylglycerol Flux Hub
     DG_MGDG    = DG   - MGDG, # Precursor flux to galactolipids
     DG_DGDG    = DG   - DGDG,
     DG_SQDG    = DG   - SQDG,
@@ -138,10 +138,13 @@ ratio_tbl <- wide_log %>%
     
     ## 1. Storage Lipid Reallocation
     TG_DG        = TG  - DG, # DAG→TAG conversion efficiency
-    TG_Phospho   = TG  - ((PC + PE + PG) / 3),
+    TG_Phospho   = TG  - ((PC + PE) / 2), # Storage vs. membrane lipids
+    DG_to_Gala   = DG - ((MGDG + DGDG)/2), # Precursor flux to galactolipids
+    TG_Galacto   = TG - (MGDG + DGDG)/2,  # Storage vs. chloroplast lipids
     
-    ## 2. Photosynthesis VS Storage
-    stor_vs_photo = ((TG + DG) / 2) - ((MGDG + PC) / 2) # Carbon sink vs structural investment
+    ## 2. Metabolic Trade-offs
+    Storage_vs_Membrane = (TG + DG)/2 - (PC + PE)/2,        # Carbon storage vs. membranes
+    Storage_vs_Photo    = (TG + DG)/2 - (MGDG + DGDG)/2,    # Storage vs. photosynthetic machinery
     
   )
 
@@ -160,16 +163,18 @@ ratio_long <- ratio_tbl %>%
                 PC_PE, PC_PG, PG_retention,
                 # Sulfolipid Adjustments
                 SQDG_PC, SQDG_PG, SQDG_DGDG, SQDG_MGDG, SQDG_total,
-                # Lysophospholipids
+                # Lysophospholipids Remodeling 
                 LPC_PC, LPE_PE, Lyso_activity,
-                # Diacylglycerol_Flux Hub
+                # Diacylglycerol Flux Hub
                 DG_MGDG, DG_DGDG, DG_SQDG, DG_Phospho, DG_PC, DG_PE,
                 # Storage Lipid Reallocation
-                TG_DG, TG_Phospho,
-                # Carbon sink and allocation
-                stor_vs_photo
+                TG_DG, TG_Phospho,DG_to_Gala,TG_Galacto,
+                # Metabolic Trade-offs
+                Storage_vs_Membrane,Storage_vs_Photo
+               
+
                 
-                
+                                
   ) %>%
   pivot_longer(-c(Sample, Condition),
                names_to = "Ratio", values_to = "Value") %>%
@@ -207,8 +212,9 @@ turn_diacylglycerol<- c("DG_MGDG","DG_DGDG","DG_SQDG","DG_Phospho","DG_PC","DG_P
 
 
 ### Carbon sink and allocation
-carbon_storage     <- c("TG_DG","TG_Phospho")
-carbon_photo       <- c("stor_vs_photo")
+carbon_storage     <- c("TG_DG","TG_Phospho","DG_to_Gala","TG_Galacto")
+carbon_photo       <- c("Storage_vs_Membrane","Storage_vs_Photo")
+
 
 
 # ╔══════════════════════════════════════════════════════════════════╗
@@ -322,7 +328,7 @@ ggsave("nested_lipid_remodeling_analysis.png", p_nested,
 # Define a lookup, e.g. via a named vector or case_when:
 ratio_to_group2 <- function(r) {
   if (r %in% turn_lysophospho) {
-    "Lipid Turnover and Signaling"
+    "Lysophospholipids Remodeling"
   } else if (r %in% turn_diacylglycerol) {
     "Diacylglycerol Flux Hub"
   } else {
@@ -335,7 +341,7 @@ ratio_long3 <- ratio_long %>%
   mutate(Group = vapply(Ratio, ratio_to_group2, character(1))) %>%
   filter(!is.na(Group)) %>%
   mutate(Group = factor(Group, levels = c(
-    "Lipid Turnover and Signaling",
+    "Lysophospholipids Remodeling",
     "Diacylglycerol Flux Hub"
   )))
 
@@ -344,7 +350,7 @@ stat_df3 <- stat_df %>%
   mutate(Group = vapply(Ratio, ratio_to_group2, character(1))) %>%
   filter(!is.na(Group)) %>%
   mutate(Group = factor(Group, levels = c(
-    "Lipid Turnover and Signaling",
+    "Lysophospholipids Remodeling",
     "Diacylglycerol Flux Hub"
   )))
 
@@ -403,11 +409,12 @@ ratio_to_group3 <- function(r) {
   if (r %in% carbon_storage) {
     "Storage Lipid Reallocation"
   } else if (r %in% carbon_photo) {
-    "Photosynthesis vs Storage"
+    "Metabolic Trade-offs"
   } else {
     NA_character_
   }
 }
+
 
 # Apply the function to create a new column in ratio_long
 ratio_long4 <- ratio_long %>%
@@ -415,7 +422,7 @@ ratio_long4 <- ratio_long %>%
   filter(!is.na(Group)) %>%
   mutate(Group = factor(Group, levels = c(
     "Storage Lipid Reallocation",
-    "Photosynthesis vs Storage"
+    "Metabolic Trade-offs"
   )))
 # Apply the function to create a new column in stat_df
 stat_df4 <- stat_df %>%
@@ -423,7 +430,7 @@ stat_df4 <- stat_df %>%
   filter(!is.na(Group)) %>%
   mutate(Group = factor(Group, levels = c(
     "Storage Lipid Reallocation",
-    "Photosynthesis vs Storage"
+    "Metabolic Trade-offs"
   )))
 # Plotting
 p_nested3 <- ggplot(ratio_long4, aes(Condition, Value, fill = Condition, colour = Condition)) +
@@ -467,7 +474,7 @@ p_nested3 <- ggplot(ratio_long4, aes(Condition, Value, fill = Condition, colour 
 quartz(width = 12, height = 6)
 print(p_nested3)
 ggsave("nested_lipid_carbon_analysis.png", p_nested3,
-       width = 6, height = 6, units = "in", dpi = 300, bg = "white")
+       width = 10, height = 6, units = "in", dpi = 300, bg = "white")
 
 
 
