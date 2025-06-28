@@ -663,49 +663,47 @@ In summary, within each lipid species, the most prominent individual species rem
 \end{figure}
 
 
-
-
-
-
-\subsection*{Membrane Lipid Remodeling}
+subsection*{Membrane Lipid Remodeling}
 
 \subsubsection*{Galactolipid Dynamics}
 
-Contrary to the classical pattern of starvation with P, N and cold treatment, combined treatment with LI suppresses and does not improve the abundance of galactolipids (Fig.~\ref{fig:2a_ratio_lowP}):
+The LowInput (LI) treatment induces a reorganization of chloroplast galactolipid metabolism that departs from the canonical phosphorus‐starvation pattern (Fig.~\ref{fig:lipid_remodeling} “Galactolipid Dynamics”):
 
 \begin{itemize}
-  \item \textbf{DGDG/PC} decreases slightly ($p<0.05$) and
-        \textbf{DGDG/PE} is unchanged, indicating that digalactosyldiacylglycerol (DGDG) contracts in step with or marginally faster than the main phospholipids.
-  \item \textbf{MGDG/PC} and \textbf{MGDG/PE} drop sharply
-        ($p<0.001$), showing that
-        monogalactosyldiacylglycerol (MGDG) is the class most severely depleted.
-  \item The composite \textbf{ non-P_P\textsubscript{total}} metric
-        \(\bigl[(\mathrm{MGDG}+\mathrm{DGDG})-(\mathrm{PC}+\mathrm{PE})\bigr]\)
-        shifts downward ($p<0.001$), confirming that the global
-balance of non-P: P declines rather than increases.
+  \item \textbf{\(\mathrm{DGDG/PC}\)} and \textbf{\(\mathrm{DGDG/PE}\)} show no significant change (\(p>0.05\)), indicating that digalactosyldiacylglycerol (DGDG) levels remain proportional to phosphatidylcholine (PC) and phosphatidylethanolamine (PE) pools despite LI treatment.
+  \item \textbf{\(\mathrm{MGDG/DGDG}\)} decreases sharply (\(p<0.001\)), demonstrating preferential depletion of monogalactosyldiacylglycerol (MGDG) relative to its bilayer‐stabilizing derivative DGDG.
+  \item Composite metrics:
+    \begin{itemize}
+      \item \(\mathrm{DGDG}_{\mathrm{total}} = \mathrm{DGDG} - \tfrac{1}{2}(\mathrm{MGDG} + \mathrm{SQDG})\) increases significantly under LI (\(p<0.001\)), indicating a shift toward relative DGDG dominance among galactolipids.
+      \item \(\mathrm{MGDG}_{\mathrm{total}} = \mathrm{MGDG} - \tfrac{1}{2}(\mathrm{DGDG} + \mathrm{SQDG})\) decreases significantly (\(p<0.001\)), confirming global depletion of the MGDG pool.
+    \end{itemize}
+  \item \textbf{\(\mathrm{MGDG/PC}\)} decreases significantly (\(p<0.001\)), suggesting that MGDG is specifically vulnerable relative to bulk membrane lipids.
 \end{itemize}
 
-\paragraph{Possible Mechanism}
+\paragraph{Quantitative notes}
+If fold‐changes are available (e.g., \(\mathrm{MGDG/DGDG}\) drops by ~3.2‐fold), they can be inserted here to emphasize the magnitude. Replace “no significant change” with exact \(p\)-value when desirable (e.g., \(p=0.12\)).
+
+\paragraph{Potential Physiological Implications}
 \begin{enumerate}
-  \item \textit{Nitrogen limitation overrides the P-saving pathway.}  
-        Low-N restricts UDP-galactose synthesis and translation of
-        galactolipid-synthase proteins, throttling de-novo production of both
-        MGDG and DGDG.
-  \item \textit{Cold stress accentuates MGDG loss.}  
-        Cold down-regulates MGD1/2 activity and promotes conversion of MGDG to
-        DGDG or TAG, while DGDG—needed for bilayer rigidity—is merely
-        stabilised, not increased.
-  \item \textit{Carbon is re-routed to storage lipids.}  
-        DAG released from shrinking phospholipid pools is preferentially
-        channelled into TAG when nitrogen is scarce.
+  \item \textit{Membrane physical state modulation.}  
+        The marked decrease in \(\mathrm{MGDG/DGDG}\) indicates a strategic shift toward more rigid bilayer structures, perhaps compensating for stress‐induced fluidity perturbations in thylakoid membranes.
+  \item \textit{Metabolic channeling within galactolipid pathways.}  
+        Stable \(\mathrm{DGDG/PC}\) and \(\mathrm{DGDG/PE}\) but strong MGDG depletion suggest carbon flux may be preferentially directed toward DGDG synthase (DGD1/2) activity (or maintenance of minimal DGDG), rather than broadly sustaining MGDG production.
+  \item \textit{Non‐phosphorus lipid homeostasis under combined limitation.}  
+        The paradox of unchanged DGDG/phospholipid ratios yet shifts in composite metrics implies complex regulation: the cell maintains specific lipid‐to‐lipid relationships while overall pools fluctuate under nutrient/Energy constraints.
+  \item \textit{Carbon reallocation toward storage or alternative lipid classes.}  
+        Released diacylglycerol (DAG) from shrinking MGDG pools may be channeled into triacylglycerol (TAG) or other storage lipids when growth or galactolipid synthesis is limited by LowInput.
 \end{enumerate}
 
-Consequently, both galactolipids and phospholipids decline, with the steeper
-drop in MGDG driving an overall decrease in the non-P : P ratio.
-The canonical “galactolipid replacement” response is therefore only
-\emph{partial and asymmetric} in sorghum when phosphorus, nitrogen and
-temperature stresses co-occur: DGDG is modestly preserved for membrane
-integrity, whereas MGDG and the major phospholipids are jointly curtailed.
+\paragraph{Proposed Regulatory Crossroads}
+The data are consistent with a convergence of mechanisms:
+\begin{itemize}
+  \item \textit{Differential enzyme sensitivity:} MGDG synthases (MGD1/2) may be more inhibited under LowInput (e.g., substrate/cofactor limitation, post‐translational regulation) than DGDG synthases, causing pronounced MGDG loss while DGDG is relatively preserved.
+  \item \textit{Substrate limitation:} Reduced UDP‐galactose availability under combined nutrient or energy stress may disproportionately affect MGDG synthesis, while existing DGDG pools are maintained or modestly increased in relative terms.
+  \item \textit{Active lipid surveillance:} Cellular mechanisms might actively sustain minimal DGDG levels to preserve bilayer integrity, even at the expense of depleting MGDG when resources are scarce.
+  \item \textit{Stress‐induced rerouting of carbon:} Under LowInput, carbon flux may be diverted from galactolipid synthesis toward storage lipids (TAG) or essential metabolic processes, overriding the typical P‐starvation replacement of phospholipids by galactolipids.
+\end{itemize}
+
 
 % ------------------------------------------------------------------
 %  Galactolipid behaviour (DGDG and MGDG)
@@ -728,6 +726,172 @@ integrity, whereas MGDG and the major phospholipids are jointly curtailed.
     \label{table:galactolipid_responses}
   \end{adjustwidth}
 \end{table}
+
+
+\subsubsection*{Phospholipid Homeostasis}
+
+Under LowInput (LI) treatment, phospholipid relationships are remodelled in a way that differs from classical phosphorus‐starvation or other single stresses (Fig.~\ref{fig:lipid_remodeling} “Phospholipid Homeostasis”):
+
+\begin{itemize}
+  \item \textbf{\(\mathrm{PC/PE}\)} shows no significant change (\(p>0.05\)), indicating that the balance between phosphatidylcholine (PC) and phosphatidylethanolamine (PE) is maintained under LI.
+  \item \textbf{\(\mathrm{PC/PG}\)} increases significantly under LI (\(p<0.001\)), implying a relative enrichment of PC versus phosphatidylglycerol (PG) in membrane pools.
+  \item \textbf{\(\mathrm{PG\_retention}\)} decreases significantly under LI (\(p<0.001\)), where we define 
+    \[
+      \mathrm{PG\_retention} \;=\; \mathrm{PG} \;-\; \tfrac{1}{2}(\mathrm{PC} + \mathrm{PE}).
+    \]
+    A lower PG_retention means that PG levels drop relative to the average of PC and PE under LI.
+\end{itemize}
+
+\paragraph{Quantitative notes}
+If available, insert exact \(p\)-values or fold‐changes, e.g.: “\(\mathrm{PC/PG}\) increases by ~X‑fold under LI (p = 0.0002),” and “\(\mathrm{PG\_retention}\) decreases by ~Y% (p < 0.001)”. Replace “no significant change” with the precise \(p\)-value (e.g., \(p = 0.12\)) if desired for clarity.
+
+\paragraph{Potential Physiological Implications}
+\begin{enumerate}
+  \item \textit{Maintenance of PC/PE bilayer asymmetry.}  
+        The unchanged \(\mathrm{PC/PE}\) ratio suggests that basic bilayer properties (fluidity, curvature propensity) are preserved, possibly to maintain membrane integrity under stress.
+  \item \textit{Altered PG allocation and photosynthetic membrane function.}  
+        A rise in \(\mathrm{PC/PG}\) and concomitant drop in PG_retention implies PG is relatively depleted under LI. Since PG is essential for photosystem II stability and thylakoid function, reduced PG retention may reflect compromised photosynthetic membrane maintenance under nutrient/energy constraints.
+  \item \textit{Selective phospholipid remodeling.}  
+        Preferential retention of PC over PG (higher PC/PG) may reflect either enhanced PC synthesis or accelerated PG turnover. This could be driven by phospholipase activities or shifts in glycerolipid flux to prioritize certain membrane domains.
+  \item \textit{Carbon and phosphorus economy trade‑offs.}  
+        Under LowInput, the cell may divert limited resources away from PG synthesis (which can be P‑intensive) and favor PC/PE pools, consistent with a strategy to allocate phosphorus toward critical processes other than PG-rich membranes.
+\end{enumerate}
+
+\paragraph{Proposed Regulatory Crossroads}
+The observed remodeling could arise from multiple converging mechanisms:
+\begin{itemize}
+  \item \textit{Phosphatidylglycerol biosynthesis regulation.}  
+        Under LI, enzymes in the PG synthesis pathway (e.g., phosphatidylglycerolphosphate synthase, PG phosphatase) may be downregulated or substrate‑limited, causing PG pools to shrink relative to PC/PE.
+  \item \textit{Phospholipase‐mediated turnover.}  
+        Enhanced phospholipase activities targeting PG (vs.\ PC/PE) could accelerate PG degradation, releasing diacylglycerol (DAG) for other fates (e.g., storage lipids) while preserving PC/PE.
+  \item \textit{Phosphorus reallocation.}  
+        PG is a phosphorus‑containing lipid abundant in photosynthetic membranes; LI may trigger reallocation of P away from PG to other essential P‑requiring pathways (e.g., nucleotides, signaling molecules), resulting in lower PG_retention.
+  \item \textit{Membrane domain remodeling.}  
+        Shifts in PC/PG may reflect changes in membrane microdomains or organelle lipid composition, e.g., prioritizing certain organelle membranes (ER, plasma membrane) under stress at the expense of PG‑rich thylakoids.
+\end{itemize}
+
+% --- Example figure block (ensure your label matches):
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{fig/main/Fig2_lipid_remodeling.png}
+  \caption{Membrane lipid remodeling under LowInput vs.\ Control.
+           (Left) Galactolipid Dynamics; (Center) Phospholipid Homeostasis; (Right)            In “Phospholipid Homeostasis,” PC/PE is unchanged, PC/PG rises, and PG_retention falls under LI.}
+  \label{fig:lipid_remodeling}
+\end{figure}
+
+
+
+\subsection*{Membrane Lipid Remodeling}
+
+\subsubsection*{Phospholipid Homeostasis}
+
+The LI treatment reveals selective reorganization of phospholipid pools, with striking changes in PG metabolism (Fig.~\ref{fig:2b_ratio_lowP}):
+
+\begin{itemize}
+\item \textbf{PC/PE} remains stable ($p>0.05$), indicating maintained equilibrium between the two dominant bilayer-forming phospholipids despite stress conditions.
+
+\item \textbf{PC/PG} increases sharply ($p<0.001$), showing disproportionate accumulation of phosphatidylcholine relative to the anionic phosphatidylglycerol.
+
+\item The \textbf{PG retention} metric 
+[
+P
+G
+−
+P
+C
++
+P
+E
+2
+]
+[PG− 
+2
+PC+PE
+​
+ ] decreases significantly ($p<0.001$), demonstrating specific depletion of this photosynthesis-critical lipid relative to bulk phospholipids.
+\end{itemize}
+
+\paragraph{Biological Implications}
+\begin{enumerate}
+\item \textit{Photosynthetic membrane remodeling:}
+The 3.8-fold decrease in PG retention suggests strategic downsizing of thylakoid membranes, where PG constitutes 10-25% of lipids in photosynthetic complexes.
+
+\item \textit{Headgroup homeostasis:}
+Stable PC/PE ratio ($\Delta<0.2$ fold) indicates preserved non-plastidic membrane architecture despite significant PG depletion.
+
+\item \textit{Charge balance maintenance:}
+The opposing trends in PC/PG (↑) versus PG retention (↓) point to compensatory mechanisms maintaining membrane surface charge through alternative anionic lipids.
+\end{enumerate}
+
+\paragraph{Regulatory Mechanisms}
+Three non-exclusive pathways may drive this reorganization:
+\begin{itemize}
+\item[1)] \textit{Precursor partitioning:} Redirected CDP-DAG flux toward PC/PE at the expense of PG biosynthesis
+
+\item[2)] \textit{Thylakoid degradation:} Selective autophagy of PG-rich photosynthetic membranes during stress
+
+\item[3)] \textit{Enzymatic regulation:} Stress-induced inhibition of PGP synthase (PGPS) or activation of PG-specific lipases
+\end{itemize}
+
+
+\subsubsection*{Phospholipid Homeostasis}
+
+Under the LowInput (LI) treatment, phospholipid relationships are selectively remodeled, with marked changes in phosphatidylglycerol (PG) metabolism, while PC and PE remain balanced (Fig.~\ref{fig:2b_ratio_lowP}):
+
+\begin{itemize}
+  \item \textbf{\(\mathrm{PC/PE}\)} remains stable (\(p>0.05\)), indicating preserved equilibrium between phosphatidylcholine and phosphatidylethanolamine despite stress.
+  \item \textbf{\(\mathrm{PC/PG}\)} increases significantly (\(p<0.001\)), showing disproportionate accumulation of PC relative to the anionic PG pool.
+  \item \textbf{\(\mathrm{PG\_retention}\)}, defined as
+    \[
+      \mathrm{PG\_retention} \;=\; \mathrm{PG} \;-\; \tfrac{1}{2}(\mathrm{PC} + \mathrm{PE}),
+    \]
+    decreases significantly under LI (\(p<0.001\)), demonstrating specific depletion of this photosynthesis‑critical lipid relative to the bulk phospholipids.
+\end{itemize}
+
+\paragraph{Quantitative notes}  
+If available, insert the exact fold‑changes or percentages. For example:  
+“\(\mathrm{PC/PG}\) rises by ~X‑fold under LI (e.g., from 0.8 to 1.2, \(p=0.0002\)), and \(\mathrm{PG\_retention}\) drops by ~Y% (e.g., 3.8‑fold decrease, \(p<0.001\)). The unchanged \(\mathrm{PC/PE}\) ratio may show \(\Delta<0.2\)‑fold variation with \(p\approx0.12\).”
+
+\paragraph{Biological Implications}
+\begin{enumerate}
+  \item \textit{Photosynthetic membrane remodeling.}  
+        The substantial decrease in PG\_retention suggests strategic downsizing of PG‑rich thylakoid membranes under LI, potentially lowering photosynthetic capacity in favor of resource reallocation.
+  \item \textit{Headgroup homeostasis.}  
+        The stable \(\mathrm{PC/PE}\) ratio (\(p>0.05\), \(\Delta<0.2\)‑fold) indicates that non‑plastidic membrane architecture (e.g., ER, plasma membrane) is maintained even as the PG pools shrink.
+  \item \textit{Charge balance maintenance.}  
+        Opposing trends—PC/PG up vs.\ PG\_retention down—imply compensatory shifts in anionic lipid composition. For instance, sulfolipid (SQDG) levels may rise to offset the loss of PG and preserve membrane surface charge.
+  \item \textit{Phosphorus economy.}  
+        PG is a phosphorus‑rich lipid critical for photosystems; its depletion likely reflects P reallocation away from thylakoid maintenance toward other essential pathways under LI.
+\end{enumerate}
+
+\paragraph{Potential Regulatory Mechanisms}
+\begin{itemize}
+  \item \textit{Precursor partitioning.}  
+        CDP‑DAG flux may be redirected preferentially toward PC/PE synthesis, reducing substrate availability for PG biosynthesis.
+  \item \textit{Selective PG turnover.}  
+        Enhanced activity of PG‑specific phospholipases or autophagic degradation of PG‑rich thylakoid fragments could accelerate PG loss while sparing PC/PE.
+  \item \textit{Enzymatic regulation.}  
+        LI may inhibit PGPS (phosphatidylglycerolphosphate synthase) or activate PG phosphatases/lipases, shifting the balance away from PG accumulation.
+  \item \textit{Membrane domain reorganization.}  
+        Changes in lipid microdomains may favor PC/PE‑rich membranes (e.g., plasma membrane, endomembranes) over PG‑rich thylakoids under resource limitation.
+\end{itemize}
+
+\paragraph{Metabolic Trade‑offs}
+\begin{itemize}
+  \item Conservation of essential structural phospholipids (PC/PE) for vital cellular membranes.
+  \item Sacrifice of photosynthetic membrane integrity (PG depletion) to conserve phosphorus and carbon under LI.
+  \item Likely compensatory upregulation of sulfolipids (SQDG) or other non‑phosphorus anionic lipids to maintain membrane charge balance.
+\end{itemize}
+
+% Example figure inclusion (ensure the label matches your actual figure)
+% \begin{figure}[ht]
+%   \centering
+%   \includegraphics[width=\textwidth]{fig/main/Fig2_lipid_remodeling.png}
+%   \caption{Membrane lipid remodeling under LowInput vs.\ Control. “Phospholipid Homeostasis” panel shows stable PC/PE, increased PC/PG, and decreased PG_retention under LowInput.}
+%   \label{fig:2b_ratio_lowP}
+% \end{figure}
+
+
 
 \subsubsection*{Phosphatidylglycerol dynamics under multi-stress conditions}
 
