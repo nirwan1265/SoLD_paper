@@ -35,16 +35,15 @@ library(viridis)
 # 2. Read in the data
 # ------------------------------------------------------------------------------
 # control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
-
-control  <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
-colnames(control)[1] <- "Compound_Name"  
-
-
 #lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
 # lowinput <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/lowinput/lowinput_all_lipids_fitted_phenotype_non_normalized.csv")
 
+# Control
+control  <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
+colnames(control)[1] <- "Compound_Name"  
+
+# Lowinput
 lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
-colnames(lowinput)
 colnames(lowinput)[1] <- "Compound_Name"  
 
 # Remove PC(17:0) from control and lowinput (internal standard) from the columns
@@ -207,7 +206,7 @@ ggsave("SuppFig_3A_Lipid_Counts.png",
 
 # Lipid class Traditional lipids
 traditional_lipid_classes <- c("Glycerolipid", "Glycerophospholipid", "Glycoglycerolipid",
-                         "Sphingolipid", "Sterol", "Betaine lipid", "Fatty acid and derivative")
+                         "Sphingolipid", "Sterol", "Fatty acid and derivative")
 lipid_class_traditional <- lipid_class_info %>% 
   dplyr::filter(Class %in% traditional_lipid_classes)
 
@@ -319,7 +318,7 @@ fig1b_updated <- ggplot(class_counts,
 quartz()
 print(fig1b_updated)
 
-ggsave("SuppFig3B_trad_nontrad_counts.png",
+ggsave("SuppFig_3B_trad_nontrad_counts.png",
        plot = fig1b_updated,
        width = 6, height = 8, dpi = 300, bg = "white")
 

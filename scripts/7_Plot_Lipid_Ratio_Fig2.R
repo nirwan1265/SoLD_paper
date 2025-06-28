@@ -18,12 +18,11 @@ library(ggh4x)
 # ╚══════════════════════════════════════════════════════════════════╝
 
 # Read the raw files 
-ctrl_file <- "/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/control/control_all_lipids_fitted_phenotype_non_normalized.csv"
+control  <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
+colnames(control)[1] <- "Compound_Name"  
 
-lowp_file <- "/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/lowinput/lowinput_all_lipids_fitted_phenotype_non_normalized.csv"
-
-control  <- vroom(ctrl_file,  show_col_types = FALSE)
-lowinput <- vroom(lowp_file,  show_col_types = FALSE)
+lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
+colnames(lowinput)[1] <- "Compound_Name"  
 
 # Valid classes
 valid_classes <- c("TG","DG","MG",

@@ -1,201 +1,116 @@
-# ──────────────────────────────────────────────────────────────
-#  0)  PACKAGES  (only ggplot2 & dplyr beyond what you loaded)
-# ──────────────────────────────────────────────────────────────
-library(dplyr)
-library(tidyr)
-library(stringr)
-library(ggplot2)
-library(forcats)
-library(scales)
-
-# ──────────────────────────────────────────────────────────────
-#  1)  READ RAW INTENSITIES  (same paths as before)
-# ──────────────────────────────────────────────────────────────
-
-ctrl_file  <- "/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv"
-
-lowp_file <- "/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv"
-
-
-control   <- vroom::vroom(ctrl_file,  show_col_types = FALSE) %>%
-  mutate(Condition = "Control")
-lowinput  <- vroom::vroom(lowp_file,  show_col_types = FALSE) %>%
-  mutate(Condition = "LowInput")
-
-# Remove PC(17:0) from control and lowinput (internal standard) from the columns
-control  <- control %>% dplyr::select(-`PC(17:0)`)
-lowinput <- lowinput %>% dplyr::select(-`PC(17:0)`)
-
-
-raw_all   <- bind_rows(control, lowinput)
-
-
-valid_classes <- c("TG","DG","MG",
-                   "PC","PE","PI",
-                   "DGDG","MGDG",
-                   "SQDG","SM","AEG",
-                   "LPC","LPE","PG","PA")
-class_pat <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
-
-library(vroom)
-library(dplyr)
-library(tidyr)
-library(stringr)
-
-# 1. Read data (you have these already)
-# control  <- vroom(ctrl_file,  show_col_types = FALSE)
-# lowinput <- vroom(lowp_file, show_col_types = FALSE)
-
-control2  <- control  %>% mutate(Condition = "Control")
-lowinput2 <- lowinput %>% mutate(Condition = "LowInput")
-combined <- bind_rows(control2, lowinput2)
-
-valid_classes <- c("TG","DG","MG",
-                   "PC","PE","PI",
-                   "DGDG","MGDG",
-                   "SQDG","SM","AEG",
-                   "LPC","LPE","PG","PA")
-class_pat <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
-
-df_long2 <- combined %>%
-  pivot_longer(
-    cols = -c(Compound_Name, Condition),
-    names_to  = "Lipid",
-    values_to = "Intensity"
-  ) %>%
-  rename(Sample = Compound_Name) %>%
-  mutate(Class = str_extract(Lipid, class_pat)) %>%
-  filter(!is.na(Class))
-
-# 2. Helper rounding
-round_to_sum_100 <- function(raw_pct_vec, target_sum = 100) {
-  n <- length(raw_pct_vec)
-  if (n == 1) {
-    return(target_sum)
-  }
-  floored <- floor(raw_pct_vec)
-  rem <- raw_pct_vec - floored
-  current_sum <- sum(floored)
-  diff <- target_sum - current_sum
-  if (diff > 0) {
-    idx <- order(rem, decreasing = TRUE)[ seq_len(min(diff, n)) ]
-    floored[idx] <- floored[idx] + 1
-  } else if (diff < 0) {
-    idx <- order(rem, decreasing = FALSE)[ seq_len(min(-diff, n)) ]
-    floored[idx] <- floored[idx] - 1
-  }
-  return(floored)
-}
-
-# 3. Compute within‐class composition with threshold lumping
-compute_within_pct_table <- function(df_long2, condition_name, threshold_pct = 3) {
-  df_long2 %>%
-    filter(Condition == condition_name) %>%
-    group_by(Sample, Class) %>%
-    mutate(class_total = sum(Intensity, na.rm = TRUE)) %>%
-    ungroup() %>%
-    mutate(rel_within = if_else(class_total > 0, Intensity / class_total, 0)) %>%
-    group_by(Class, Lipid) %>%
-    summarise(mean_prop = mean(rel_within, na.rm = TRUE), .groups = "drop") %>%
-    group_by(Class) %>%
-    group_modify(~ {
-      dfc <- .x %>% mutate(mean_prop = if_else(is.na(mean_prop), 0, mean_prop))
-      raw_pct <- dfc$mean_prop * 100
-      small_mask <- raw_pct < threshold_pct
-      sum_small_prop <- sum(dfc$mean_prop[small_mask], na.rm = TRUE)
-      if (all(small_mask)) {
-        # everything < threshold → single Other
-        df2 <- tibble(Lipid = "Other", mean_prop = sum(dfc$mean_prop))
-      } else {
-        df_big <- dfc[!small_mask, , drop = FALSE]
-        if (sum_small_prop > 0) {
-          df2 <- bind_rows(df_big,
-                           tibble(Lipid = "Other", mean_prop = sum_small_prop))
-        } else {
-          df2 <- df_big
-        }
-      }
-      raw_pct2 <- df2$mean_prop * 100
-      if (nrow(df2) == 1) {
-        df2 <- df2 %>% mutate(mean_pct = 100L)
-      } else {
-        int_pct <- round_to_sum_100(raw_pct2, target_sum = 100)
-        df2 <- df2 %>% mutate(mean_pct = int_pct)
-      }
-      return(df2)
-    }) %>%
-    ungroup() %>%
-    arrange(Class, desc(mean_pct))
-}
-
-table_control  <- compute_within_pct_table(df_long2, "Control",  threshold_pct = 3)
-table_lowinput <- compute_within_pct_table(df_long2, "LowInput", threshold_pct = 3)
-
-# Check sums:
-table_control  %>% group_by(Class) %>% summarise(sum100 = sum(mean_pct))
-table_lowinput %>% group_by(Class) %>% summarise(sum100 = sum(mean_pct))
-
-library(dplyr)
-
-# Rename Lipid -> Species for clarity
-control_long <- table_control %>%
-  select(Class, Species = Lipid, Percentage = mean_pct)
-
-lowinput_long <- table_lowinput %>%
-  select(Class, Species = Lipid, Percentage = mean_pct)
-
-
-# Combine the two 
-combined_long <- bind_cols(
-  control_long %>% mutate(Condition = "Control"),
-  lowinput_long %>% mutate(Condition = "LowInput")
-)
-
-
-
-# Rename Percentage columns to distinguish
-ctrl <- control_long %>%
-  rename(Pct_Control = Percentage)
-
-lwp <- lowinput_long %>%
-  rename(Pct_LowInput = Percentage)
-
-# Full join by Class & Species
-combined <- full_join(ctrl, lwp, by = c("Class", "Species"))
-
-# Flag common species (present in both) and compute a sorting value
-combined <- combined %>%
-  mutate(
-    common = !is.na(Pct_Control) & !is.na(Pct_LowInput),
-    # For ordering: compute max percent across conditions, treating NA as 0 for ordering
-    max_pct = pmax(replace_na(Pct_Control, 0), replace_na(Pct_LowInput, 0))
-  )
-
-combined <- combined %>%
-  arrange(Class, desc(common), desc(max_pct), Species) %>%
-  dplyr::select(-common, -max_pct)
-
-# See the combined table:
-print(combined, n = Inf)
-
-
-
-
-
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ################################################################################
 #### SOrghum Lipidomics Database (SOLD)
 ################################################################################
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-
 ###############################################################################
-## Supplementary Figures – Overlap of Control vs Low‑input lipid lists
+## Supplementary Tables – Overlap of Control vs Low‑input lipid lists
 ## Three panels:
 ##   S1 – All detected lipids               (Venn)
 ##   S2 – Traditional classes only          (Venn)
 ##   S3 – Curated “Class” annotation set    (table + bar *optional*)
 ###############################################################################
+
+
+
+# ──────────────────────────────────────────────────────────────
+#  0)  PACKAGES
+# ──────────────────────────────────────────────────────────────
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(vroom)
+
+# ──────────────────────────────────────────────────────────────
+#  1)  READ & COMBINE RAW INTENSITIES
+# ──────────────────────────────────────────────────────────────
+
+# Control
+control <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>%
+  select(-c(2,3,4)) %>%
+  rename(Compound_Name = 1) %>%
+  mutate(Condition = "Control") #%>%
+  #select(-`PC(17:0)`)
+
+# Lowinput
+lowinput <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>%
+  select(-c(2,3,4)) %>%
+  rename(Compound_Name = 1) %>%
+  mutate(Condition = "LowInput") #%>%
+  #select(-`PC(17:0)`)
+
+raw_all <- bind_rows(control, lowinput)
+
+# ──────────────────────────────────────────────────────────────
+#  2)  TIDY LONG
+# ──────────────────────────────────────────────────────────────
+
+valid_classes <- c("TG","DG","MG",
+                   "PC","PE","PI",
+                   "DGDG","MGDG",
+                   "SQDG","SM","AEG",
+                   "LPC","LPE","PG","PA")
+class_pat <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
+
+df_long <- raw_all %>%
+  pivot_longer(
+    cols      = -c(Compound_Name, Condition),
+    names_to  = "Lipid",
+    values_to = "Intensity"
+  ) %>%
+  mutate(
+    Class  = str_extract(Lipid, class_pat),
+    Sample = Compound_Name
+  ) %>%
+  filter(!is.na(Class))
+
+# ──────────────────────────────────────────────────────────────
+#  3)  COMPUTE WITHIN-CLASS PERCENTAGES (no lumping)
+# ──────────────────────────────────────────────────────────────
+
+compute_pct <- function(df, cond) {
+  df %>%
+    filter(Condition == cond) %>%
+    group_by(Sample, Class) %>%
+    mutate(class_total = sum(Intensity, na.rm = TRUE)) %>%
+    ungroup() %>%
+    mutate(rel_within = if_else(class_total > 0, Intensity / class_total, 0)) %>%
+    group_by(Class, Lipid) %>%
+    summarise(mean_prop = mean(rel_within, na.rm = TRUE), .groups = "drop") %>%
+    mutate(mean_pct = round(mean_prop * 100, 1)) %>%   # one decimal place
+    arrange(Class, desc(mean_pct))
+}
+
+table_control  <- compute_pct(df_long, "Control")
+table_lowinput <- compute_pct(df_long, "LowInput")
+
+# ──────────────────────────────────────────────────────────────
+#  4)  MERGE & FORMAT FOR COMPARISON
+# ──────────────────────────────────────────────────────────────
+
+ctrl <- table_control  %>% rename(Pct_Control    = mean_pct, Species = Lipid)
+lwp  <- table_lowinput %>% rename(Pct_LowInput  = mean_pct, Species = Lipid)
+
+combined <- full_join(ctrl, lwp, by = c("Class", "Species")) %>%
+  arrange(Class, desc(ifelse(is.na(Pct_Control), 0, Pct_Control) +
+                        ifelse(is.na(Pct_LowInput),  0, Pct_LowInput)),
+          Species) %>%
+  dplyr::select(-mean_prop.x) %>%
+  dplyr::select(-mean_prop.y) 
+    
+
+# clean column names
+colnames(combined)[3:4] <- c("Control_Percentage", "LowInput_Percentage")
+
+# drop Class column if you just want Species & the two percentages
+# combined <- combined[ , -1 ]
+
+print(combined, n = Inf)
+
+# Save:
+write.csv(combined, "SuppTable1_overlap_control_lowinput_lipid_species_percentages.csv", row.names = FALSE)
+
 
 # ------------------------------------------------------------------------------
 # 1. Load libraries
@@ -218,10 +133,17 @@ library(viridis)
 # ------------------------------------------------------------------------------
 # 2. Read in the data
 # ------------------------------------------------------------------------------
-control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
+# control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
+# 
+# lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
+# colnames(control)
 
-lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
-colnames(control)
+control  <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4)) 
+colnames(control)[1] <- "Compound_Name"  
+
+lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
+colnames(lowinput)[1] <- "Compound_Name"  
+
 
 
 # Remove PC(17:0) from control and lowinput (internal standard) from the columns
@@ -349,5 +271,5 @@ print(trad_summary)
 print(nontrad_summary)
 
 # 6) (Optional) write out
-write.csv(trad_summary,    "SuppTable_1_traditional_lipid_overlap.csv",    row.names = FALSE)
-write.csv(nontrad_summary, "SuppTable_2_nontraditional_lipid_overlap.csv", row.names = FALSE)
+write.csv(trad_summary,    "SuppTable_2_traditional_lipid_class_overlap.csv",    row.names = FALSE)
+write.csv(nontrad_summary, "SuppTable_3_nontraditional_lipid_class_overlap.csv", row.names = FALSE)

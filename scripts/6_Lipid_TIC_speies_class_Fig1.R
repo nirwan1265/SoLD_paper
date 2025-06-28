@@ -29,10 +29,7 @@ suppressPackageStartupMessages({
 control  <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
 colnames(control)[1] <- "Compound_Name"  
 
-
-# lowinput <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/lowinput/lowinput_all_lipids_fitted_phenotype_non_normalized.csv")
 lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
-colnames(lowinput)
 colnames(lowinput)[1] <- "Compound_Name"  
 
 
@@ -204,6 +201,12 @@ ggsave("Fig1a_lipid_species.png",fig1a, width = 21, height = 8, units = "in", bg
 #ggsave("SuppFig_TIC_PC_PA_PE_PG_PS.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
 
 
+
+
+
+
+
+
 ################################################################################
 ################################################################################
 #### FIGURE 1B
@@ -234,22 +237,20 @@ colnames(lowinput)[1] <- "Compound_Name"
 
 
 # Lipid Class
-# lipid_class_info <- vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SoLD/data/lipid_class.csv",
-#                           show_col_types = FALSE) %>% 
-#   filter(!is.na(SubClass)) %>% 
-#   transmute(Lipid = Lipids, SuperClass = Class)
-
-
-
+lipid_class_info <- vroom("data/lipid_class/lipid_classes.csv",
+                          show_col_types = FALSE) %>%
+  #filter(!is.na(SubClass)) %>%
+  transmute(Lipid = Lipids, SuperClass = Class)
 
 # keep only the five super-classes you want on the pie
-wanted_super <- c("Terpenoid",
-                  "Glycerophospholipid",
-                  "Glycerolipid",
-                  "Glycoglycerolipid",
-                  "Fatty acid and derivative","Sphingolipid",
-                  "Steroid", "Tetrapyrrole", "Sterol",
-                  "N-acylethanolamine", "Betaine lipid","Vitamin" )
+
+# traditional_lipid_classes
+wanted_super<- c("Glycerolipid", "Glycerophospholipid", "Glycoglycerolipid",
+                               "Sphingolipid", "Sterol", "Fatty acid and derivative")
+# nontraditional_lipid_class
+wanted_super <- c("N-acylethanolamine","Terpenoid","Prenol","Tetrapyrrole","Vitamin","Steroid",
+                                "Fatty acid amide")
+
 
 lipid_class_info <- lipid_class_info %>% 
   filter(SuperClass %in% wanted_super)
@@ -388,10 +389,13 @@ grid::grid.draw(fig1b)
 # 9.  SAVE THE PLOT
 ###############################################################################
 
-ggplot2::ggsave("Fig1b_lipid_class.png",
+ggplot2::ggsave("Fig1b_traditional_lipid_class.png",
                 fig1b,
                 width = 21, height = 8, units = "in", bg = "white")
 
+ggplot2::ggsave("SuppFig_nontraditional_lipid_class.png",
+                fig1b,
+                width = 21, height = 8, units = "in", bg = "white")
 
 
 
