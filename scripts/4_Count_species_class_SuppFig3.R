@@ -34,10 +34,18 @@ library(viridis)
 # ------------------------------------------------------------------------------
 # 2. Read in the data
 # ------------------------------------------------------------------------------
-control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
+# control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
+
+control  <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
+colnames(control)[1] <- "Compound_Name"  
+
 
 #lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
-lowinput <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/lowinput/lowinput_all_lipids_fitted_phenotype_non_normalized.csv")
+# lowinput <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/lowinput/lowinput_all_lipids_fitted_phenotype_non_normalized.csv")
+
+lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
+colnames(lowinput)
+colnames(lowinput)[1] <- "Compound_Name"  
 
 # Remove PC(17:0) from control and lowinput (internal standard) from the columns
 control  <- control %>% dplyr::select(-`PC(17:0)`)
@@ -45,9 +53,9 @@ lowinput <- lowinput %>% dplyr::select(-`PC(17:0)`)
 
 #### CHANGE THE NAME TO COMMONNAME
 # Lipid class
-lipid_class_info <- vroom::vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SoLD/data/lipid_class.csv", show_col_types = FALSE) %>%
-  dplyr::filter(!is.na(Class))
-
+# lipid_class_info <- vroom::vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SoLD/data/lipid_class.csv", show_col_types = FALSE) %>%
+#   dplyr::filter(!is.na(Class))
+lipid_class_info <- vroom::vroom("data/lipid_class/lipid_classes.csv", show_col_types = FALSE) %>% dplyr::distinct(Lipids, .keep_all = TRUE)  # keep unique Lipids with their CommonName
 
 # Create a named vector of replacements: names = original, values = new names
 name_map <- lipid_class_info %>%
@@ -72,14 +80,13 @@ rename_lipid_columns <- function(df, name_map) {
 control  <- rename_lipid_columns(control,  name_map)
 lowinput <- rename_lipid_columns(lowinput, name_map)
 
-colnames(lowinput)
 # ------------------------------------------------------------------------------
 # 3."Traditional” lipid classes and extractor
 # ------------------------------------------------------------------------------
 valid_classes <- c("TG","DG","MG",
                    "PC","PE","PG","PI",
                    "LPC","LPE",
-                   "DGDG","MGDG",
+                   "DGDG","MGDG","GalCer",
                    "Cer","SM","FA","DGDG","SQDG","AEG","GalCer","FA")
 
 class_pattern <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
@@ -186,20 +193,17 @@ ggsave("SuppFig_3A_Lipid_Counts.png",
        units = "in", bg = "white")  # white background for publication quality
 
 
-
-
-
-
-
-
-
 # -------------------------------------------------------------------------------
 # 6.Supplementary Figure 2 – Lipid‑class diversity using curated "Class" annotations
 # -------------------------------------------------------------------------------
 
 # Lipid class
-lipid_class_info <- vroom::vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SoLD/data/lipid_class.csv", show_col_types = FALSE) %>%
-  dplyr::filter(!is.na(Class))
+# lipid_class_info <- vroom::vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SoLD/data/lipid_class.csv", show_col_types = FALSE) %>%
+#   dplyr::filter(!is.na(Class))
+
+# lipid_class_info <- vroom::vroom("data/lipid_class/lipid_classes.csv", show_col_types = FALSE) 
+#   #   dplyr::filter(!is.na(Class))
+# table(lipid_class_info$Class)
 
 # Lipid class Traditional lipids
 traditional_lipid_classes <- c("Glycerolipid", "Glycerophospholipid", "Glycoglycerolipid",
@@ -208,7 +212,8 @@ lipid_class_traditional <- lipid_class_info %>%
   dplyr::filter(Class %in% traditional_lipid_classes)
 
 # Lipid class Traditional lipids
-nontraditional_lipid_class <- c("N-acylethanolamine","Terpenoid","Prenol","Tetrapyrrole","Vitamin")
+nontraditional_lipid_class <- c("N-acylethanolamine","Terpenoid","Prenol","Tetrapyrrole","Vitamin","Steroid",
+                                "Fatty acid amide")
 
 lipid_class_nontraditional <- lipid_class_info %>% 
   dplyr::filter(Class %in% nontraditional_lipid_class)
@@ -382,7 +387,7 @@ p_nontrad <- ggvenn(
     legend.position = "none"
   )
 quartz(); print(p_trad)
-
+quartz(); print(p_nontrad)
 # 6) (Optional) Save
 # ggsave("Fig_venn_trad_nontrad.png", venn_figure, width = 10, height = 5, dpi = 300)
 

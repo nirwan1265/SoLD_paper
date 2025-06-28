@@ -24,9 +24,16 @@ suppressPackageStartupMessages({
 ################################################################################
 #control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
 #lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
-control <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/control/control_all_lipids_fitted_phenotype_non_normalized.csv")
+# control <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/control/control_all_lipids_fitted_phenotype_non_normalized.csv")
 
-lowinput <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/lowinput/lowinput_all_lipids_fitted_phenotype_non_normalized.csv")
+control  <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
+colnames(control)[1] <- "Compound_Name"  
+
+
+# lowinput <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/lowinput/lowinput_all_lipids_fitted_phenotype_non_normalized.csv")
+lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
+colnames(lowinput)
+colnames(lowinput)[1] <- "Compound_Name"  
 
 
 ################################################################################
@@ -34,7 +41,7 @@ lowinput <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spa
 ################################################################################
 
 valid_classes <- c("TG","DG","MG","PC","PE","PG","PI",
-                   "LPC","LPE","DGDG","MGDG","Cer","SM","FA","SQDG","AEG","PA","PS")
+                   "LPC","LPE","DGDG","MGDG","Cer","GalCer","SM","FA","SQDG","AEG","PA","PS")
                    
 #valid_classes <- c("LPE","LPC")
 #valid_classes <- c("PC","PE","PA","PG","PS")
@@ -219,16 +226,20 @@ suppressPackageStartupMessages({
 #control   <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
 #lowinput  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
 
-control <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/control/control_all_lipids_fitted_phenotype_non_normalized.csv")
+control  <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
+colnames(control)[1] <- "Compound_Name"  
 
-lowinput <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/lowinput/lowinput_all_lipids_fitted_phenotype_non_normalized.csv")
+lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
+colnames(lowinput)[1] <- "Compound_Name"  
 
 
+# Lipid Class
+# lipid_class_info <- vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SoLD/data/lipid_class.csv",
+#                           show_col_types = FALSE) %>% 
+#   filter(!is.na(SubClass)) %>% 
+#   transmute(Lipid = Lipids, SuperClass = Class)
 
-lipid_class_info <- vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SoLD/data/lipid_class.csv",
-                          show_col_types = FALSE) %>% 
-  filter(!is.na(SubClass)) %>% 
-  transmute(Lipid = Lipids, SuperClass = Class)
+
 
 
 # keep only the five super-classes you want on the pie

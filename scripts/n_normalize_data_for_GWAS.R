@@ -38,7 +38,8 @@ control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normali
 
 lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
 colnames(control)
-
+quartz()
+hist(control$`.alpha.-Ionone`)
 
 # Remove PC(17:0) from control and lowinput (internal standard) from the columns
 control  <- control %>% dplyr::select(-`PC(17:0)`)

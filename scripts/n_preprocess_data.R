@@ -32,30 +32,40 @@ library(tibble)
 
 
 # Loading datasets
-A <- read.csv("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/SERRF_normalization/SERRF_Result_A/normalized by - SERRF.csv")
-B <- read.csv("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/SERRF_normalization/SERRF_Result_B/normalized by - SERRF.csv")
-
+A <- read.csv("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/SERRF_normalization/SERRF_Result_A_new/normalized by - SERRF.csv")
+B <- read.csv("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/SERRF_normalization/SERRF_Result_B_new/normalized by - SERRF.csv")
+glimpse(A)
 ###### Filtering just the Peak intensities 
 # Find column names that match the pattern "S1_Run" at the end
-selected_columns_A <- grep("S1_Run\\d+", colnames(A), value = TRUE)
-selected_columns_B <- grep("S1_Run\\d+", colnames(B), value = TRUE)
+#selected_columns_A <- grep("S1_Run\\d+", colnames(A), value = TRUE)
+#selected_columns_B <- grep("S1_Run\\d+", colnames(B), value = TRUE)
+
+# Subset the CHECKS; for the checks, use the SERRF_Result_B_new else use the old one
+selected_columns_A_CHECKS <- grep("CHECK", colnames(A), value = TRUE)
+selected_columns_B_CHECKS <- grep("Check", colnames(B), value = TRUE)
+
+# Subset the PI columns
+selected_columns_A_PI <- grep("PI", colnames(A), value = TRUE)
+selected_columns_B_PI <- grep("PI", colnames(B), value = TRUE)
+
+
+# Combine the two
+selected_columns_A <- c(selected_columns_A_CHECKS, selected_columns_A_PI)
+selected_columns_B <- c(selected_columns_B_CHECKS, selected_columns_B_PI)
 
 # Select the corresponding columns in your data frame A
 A_filtered <- A[, colnames(A) %in% selected_columns_A]
 B_filtered <- B[, colnames(B) %in% selected_columns_B]
 
-# Rename the columns to contain only the PI numbers
-names(A_filtered) <- gsub(".*_(PI\\d+)", "\\1", names(A_filtered))
-names(B_filtered) <- gsub(".*_(PI\\d+)", "\\1", names(B_filtered))
 
 # Adding colnames
 rownames(A_filtered) <- A[,1]
 rownames(B_filtered) <- B[,1]
 rm(A,B)
 
-# Removing CHECKs (removed in 2)
-#A_filtered <- A_filtered[, !grepl("CHECK", names(A_filtered))]
-#B_filtered <- B_filtered[, !grepl("Check", names(B_filtered))]
+# Saving CHECKs (removed in 2)
+#write.csv(A_filtered, "Control_SERRF_checks.csv", row.names = TRUE)
+#write.csv(B_filtered, "LowInput_SERRF_checks.csv", row.names = TRUE)
 
 
 # Set the threshold for proportion of zeroes you want to remove
@@ -81,10 +91,12 @@ B_filtered$X.Scan. <- rownames(B_filtered)
 ################################################################################
 
 ##### Filtering based on lipids
-lipid_A <- read.csv("data/lipid_class_A.csv")
+lipid_A <- read.csv("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/lipid_class_A.csv")
 lipid_A$X.Scan. <- as.character(lipid_A$X.Scan.)
-lipid_B <- read.csv("data/lipid_class_B.csv")
+lipid_B <- read.csv("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/data/lipid_class_B.csv")
 lipid_B$X.Scan. <- as.character(lipid_B$X.Scan.)
+
+colnames(lipid_A)
 
 # Unique ID's  
 unique_scans_all_lipid_A <- lipid_A %>%
@@ -118,40 +130,64 @@ unique_scans_all_lipid_B$X.Scan. <- as.character(unique_scans_all_lipid_B$X.Scan
 subset_A <- inner_join(A_filtered, unique_scans_all_lipid_A)
 
 subset_B <- inner_join(B_filtered, unique_scans_all_lipid_B)
-str(subset_A$X.Scan.)
 
 # Collapse by X.Scan. and combine Compound_Name values
-subset_A_collapsed <- subset_A %>%
-  dplyr::group_by(X.Scan.) %>%
-  dplyr::summarize(
-    across(where(is.numeric), dplyr::first),  # safely keep numeric values
+subset_A_collapsed <- subset_A %>% 
+  dplyr::group_by(X.Scan.) %>% 
+  dplyr::summarise(
+    ## keep (or sum) numeric sample columns
+    across(where(is.numeric), dplyr::first),
+    
+    ## main name column
     Compound_Name = paste(unique(Compound_Name), collapse = "%"),
+    
+    ## NP‑classifier taxonomy
+    npclassifier_superclass = paste(unique(npclassifier_superclass), collapse = ";"),
+    npclassifier_class      = paste(unique(npclassifier_class),      collapse = ";"),
+    npclassifier_pathway    = paste(unique(npclassifier_pathway),    collapse = ";"),
+    
     .groups = "drop"
   )
 
 
-subset_B_collapsed <- subset_B %>%
-  dplyr::group_by(X.Scan.) %>%
-  dplyr::summarize(
-    across(where(is.numeric), dplyr::first),  # safely keep numeric values
+subset_B_collapsed <- subset_B %>% 
+  dplyr::group_by(X.Scan.) %>% 
+  dplyr::summarise(
+    across(where(is.numeric), dplyr::first),
     Compound_Name = paste(unique(Compound_Name), collapse = "%"),
+    npclassifier_superclass = paste(unique(npclassifier_superclass), collapse = ";"),
+    npclassifier_class      = paste(unique(npclassifier_class),      collapse = ";"),
+    npclassifier_pathway    = paste(unique(npclassifier_pathway),    collapse = ";"),
     .groups = "drop"
   )
 
 
 # Remove the X.Scan. and order
-subset_A <- subset_A_collapsed %>%
-  dplyr::select(-X.Scan.) %>%
-  dplyr::select(Compound_Name, everything())
+subset_A <- subset_A_collapsed %>%            # reorder: name first, then everything
+  dplyr::select(-X.Scan.) %>% 
+  dplyr::select(
+    Compound_Name,
+    npclassifier_superclass,
+    npclassifier_class,
+    npclassifier_pathway,
+    everything()
+  )
 
-subset_B <- subset_B_collapsed %>%
-  dplyr::select(-X.Scan.) %>%
-  dplyr::select(Compound_Name, everything())
-
+subset_B <- subset_B_collapsed %>% 
+  dplyr::select(-X.Scan.) %>% 
+  dplyr::select(
+    Compound_Name,
+    npclassifier_superclass,
+    npclassifier_class,
+    npclassifier_pathway,
+    everything()
+  )
 
 # Save the subset data
-# write.csv(subset_A, "Control_All_Lipids.csv", row.names = FALSE)
-# write.csv(subset_B, "LowInput_All_Lipids.csv", row.names = FALSE)
+write.csv(subset_A, "Control_All_Lipids.csv", row.names = FALSE)
+write.csv(subset_B, "LowInput_All_Lipids.csv", row.names = FALSE)
+
+
 
 # Data wrangle
 # Go to excel and remove Spectra Match to and NIST14
