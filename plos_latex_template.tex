@@ -135,7 +135,11 @@
 \usepackage{placeins}      % lets us slam a barrier before the SI
 \usepackage[margin=1in]{geometry}
 
-
+% For table
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{tabularx}
 
 % ---------- helper to switch counters to S-numbers ----------
 \newcommand{\beginsupplement}{%
@@ -562,70 +566,69 @@ Data processing and statistical analyzes were performed in R (version 4.3.3) usi
 % Results and Discussion can be combined.
 \section*{Results}
 
-\subsection*{Overview of lipid profiles}
-
+\subsection*{Quality Control and Signal Normalization of Lipidomics Data}
 Instrument performance was measured using total ion current (TIC) traces throughout the injection sequence for batches C (Supplementary Fig. \ref{fig:S1A}) and LI (Supplementary Fig. \ref{fig:S1B}). As expected, the blanks (gray) remain near zero TIC, the internal standards (green) cluster tightly around their nominal signal, and the quality controls (red) track reproducibly throughout the run. The injections of samples (blue) exhibit the highest TIC with no isolated outliers or sudden jumps. These profiles confirm that instrument performance was stable over time, with consistent sensitivity and no evidence of progressive signal decay or unexpected artifacts.
 
-In sets C and LI, the relative standard deviation of the sample (RSD) for all lipid characteristics decreased from 3. 86 \% and 1. 18 \% (raw data)  to 0. 94 \% and 0. 51 \%, respectively, after normalization of the SERRF (Supplementary Figs. \ref{fig:S1A} and \ref{fig:S1B}, top panel). This reduction in technical variability demonstrates that SERRF effectively removes batch-related effects, producing more consistent peak areas across injections. Similarly, PCA of the signal pre- and post-SERRF shows that the points cluster tightly, indicating that most of the remaining variance is biological rather than instrumental (Supplementary Figs. \ref{fig:S1A} and \ref{fig:S1B}, bottom panel).
+After normalization of the SERRF for instrumental artifacts, in sets C and LI, the relative standard deviation (RSD) of the sample  for all lipid characteristics decreased from 3. 86 \% and 1. 18 \% (raw data)  to 0. 94 \% and 0. 51 \%, respectively,  (Supplementary Figs. \ref{fig:S2A} and \ref{fig:S2}, top panel). This reduction in technical variability demonstrates that SERRF effectively removes batch-related effects, producing more consistent peak areas across injections. Similarly, PCA of the signal pre- and post-SERRF shows that the points cluster tightly, indicating that most of the remaining variance is biological rather than instrumental (Supplementary Figs. \ref{fig:S1A} and \ref{fig:S1B}, bottom panel).
 
+\subsection*{Overview of lipid species count}
+The total number of different lipid species and their classes identified under C and LI conditions is shown in the Supplementary Figure \ref{fig:S3A}, Supplementary Figure \ref{fig:S3B} and  \href{https://docs.google.com/spreadsheets/d/1SB90-QLYheKEzmHCUIh1UfgkrtbL064s8Oo5BfwFaV0/edit?gid=1876149577#gid=1876149577}{Supplementary Table S1A}. In particular, triacylglycerols (TG) exhibit the highest species diversity with both LI and C having 60 species each. Phosphatidylcholines (PC) decrease from 25 species in C to 24 species in LI. Monoacylglycerols (MG) also decline from 8 species in C to 6 species in LI. Phosphatidylethanolamines (PE) increase slightly (12 species in C versus 13 in LI) (Supplementary Figure \ref{fig:S3B}, \href{https://docs.google.com/spreadsheets/d/1SB90-QLYheKEzmHCUIh1UfgkrtbL064s8Oo5BfwFaV0/edit?gid=1876149577#gid=1876149577}{Supplementary Table 1B}). When aggregated by lipid class (Supplementary Figure \ref{fig:S3C}), glycerolipids increase from 86 classes in Control to 96 in LI, while glycerophospholipids fall from 39 classes in C to 35 in LI, driven primarily by the loss of PC subspecies. The glycoglycerolipids remain essentially unchanged (25 in C, 24 in LI), and the small molecule classes such as sphingolipids (SM), lysophospholipids (LPC, LPE), free fatty acids (FA), phosphoglycerols (PG) and ceramides (Cer) each remain at one or two detected species under both conditions, possibly due to the inability of the mass spectrometer to identify those small signals (Supplementary Figures \ref{fig:S3A} and \ref{fig:S3B}). A total of 183 (162 in C, 159 in LI) traditional lipid species were detected across both workflows, 24 (13.1\%) are unique to C, 21 (11.5\%) are unique to LI and 138 (75.4.5\%) are shared (Supplementary Figure \ref{fig:S3C}). Similarly, a total of 49 non-traditional lipids were also identified across both the conditions with 10 (20.4\%) unique to C, 11 (22.4\%) unique to LI, and 28 (57.1 \%) shared among the groups. Thus, in the LI condition, (1) TG represents the highest lipid species, (2) the diversity of PC, PE, MG, SQDG, and DG slightly decreases, and (3) approximately 75\% of the traditional lipid species are common to both datasets, with around 24\% unique to C and 21\% unique to LI.
 
-The total number of different lipid species and their classes identified under C and LI conditions is shown in the Supplementary Figure \ref{fig:S3A}, Supplementary Figure \ref{fig:S3B} and  \href{https://docs.google.com/spreadsheets/d/1SB90-QLYheKEzmHCUIh1UfgkrtbL064s8Oo5BfwFaV0/edit?gid=1876149577#gid=1876149577}{Supplementary Table S1A}. In particular, triacylglycerols (TG) exhibit greater species diversity with low input (85 species) compared to Control (74 species), while phosphatidylcholines (PC) decrease from 33 species in C to 26 species in LI. Monoacylglycerols (MG) also decline from 7 species in C to 3 species in LI, while phosphatidylethanolamines (PE) increase slightly (11 species in C versus 12 in LI) (Supplementary Figure \ref{fig:S3B}, \href{https://docs.google.com/spreadsheets/d/1SB90-QLYheKEzmHCUIh1UfgkrtbL064s8Oo5BfwFaV0/edit?gid=1876149577#gid=1876149577}{Supplementary Table 1B}). When aggregated by lipid class (Supplementary Figure \ref{fig:S3C}), glycerolipids increase from 86 classes in Control to 96 in LI, while glycerophospholipids fall from 39 classes in C to 35 in LI, driven primarily by the loss of PC subspecies. The glycoglycerolipids remain essentially unchanged (25 in C, 24 in LI), and the small molecule classes such as sphingolipids (SM), lysophospholipids (LPC, LPE), free fatty acids (FA), phosphoglycerols (PG) and ceramides (Cer) each remain at one or two detected species under both conditions, possibly due to the inability of the mass spectrometer to identify those small signals (Supplementary Figures \ref{fig:S3A} and \ref{fig:S3B} and ). A total of 301 (217 in C, 254 in LI) species were detected across both workflows, 47 (15.6\%) are unique to C, 84 (27.9\%) are unique to LI and 170 (56.5\%) are shared (Supplementary Figure \ref{fig:S3C}). Thus, in the LI condition, (1) the diversity of TG increases, (2) the diversity of PC decreases, (3) the diversity of PE slightly increases, and (4) approximately 57\% of the lipid species are common to both datasets, with around 15\% unique to C and 29\% unique to LI.
+\subsection*{Overview of lipid profiles}
+We also calculated the contribution of each lipid species and class to the total ion current (TIC) in each sample. The percentage of TIC values was averaged in all C (n = 384) and in all LI (n = 362). Any species or class whose mean percentage fell below 3\% in both conditions was not labeled in our visualization. At the species level, MGDG (2.3 \%) exhibits the largest depletion under LI handling. PC (1.3 \%) and  SQDG (1.2 \%)has the second and third largest depletion (Fig. \ref{fig:1A_lipid_species}). TG species had the largest rise from 2.4\% to 6.0\%. DG also increased from 8.9\% to 10.1\%. Together, these shifts illustrate that mid-abundance triglycerolipid species (TG) become more dominant when input is limited, while key glycerophospholipids (such as PC) and pigment‐derived lipids (SQDG) are comparatively underrepresented (Fig. \ref{fig:1A_lipid_species}).
 
-We also calculated the contribution of each lipid species and class to the total ion current (TIC) in each sample. The percentage of TIC values was averaged in all C (n = 384) and in all LI (n = 362). Any species or class whose mean percentage fell below 3\% in both conditions was not labeled in our visualization. At the species level, PC exhibits the largest depletion under LI handling. PC species collectively account for approximately 13.3\% of TIC in the C samples but drop to approximately 7. 4\% with LI (Fig. \ref{fig:1A_lipid_species}). In contrast, monogalactosyldiacylglycerol (MGDG) species increase from 37.1\% of TIC in C to 39.9\% in LI, making MGDG the single largest relative gain among abundant species. The sulfoquinovosyldiacylglycerol species (SQDG) drop from 8. 2\% to 3. 9\%, and the TG species rise from 5. 1\% to 9. 7\%. Together, these shifts illustrate that mid-abundance glycerolipid species (MGDG and TG) become more dominant when input is limited, while key glycerophospholipids (such as PC) and pigment‐derived lipids (SQDG) are comparatively underrepresented (Fig. \ref{fig:1A_lipid_species}).
+When we divided the lipids into broader lipid classes, the same pattern emerged at the class level as well. In C, glycoglycerolipids (MGDG + DGDG) account for approximately 68.1\% of TIC, while under LI, this increases modestly to approximately 69.7\%. In contrast, glycerophospholipids (PC + PE + PG + LPC + LPE) decrease from 31.8\% in C to 30.3\% in LI, reflecting the loss driven by PC observed at the species level. Negligible changes were observed for sphingolipid and sterols (Fig. \ref{fig:1B_lipid_class}). Among the non-traditional lipids, the most striking class-level increase are terpenoids and tetrapyrrole  (chlorophyll-derived pigments) dropped from 84.3.5\% to 83.9.5\% (Supplementary Figure \ref{fig:S4_TIC_nontraditional}).
 
-When we divided the lipids into broader lipid classes, the same pattern emerged at the class level as well. In C, glycoglycerolipids (MGDG + DGDG) account for approximately 60 4\% of TIC, while under LI, this increases to approximately 65 7\%. In contrast, glycerophospholipids (PC + PE + PG + LPC + LPE) decrease from 13.5\% in C to 8. 5\% in LI, reflecting the loss driven by PC observed at the species level. The most striking class-level depletions are tetrapyrroles (chlorophyll-derived pigments), which drop from 14.5\% to 9.5\% (Fig. \ref{fig:1B_lipid_class}).
-
-In summary, the LI condition marked a redistribution of leaf lipid TIC: the combined glycerolipid pool (MGDG + DGDG + TG) gains approximately 10 percentage points of relative abundance, at the expense of glycerophospholipids (primarily PC) and tetrapyrroles. These results underscore how reduced starting material skews the measured lipidome toward galactolipid-rich membranes (e.g., MGDG / DGDG) and neutral storage lipids (TG), while under‐sampling key phospholipids and pigment‐associated lipids.
+In summary, LI conditions reshaped the distribution of lipid-derived TIC in favor of storage and galactolipid species. The combined contribution of TG, DG, and MGDG rose markedly, reflecting an increased prominence of neutral lipids and chloroplast-associated membranes. In contrast, key glycerophospholipids, specifically PC and pigment-derived SQDG declined in relative abundance. At the class level, glycerophospholipids lost ground while glycoglycerolipids modestly expanded their share, reinforcing the lipidomic shift. These results highlight how LI sampling disproportionately favors energy-dense and galactolipid-rich components, while diminishing representation of phospholipid and pigment-based membrane structures.
 
 \subsection*{Overview of individual lipid species}
 We computed, for each lipid species, the mean percentage contribution within each species (the relative abundance of each species divided by the total abundance of that species under a given condition, averaged between samples). 
 
-Supplementary Table~4 lists the species sorted by their mean percentage contribution under C and LI. In the following, we summarize the dominant species and any moderate compositional changes between the two conditions.
+Supplementary Table~1 lists the species sorted by their mean percentage contribution under C and LI. In the following, we summarize the dominant species and any moderate compositional changes between the two conditions.
 
 \bigskip
 
 \textbf{Acyl‐ether glycerol (AEG).}  
-AEG(32:3) and AEG(34:5) together account for almost all of the AEG pool under both conditions. The composition remains largely stable, with a slight reduction of AEG (33.5) under LowInput, but no new dominant species emerge.
+AEG(o-32:3), AEG(o-34:4), and AEG(o-34:5) are the most prevalent species, together comprising more than 75\% of the overall AEG signal across both conditions. Importantly, AEG(o-32:3) experiences a notable increase under LI, going from 23.2\% to 35\%, whereas AEG(o-34:5) decreases from 26.9\% to 21.2\%. AEG(o-34:4) remains relatively constant. Minor species like AEG(o-36:6) and AEG(o-30:2) are present at low levels and exhibit minimal changes. In summary, the AEG pool composition undergoes a moderate adjustment under stress, with the significant rise in AEG(o-32:3) being a key factor in this alteration.
 
 \textbf{Diacylglycerol (DG).}  
-Under C, DG(18:3) (~26\%), DG(34:2) (~22\%), DG(24:0) (~10\%), DG(36:5) (~8\%), DG(36:6) (~8\%) and DG(32:0) (~7\%) are the main contributors, with about 9\% other species. Under LI, the same top species persist: DG(18:3) remains ~26\%, DG(34:2) slightly decreases to ~18\%, DG(24:0) ~7\%, DG(36:5) & DG(36:6) ~8\% each, plus a new DG species DG(20:1) at ~19\% (which was absent in Control). Some species (e.g., DG(32:0), DG(36:4)) drop out under LI. Overall, the DG class retains a similar core composition, although LI shows the emergence of DG (20: 1) and a modest redistribution among the other chain length / unsaturation species.
+DG(18:3) is the most prevalent species in both the C (58\%) and LI (55.1\%), with DG(24:0), DG(34:2), DG(34:1), DG(36:4), and DG(36:6) following, each contributing 3–6\%. DG(20:1), almost absent in Control (0.6\%), becomes significantly more abundant in LowInput (9.6\%), embodying the most substantial compositional shift. Similarly, DG(34:3) shows a notable increase from 3.3\% to 8\%, while species such as DG(36:4), DG(34:2), and DG(34:1) exhibit slight decreases. In C, low-abundance species like DG(32:0), DG(18:0), and DG(36:0) were detectable, whereas DG(16:0) and DG(38:3) were exclusively found in LI. Overall, the DG profile remains centered around DG(18:3), although LI conditions trigger selective remodeling, illustrated by the emergence of DG(20:1) and a redistribution among the mid- and low-abundance species.
 
-\textbf{Digalactosyldiacylglycerol (DGDG).}  
-The two major species under C are DGDG(36:6) (~48\%) and DGDG(34:3) (~40\%), with a minor concentration of DGDG(36:3) (~6\%) and “Other” ~3\%. Under LI, DGDG(36:6) increases to ~66\% of the class, while DGDG(34:3) decreases to ~24\%; DGDG(36:3) remains ~5\%. A minor DGDG(34:2) (~3\%) in C disappears in LI. Thus, LI drives a stronger dominance of DGDG(36:6) at the expense of DGDG(34:3), indicating a shift toward the more highly unsaturated 36:6 species.
 
-\textbf{Monogalactosyldiacylglycerol (MGDG).}  
-MGDG(36:6) is by far the predominant species in both conditions (~80\% Control, ~82\% LowInput). Secondary species MGDG(36:5) (~7–8\%) and MGDG(34:3) (~7\%) remain in similar concentration. MGDG(36:4) decreases moderately from ~6\% to ~3\% under LI. Thus, the MGDG pool remains overwhelmingly MGDG(36:6), with only slight reduction in MGDG(36:4) under LI.
+\textbf{Monogalactosyldiacylglycerol (MGDG).} 
+Under both conditions, MG(18:3) is the most prevalent, rising from 48.3\% in C to 58.1\% in LI. MG(18:1) and MG(12:0) also see moderate increases, growing from 15\% to 18.3\% and from 11.5\% to 14.6\%, respectively, thereby comprising the majority of the MG pool. On the other hand, MG(16:0) experiences a slight decline from 8.3\% to 6.8\%, and MG(18:0) and MG(16:1) are found only in C. MG(20:4) is exclusive to LI but at a negligible concentration (0.2\%). These shifts indicate a subtle reorganization of the MG pool in LI, with a significant rise in unsaturated short- and medium-chain species, especially MG(18:3).
 
-\textbf{Lysophospholipids (LPC, LPE).}  
-Each class is dominated by a single species: LPC(16:0) is 100\% in both C and LI. LPE(16:0) is also 100\% in both. This is probably due to the fact that the massspec machine was unable to identify the other lysophospholipids. 
+\textbf{Lysophospholipids (LPC, LPE).} 
+LPC(16:0) and LPC(18:3) constitute virtually the entire LPC pool in both conditions. Under LI, LPC(16:0) increases from 56.5\% to 70.1\%, while LPC(18:3) decreases from 36.6\% to 29.9\%. This shift underscores a preference for the saturated C16 species at the expense of the polyunsaturated C18:3 form when the sample is in LI.
 
 \textbf{Monoacylglycerol (MG).}  
-Under C, MG(12:0) (~48\%), MG(18:3) (~28\%), and MG(18:0) (~15\%) were the highest species. Under LI, MG(12:0) rises to ~58\% and MG(18:3) to ~38\%. MG(16:0) appears at ~4\%, while MG(18:0) and MG(16:1) drop out in LI. Thus, the MG class shifts slightly towards shorter-chain or more unsaturated species (MG (12: 0), MG (18: 3), with the disappearance of some minor species and the appearance of MG (16: 0) under LI.
+MG(18:3) is the predominant component of the MG pool and shows an increase from 48.3\% in the C to 58.1\% in the LI. Both MG(18:1) and MG(12:0) also increase, from 15\% to 18.3\% and from 11.5\% to 14.6\%, respectively, while MG(16:0) experiences a reduction from 8.3\% to 6.8\%. MG(18:2) sees a slight decrease from 3.2\% to 2\%, and trace components like MG(20:4) only appear under LI at 0.2\%. Several minor species, such as MG(18:0) and MG(16:1), are exclusively found in C. This pattern indicates a moderate reorganization of the MG profile under LI conditions, with a shift towards more unsaturated C18 species.
+
 
 \textbf{Phosphatidic acid (PA).}  
-PA(34:20) constitutes ~100\% of the PA pool in both conditions, indicating that only one species is reliably detected and dominant. Similarly to lysophospholipids, the mass-spec machine might not identify all PA species. 
+PA(34:2) constitutes ~100\% of the PA pool in both conditions, indicating that only one species is reliably detected and dominant.
 
 \textbf{Phosphatidylcholine (PC).}  
-C composition is split among PC(34:3) (~24\%), PC(34:2) (~24\%), PC(36:4) (~19\%), PC(36:5) (~10\%), PC(34:0) (~4\%), PC(18:3) (~4\%), and PC(34:1) (~4\%), with some minor species (~11\%). Under LI, PC(34:3) increases to ~33\%, PC(34:2) to ~31\%, PC(36:4) decreases to ~7\%. PC(36:5) remains at ~9\%, PC(34:0) ~4\%, and PC(18:3) and PC(34:1) become negligible or absent. Thus, the composition of the LI PC changes towards the 34 carbon species (34:3 and 34:2) at the expense of 36:4 and the minor species, and the other pool of small PC species expands slightly.
+PC(34:2) remains the primary species but decreases from 35.4\% in the C to 28.3\% with LI. Conversely, PC(34:0) and PC(34:3) nearly double their proportions (13.7\% to 20\% and 8.4\% to 16.6\%, respectively), whereas PC(34:1) drops significantly (13.2\% to 7.5\%). Additionally, PC(36:5) sees an increase (7.3\% to 11.4\%), while PC(36:4) diminishes (6.5\% to 4.0\%). Low-abundance species show slight shifts: PC(36:2) and PC(36:6) stay around 2–3\%, PC(18:3) appears only under LI conditions (0\% to 2.5\%), and PC(32:0) edges up slightly (0.4\% to 1.0\%). Some minor PCs are unique to specific conditions, such as PC(36:1) which shows up only in LI at 0.8\%, while PC(32:1), PC(34:4), PC(40:2), PC(42:1), and PC(44:2) are exclusive to the C. In total, this class of PCs experiences targeted remodeling with low-input sampling, marked by increases in some saturated and polyunsaturated C34 species and the emergence of previously unseen minor variants.
 
 \textbf{Phosphatidylethanolamine (PE).}  
-Under C, PE(36:4) (~41\%), PE(34:3) (~26\%), PE(34:2) (~17\%), PE(36:5) (~9\%) are the most abundant. Under LI, PE(34:3) rises to ~36\%, PE(36:4) drops to ~33\%, PE(34:2) to ~11\%, and PE(36:5) ~8\%. PE(34:1) appears at ~3\% in LI. Thus, the dominant PE species shift modestly. PE(34:3) gains relative share, PE(36:4) loses some, and PE(34:1) appears under LI.
+Under LI conditions, PE(34:2) stays as the predominant species, showing a slight decline from 46.7\% in C to 45.7\%. The most noteworthy transformation occurs in PE(34:3), which sees its portion tripling from 5.0\% to 15.4\%, suggesting a preferential enrichment in this polyunsaturated variant. A modest decrease is noted in PE(36:4), moving from 19.0\% to 16.8\%, while other principal species, PE(34:1), PE(36:5), and PE(36:2) remain mostly unaffected. In the category of low-abundance PEs, there is an increase in PE(36:3) from 0.4\% to 1.1\%, and PE(34:0) slightly ascends from 0.2\% to 0.3\%. Meanwhile, PE(36:6), PE(16:0), and PE(18:2) persist around 0.1–0.5\%. Under LI conditions, PE(36:1) drops below detectable levels. Overall, the LI scenario prompts a targeted restructuring of the PE pool, significantly enhancing PE(34:3) and, to a lesser extent, PE(36:3), while maintaining the predominance of the 34:2 species.
 
 \textbf{Phosphatidylglycerol (PG).}  
-PG(16:0) is the main species (~69\% C, ~61\% LI). PG(17:0) increases from ~15\% to ~22\%, and PG(34:1) remains ~16–17\%. This indicates moderate redistribution toward PG(17:0) under LI but the overall class remains dominated by PG(16:0).
+In both scenarios, PG(34:1) and PG(16:0) nearly entirely constitute the PG pool. Under LI conditions, the proportion of PG(34:1) rises from 59.1\% to 65.4\%, while PG(16:0) shows an insignificant change (34.1\% to 34.6\%). This small adjustment highlights the preferential accumulation of the unsaturated 34:1 species in LI samples.
 
 \textbf{Sphingomyelin (SM).}  
 SM(35:1) comprises ~100\% of SM in both conditions.
 
 \textbf{Sulfoquinovosyldiacylglycerol (SQDG).}  
-For C the main species are SQDG(34:3) ~47\%, SQDG(36:6) ~26\%, and SQDG(32:0) ~16\%. Under LI, SQDG(34:3) had similar share of ~46\%, SQDG(36:6) reduced to ~22\%, and SQDG(32:0) increased to ~19\%. SQDG(36:5) ~4\% and SQDG(36:3) ~3\% appeared in LI. Thus, SQDG(34:3) remains the largest share; LowInput shows slight rise in SQDG(32:0) and appearance of minor SQDG(36:5)/(36:3), with overall modest redistribution but same dominant species.
+SQDG(34:3) continues as the predominant species, exhibiting a minor uptick under LI conditions (45.1\% to 46.8\%), whereas SQDG(36:6) sees a slight decrease (24.5\% to 22.3\%). SQDG(32:0) experiences a significant increase (14.5\% to 19.2\%), highlighting a trend towards shorter-chain derivatives. Forms of intermediate abundance such as SQDG(36:5), SQDG(36:3), and SQDG(34:2) also rise (2.7\% to 3.6\%, 2.1\% to 3.2\%, and 1.8\% to 2.6\%, respectively), while SQDG(36:4) and SQDG(34:1) remain steady. Trace amounts like SQDG(30:0) double (0.1\% to 0.2\%), SQDG(34:4) stays at 0.3\%, and SQDG(34:0) becomes undetectable under LI. Hence, the SQDG spectrum under low-input conditions is characterized by increased representation of species 34:3 and 32:0, along with a general rise in various mid- to low-abundance types.
 
 \textbf{Triacylglycerol (TG).}  
-Major species include the TG(54:8) (rising from ~10\% to ~19\%), TG(54:7) (~16\% to ~18\%), TG(54:9) (~4\% to ~10\%), TG(54:6) (~8\% to ~9\%), TG(52:5) (~11\% to ~7\%), TG(52:4) (~8\% to ~5\%), TG(52:6) (~8\% to ~6\%), and TG(54:5) (~4\% both). Additionally, some species drop out under LI (e.g., TG(49:0), TG(50:2)). In general, LI changes the composition of TG towards a higher relative abundance of certain longer chain / unsaturated species (e.g., TG (54.4), TG (54.4), TG (54.7), while some shorter or less unsaturated TG drop in share.
+TG(54:7) remains the predominant species and rises from 23.3\% in the C to 26.0\% under LI conditions. Several TGs with moderate abundance also exhibit notable shifts. TG(54:8) nearly doubles (from 7.8\% to 15.0\%), TG(54:9) more than doubles (from 3.4\% to 8.2\%), and TG(54:5) triples (from 2.6\% to 8.5\%). Both TG(54:6) and TG(54:4) experience modest increases, while TG(52:5), TG(52:6), TG(52:4), and TG(52:3) decline. Interestingly, TG(36:0) and TG(38:0) decrease under LI, and new species such as TG(24:0) (1.0\%) and TG(28:0) (0.4\%) appear. Consequently, the TG pool largely transitions towards longer, more unsaturated C54 species under LI, along with the emergence of some short-chain variants.
 
 \bigskip
 
-In summary, within each lipid species, the most prominent individual species remain the same across C and LI, indicating a largely stable lipid profile. However, LI induces moderate redistributions. For example, in DGDG the 36:6 species becomes more dominant, PC shifts toward 34carbon species, MG and TG classes show an increased share of certain chainlength/unsaturation species, and PG shows a modest increase of PG(17:0). Lysophospholipids and single‐species classes (LPC, LPE, PA, SM) remain unchanged. These percentage shifts within classes reflect how combined LowP, LowN, and cold stress redistribute the lipidome by favoring particular acyl chain compositions, even while preserving the same major species.  
+In conclusion, in LI samples, there is a systematic alteration in the lipidome, prioritizing energy-storing lipids and unsaturated membrane components over certain structural phospholipids. Neutral lipids, particularly TG, increase significantly with a notable rise in long-chain unsaturated C54 species, while DG maintain a predominance of DG(18:3) and incorporate DG(20:1) during LI conditions. Monoglycerides increasingly consist of polyunsaturated C18 variants, and acyl-ether glycerols generally stay compositionally unchanged except for a considerable growth in AEG(o-32:3). Among lysophospholipids, saturated LPC(16:0) rises at the expense of LPC(18:3). PC and PE are selectively reorganized. PC loses major C(34:2) and C(34:1) species while C(34:0)/C(34:3) forms appear, and PE significantly enriches PE(34:3). Additionally, chloroplast-associated SQDG transitions towards 34:3 and 32:0 species. Collectively, these modifications highlight how LI sampling enhances neutral and galactolipid reserves and favors unsaturated species, while reorganizing the glycerophospholipid framework, emphasizing the crucial role of sample amount in understanding plant lipidomic profiles.
 
 
 \begin{figure}[htp]
@@ -663,572 +666,454 @@ In summary, within each lipid species, the most prominent individual species rem
 \end{figure}
 
 
-subsection*{Membrane Lipid Remodeling}
+\subsection*{Lipid Changes under LowInput (LI)}
 
-\subsubsection*{Galactolipid Dynamics}
+\subsection*{1. Membrane Lipid Remodeling under LowInput (LI)}
 
-The LowInput (LI) treatment induces a reorganization of chloroplast galactolipid metabolism that departs from the canonical phosphorus‐starvation pattern (Fig.~\ref{fig:lipid_remodeling} “Galactolipid Dynamics”):
+\subsubsection*{1.1 Sulfolipid (SQDG) Collapse Under LI Stress Adaptation}
 
-\begin{itemize}
-  \item \textbf{\(\mathrm{DGDG/PC}\)} and \textbf{\(\mathrm{DGDG/PE}\)} show no significant change (\(p>0.05\)), indicating that digalactosyldiacylglycerol (DGDG) levels remain proportional to phosphatidylcholine (PC) and phosphatidylethanolamine (PE) pools despite LI treatment.
-  \item \textbf{\(\mathrm{MGDG/DGDG}\)} decreases sharply (\(p<0.001\)), demonstrating preferential depletion of monogalactosyldiacylglycerol (MGDG) relative to its bilayer‐stabilizing derivative DGDG.
-  \item Composite metrics:
-    \begin{itemize}
-      \item \(\mathrm{DGDG}_{\mathrm{total}} = \mathrm{DGDG} - \tfrac{1}{2}(\mathrm{MGDG} + \mathrm{SQDG})\) increases significantly under LI (\(p<0.001\)), indicating a shift toward relative DGDG dominance among galactolipids.
-      \item \(\mathrm{MGDG}_{\mathrm{total}} = \mathrm{MGDG} - \tfrac{1}{2}(\mathrm{DGDG} + \mathrm{SQDG})\) decreases significantly (\(p<0.001\)), confirming global depletion of the MGDG pool.
-    \end{itemize}
-  \item \textbf{\(\mathrm{MGDG/PC}\)} decreases significantly (\(p<0.001\)), suggesting that MGDG is specifically vulnerable relative to bulk membrane lipids.
-\end{itemize}
+Under LI stress, SQDG is the lipid most susceptible to degradation, breaking down quickly prior to the remodeling of other membrane lipids (Fig.~\ref{fig:lipid_remodeling}\,“Sulfolipid Adjustments”).
 
-\paragraph{Quantitative notes}
-If fold‐changes are available (e.g., \(\mathrm{MGDG/DGDG}\) drops by ~3.2‐fold), they can be inserted here to emphasize the magnitude. Replace “no significant change” with exact \(p\)-value when desirable (e.g., \(p=0.12\)).
 
-\paragraph{Potential Physiological Implications}
+% ------------------------------------------------------------------
+%  Canonical behaviour of SQDG under single stresses
+% ------------------------------------------------------------------
+\begin{table}[!ht]
+  \centering
+  \caption{\bf Canonical responses of sulfoquinovosyldiacylglycerol (SQDG) under single abiotic stresses.}
+  \label{table:SQDG_responses}
+  \begin{tabular}{@{} l l c p{6cm} c @{}}
+    \toprule
+    \textbf{Class} 
+      & \textbf{Stress} 
+      & \textbf{Response} 
+      & \textbf{Mechanism} 
+      & \textbf{Ref.} \\
+    \midrule
+    \multirow{3}{*}{\textbf{SQDG}}
+      & Low-P  & ↑ (strong induction)   
+               & SQDG replaces anionic phospholipids (mainly PG) to maintain thylakoid surface charge while economizing phosphorus; up-regulation of SQD1/SQD2 diverts UDP-sulfoquinovose toward SQDG synthesis. 
+               & [1] \\
+      & Low-N  & ↓/≈ (variable)         
+               & Nitrogen scarcity limits sulfate assimilation and UDP-sulfoquinovose production; DAG backbones are redirected to TAG or DGDG rather than SQDG. 
+               & [2] \\
+      & Cold   & ↑/≈ (species-dependent)
+               & Cold acclimation often elevates SQDG for extra anionic buffering of PSII complexes; responses vary with species and sugar availability. 
+               & [3] \\
+    \bottomrule
+  \end{tabular}
+  \begin{flushleft}
+    {\footnotesize Arrows denote relative change vs.\ control (↑ increase, ↓ decrease, ≈ no consistent change).}
+  \end{flushleft}
+\end{table}
+
+
+
+\paragraph{Key Observations}
 \begin{enumerate}
-  \item \textit{Membrane physical state modulation.}  
-        The marked decrease in \(\mathrm{MGDG/DGDG}\) indicates a strategic shift toward more rigid bilayer structures, perhaps compensating for stress‐induced fluidity perturbations in thylakoid membranes.
-  \item \textit{Metabolic channeling within galactolipid pathways.}  
-        Stable \(\mathrm{DGDG/PC}\) and \(\mathrm{DGDG/PE}\) but strong MGDG depletion suggest carbon flux may be preferentially directed toward DGDG synthase (DGD1/2) activity (or maintenance of minimal DGDG), rather than broadly sustaining MGDG production.
-  \item \textit{Non‐phosphorus lipid homeostasis under combined limitation.}  
-        The paradox of unchanged DGDG/phospholipid ratios yet shifts in composite metrics implies complex regulation: the cell maintains specific lipid‐to‐lipid relationships while overall pools fluctuate under nutrient/Energy constraints.
-  \item \textit{Carbon reallocation toward storage or alternative lipid classes.}  
-        Released diacylglycerol (DAG) from shrinking MGDG pools may be channeled into triacylglycerol (TAG) or other storage lipids when growth or galactolipid synthesis is limited by LowInput.
+  \item \textbf{Preferential SQDG depletion relative to phospholipids: } \\ 
+  Both SQDG/PC and SQDG/PG decrease significantly (LI $<$ Control, $p<0.001$), indicating that SQDG deteriorates more rapidly compared to the primary phospholipids in extraplastidial (\textit{PC}) and thylakoid (\textit{PG}) membranes.
+  
+  \item \textbf{SQDG loss outpaces DGDG: }\\
+  SQDG decreases more significantly than DGDG ($p<0.001$), suggesting that DGDG is conserved to maintain bilayer stability. The potential high metabolic costs in terms of sulfur and energy, as well as its non-essential nature for short-term membrane integrity, make the breakdown of SQDG more prioritized. We define {SQDG\textsubscript{total}} as \(\bigl[\mathrm{SQDG}-\tfrac12(\mathrm{DGDG}+\mathrm{MGDG})\bigr]\). Furthermore, the total SQDG levels decline in LI ($p<0.001$), indicating an overall sulfolipid deficit. However, MGDG levels remain unchanged with respect to SQDG.
+  
 \end{enumerate}
 
-\paragraph{Proposed Regulatory Crossroads}
-The data are consistent with a convergence of mechanisms:
-\begin{itemize}
-  \item \textit{Differential enzyme sensitivity:} MGDG synthases (MGD1/2) may be more inhibited under LowInput (e.g., substrate/cofactor limitation, post‐translational regulation) than DGDG synthases, causing pronounced MGDG loss while DGDG is relatively preserved.
-  \item \textit{Substrate limitation:} Reduced UDP‐galactose availability under combined nutrient or energy stress may disproportionately affect MGDG synthesis, while existing DGDG pools are maintained or modestly increased in relative terms.
-  \item \textit{Active lipid surveillance:} Cellular mechanisms might actively sustain minimal DGDG levels to preserve bilayer integrity, even at the expense of depleting MGDG when resources are scarce.
-  \item \textit{Stress‐induced rerouting of carbon:} Under LowInput, carbon flux may be diverted from galactolipid synthesis toward storage lipids (TAG) or essential metabolic processes, overriding the typical P‐starvation replacement of phospholipids by galactolipids.
-\end{itemize}
+\paragraph{Metabolic Interpretation and Physiological Significance}
+\vspace{-0.5ex}
+\begin{enumerate}
+  \item \textbf{Sulfur salvage for stress defence.} \\ 
+        SQDG breakdown yields sulfoquinovose, contributing sulfur for glutathione and other thiols that neutralize ROS during the initial phase of simultaneous cold and nutrient scarcity.
+ % \item \textit{DG liberation fuels downstream pathways.}  
+ %       DAG produced from SQDG hydrolysis explains the sharp rise in
+ %       \(\mathrm{DG/SQDG}\) (Section 2); that DAG is later diverted to
+ %       TAG rather than recycled into membranes.
+  \item \textbf{Anionic‐lipid charge compensation.} \\
+        The loss of SQDG is typically compensated by an increase in PG or DGDG during phosphorus deficiency. In this scenario, both the SQDG/Phospho and SQDG/Galacto ratios decrease, indicating that LI plants may tolerate a net decrease in anionic surface charge, which might be stabilized by the association with Ca\(^{2+}\) or Mg\(^{2+}\) in cold conditions.
+\end{enumerate}
 
 
+
+\subsubsection*{1.2 Galactolipid Dynamics}
+
+ In LI treatment, galactolipid degradation becomes asymmetrical, with MGDG experiencing a greater depletion relative to DGDG. This imbalance signifies a tactical balance between energy efficiency and maintaining membrane integrity (see Fig.~\ref{fig:lipid_remodeling}, “Galactolipid Dynamics”):
 % ------------------------------------------------------------------
 %  Galactolipid behaviour (DGDG and MGDG)
 % ------------------------------------------------------------------
-% Place tables after the first paragraph in which they are cited.
 \begin{table}[!ht]
-  \begin{adjustwidth}{-2.25in}{0in} % Remove or comment out if table already fits the column
-    \centering
-    \caption{{\bf Canonical responses of the two major galactolipids under single stresses.}}
-    \begin{tabular}{|l|c|c|p{3.8in}|}
-      \hline
-      \textbf{Stress} & \textbf{DGDG} & \textbf{MGDG} & \textbf{Key mechanism(s)} \\ \hline
-      Low-P  & ↑ (replaces PC/PE) & ↑ (replaces PC/PE) & Diacylglycerol is redirected toward galactolipid synthesis, substituting for phospholipids under P limitation. \\ \hline
-      Low-N  & ↑ / ≈ (weak retention) & ↓ & Enhanced PC breakdown releases DAG that is partly channeled to DGDG, while MGDG tends to decline as resources shift to storage lipids or other pathways. \\ \hline
-      Cold   & ↑ (bilayer stabilizer) & ↓ (converted or remodeled) & Cold stress favors higher DGDG for maintaining bilayer stability; MGDG is remodeled or reduced to adjust membrane fluidity. \\ \hline
-    \end{tabular}
-    \begin{flushleft}
-      Table notes: Arrows indicate relative changes under stress compared to control. Symbols: ↑ increase, ↓ decrease, ≈ no significant change.
-    \end{flushleft}
-    \label{table:galactolipid_responses}
-  \end{adjustwidth}
+  \centering
+  \caption{\bf Canonical responses of the two major galactolipids (DGDG and MGDG) under single abiotic stresses.}
+  \label{table:galactolipid_responses}
+  \begin{tabularx}{\textwidth}{@{} l l p{3.5cm} X c @{}}
+    \toprule
+    \textbf{Class}
+      & \textbf{Stress}
+      & \textbf{Response}
+      & \textbf{Mechanism}
+      & \textbf{Ref.} \\
+    \midrule
+    \multirow{3}{*}{\textbf{Galactolipids}}
+      & Low-P  
+         & \begin{minipage}[t]{3.5cm}
+             DGDG: ↑ replaces PC/PE;\\
+             MGDG: ↑ replaces PC/PE
+           \end{minipage}
+         & DAG is redirected toward galactolipid synthesis, substituting for phospholipids under P limitation.
+         & [1] \\[1ex]
+      & Low-N  
+         & \begin{minipage}[t]{3.5cm}
+             DGDG: ↑/≈ (weak retention);\\
+             MGDG: ↓
+           \end{minipage}
+         & Enhanced PC breakdown releases DAG that is partly channeled to DGDG, while MGDG declines as resources shift to storage lipids or other pathways.
+         & [2] \\[1ex]
+      & Cold   
+         & \begin{minipage}[t]{3.5cm}
+             DGDG: ↑ (bilayer stabilizer);\\
+             MGDG: ↓ (converted or remodeled)
+           \end{minipage}
+         & Cold stress favors higher DGDG for maintaining bilayer stability; MGDG is remodeled or reduced to adjust membrane fluidity.
+         & [3] \\
+    \bottomrule
+  \end{tabularx}
+  \begin{flushleft}
+    {\footnotesize Arrows denote relative changes vs.\ control (↑ increase, ↓ decrease, ≈ no significant change).}
+  \end{flushleft}
 \end{table}
 
-
-\subsubsection*{Phospholipid Homeostasis}
-
-Under LowInput (LI) treatment, phospholipid relationships are remodelled in a way that differs from classical phosphorus‐starvation or other single stresses (Fig.~\ref{fig:lipid_remodeling} “Phospholipid Homeostasis”):
-
-\begin{itemize}
-  \item \textbf{\(\mathrm{PC/PE}\)} shows no significant change (\(p>0.05\)), indicating that the balance between phosphatidylcholine (PC) and phosphatidylethanolamine (PE) is maintained under LI.
-  \item \textbf{\(\mathrm{PC/PG}\)} increases significantly under LI (\(p<0.001\)), implying a relative enrichment of PC versus phosphatidylglycerol (PG) in membrane pools.
-  \item \textbf{\(\mathrm{PG\_retention}\)} decreases significantly under LI (\(p<0.001\)), where we define 
-    \[
-      \mathrm{PG\_retention} \;=\; \mathrm{PG} \;-\; \tfrac{1}{2}(\mathrm{PC} + \mathrm{PE}).
-    \]
-    A lower PG_retention means that PG levels drop relative to the average of PC and PE under LI.
-\end{itemize}
-
-\paragraph{Quantitative notes}
-If available, insert exact \(p\)-values or fold‐changes, e.g.: “\(\mathrm{PC/PG}\) increases by ~X‑fold under LI (p = 0.0002),” and “\(\mathrm{PG\_retention}\) decreases by ~Y% (p < 0.001)”. Replace “no significant change” with the precise \(p\)-value (e.g., \(p = 0.12\)) if desired for clarity.
+\paragraph{Key Observations}
+\begin{enumerate}
+  \item \textbf{MGDG is the Primary Target of Degradation} \\
+  The ratio \(\mathrm{MGDG/DGDG}\) decreases significantly (\(p<0.001\)), highlighting a more rapid depletion of MGDG compared to its bilayer-supporting counterpart, DGDG. This pattern may imply that stress-activated lipases, such as PLA1, preferentially hydrolyze MGDG. Additionally, the \(\mathrm{MGDG/PC}\) ratio and the composite measure \(\mathrm{MGDG}_{\mathrm{total}} = \mathrm{MGDG} - \tfrac12(\mathrm{DGDG}+\mathrm{SQDG})\) both show substantial reductions (\(p<0.001\)), indicating that MGDG is the primary lipid reserve to be depleted under LI stresses.
+  
+  \item \textbf{DGDG is Relatively Preserved but Outcompeted by Phospholipids} \\
+  DGDG\_total which is \([\mathrm{DGDG} - \tfrac12(\mathrm{MGDG}+\mathrm{SQDG})]\) shows a significant increase (\(p<0.001\)), suggesting relative preservation (Fig. TIC). This retention of DGDG implies that membrane collapse is being avoided. Furthermore, both \(\mathrm{DGDG/PC}\) and \(\mathrm{DGDG/PE}\) decrease (\(p<0.001\)), indicating that while DGDG levels surpass those of MGDG, they are still being overtaken by phospholipid concentrations under stress. Interestingly, \(\mathrm{DGDG/PG}\) exhibits an increase (\(p<0.001\)), which indicates a shift in DGDG distribution that might stabilize photosystem II (PSII) complexes. The increase in PG$_{\text{retention}}$ underscores PG's active preservation relative to other phospholipids like PC and PE, aligning with its vital function in photosynthesis.
+\end{enumerate}
 
 \paragraph{Potential Physiological Implications}
 \begin{enumerate}
-  \item \textit{Maintenance of PC/PE bilayer asymmetry.}  
-        The unchanged \(\mathrm{PC/PE}\) ratio suggests that basic bilayer properties (fluidity, curvature propensity) are preserved, possibly to maintain membrane integrity under stress.
-  \item \textit{Altered PG allocation and photosynthetic membrane function.}  
-        A rise in \(\mathrm{PC/PG}\) and concomitant drop in PG_retention implies PG is relatively depleted under LI. Since PG is essential for photosystem II stability and thylakoid function, reduced PG retention may reflect compromised photosynthetic membrane maintenance under nutrient/energy constraints.
-  \item \textit{Selective phospholipid remodeling.}  
-        Preferential retention of PC over PG (higher PC/PG) may reflect either enhanced PC synthesis or accelerated PG turnover. This could be driven by phospholipase activities or shifts in glycerolipid flux to prioritize certain membrane domains.
-  \item \textit{Carbon and phosphorus economy trade‑offs.}  
-        Under LowInput, the cell may divert limited resources away from PG synthesis (which can be P‑intensive) and favor PC/PE pools, consistent with a strategy to allocate phosphorus toward critical processes other than PG-rich membranes.
+  \item \textbf{Thylakoid Membrane Rigidification via Lipid Restructuring} \\
+        The reduction in MGDG/DGDG suggests a shift from the non-bilayer arrangement of MGDG to the stable bilayer form of DGDG. This change likely serves to counteract fluidity alterations caused by cold and nutrient stress, thus increasing membrane rigidity. Furthermore, it could aid in preventing ion leakage during nutrient shortages, given that the bilayer structure of DGDG provides superior seal integrity compared to the hexagonal II phase inclination of MGDG.
+  
+  \item \textbf{Carbon channeling within galactolipid pathways.} \\ 
+        The simultaneous reduction of MGDG\_total while total DGDG\_total levels are maintained or increased indicates a prioritization in resource allocation, where the breakdown of MGDG supports the continued synthesis of DGDG during LI stress conditions. This suggests that the activity of DGD1/2 synthase could remain active for a more extended period or resist low temperatures more effectively than MGD1/3 activities, possibly due to differences in enzyme stability and the requirement for a bilayer during stress. The degradation of MGDG may release carbon, which is then used for the ongoing synthesis of residual DGDG, mediated through recycled DG, and for the storage of TG (refer to the increase in TG/DG in Section 1.3).
+  
+  \item \textbf{Dual functionality of DGDG} \\ 
+        The rise in DGDG/PG indicates that DGDG may partially substitute for PG’s anionic surface charge. %By shuffling anionic lipids—DGDG and PG—to the forefront, LI plants may also optimize binding sites for Ca\(^{2+}\) and Mg\(^{2+}\) ions. These cations bridge adjacent negatively charged headgroups, tightening bilayer packing and mitigating leakiness that would otherwise arise from headgroup depletion.
+        PG is limited (↓ PG\_retention, \(p<0.001\)), and SQDG is inadequate in this capacity (↓ SQDG/PG, \(p<0.001\)), which underscores the unique dual role of DGDG as both a structural lipid and a charge buffer.
 \end{enumerate}
 
-\paragraph{Proposed Regulatory Crossroads}
-The observed remodeling could arise from multiple converging mechanisms:
-\begin{itemize}
-  \item \textit{Phosphatidylglycerol biosynthesis regulation.}  
-        Under LI, enzymes in the PG synthesis pathway (e.g., phosphatidylglycerolphosphate synthase, PG phosphatase) may be downregulated or substrate‑limited, causing PG pools to shrink relative to PC/PE.
-  \item \textit{Phospholipase‐mediated turnover.}  
-        Enhanced phospholipase activities targeting PG (vs.\ PC/PE) could accelerate PG degradation, releasing diacylglycerol (DAG) for other fates (e.g., storage lipids) while preserving PC/PE.
-  \item \textit{Phosphorus reallocation.}  
-        PG is a phosphorus‑containing lipid abundant in photosynthetic membranes; LI may trigger reallocation of P away from PG to other essential P‑requiring pathways (e.g., nucleotides, signaling molecules), resulting in lower PG_retention.
-  \item \textit{Membrane domain remodeling.}  
-        Shifts in PC/PG may reflect changes in membrane microdomains or organelle lipid composition, e.g., prioritizing certain organelle membranes (ER, plasma membrane) under stress at the expense of PG‑rich thylakoids.
-\end{itemize}
+%\paragraph{Proposed Regulatory Crossroads}
+%\begin{itemize}
+%  \item \textit{Differential enzyme sensitivities:}  
+%        MGDG synthase (MGD1/2) activity may be more inhibited by combined Low-N/P/cold than DGDG synthases, leading to sharper MGDG loss.
+%  \item \textit{Galactose precursor limitation:}  
+%        Reduced UDP-galactose under nutrient/cold stress may throttle MGDG production more than DGDG, whose existing pools are preferentially maintained.
+%\end{itemize}
 
-% --- Example figure block (ensure your label matches):
-\begin{figure}[ht]
+
+
+\subsubsection*{1.3 Phospholipid Homeostasis}
+
+Under LI stress, phospholipid pools are selectively reorganized (Fig.~\ref{fig:lipid_remodeling} “Phospholipid Homeostasis”):
+
+\begin{table}[!ht]
   \centering
-  \includegraphics[width=\textwidth]{fig/main/Fig2_lipid_remodeling.png}
-  \caption{Membrane lipid remodeling under LowInput vs.\ Control.
-           (Left) Galactolipid Dynamics; (Center) Phospholipid Homeostasis; (Right)            In “Phospholipid Homeostasis,” PC/PE is unchanged, PC/PG rises, and PG_retention falls under LI.}
-  \label{fig:lipid_remodeling}
-\end{figure}
+  \caption{\bf Canonical responses of PC, LPC and PG under single abiotic stresses.}
+  \label{table:lipid_responses}
+  \begin{tabular}{@{} l l c p{5.5cm} c @{}}
+    \toprule
+    \textbf{Class} 
+      & \textbf{Stress} 
+      & \textbf{Response} 
+      & \textbf{Mechanism} 
+      & \textbf{Ref.} \\
+    \midrule
+    \multirow{3}{*}{\textbf{PC}} 
+      & Low-P  & ↓ (major P donor)      
+               & Phospholipase-mediated PC hydrolysis releases choline and phosphate; DAG backbone is redirected to DGDG or TAG synthesis. 
+               & [1] \\
+      & Low-N  & ↓ (N-source)          
+               & Choline head-group catabolism supplies nitrogen; DAG is channeled into TAG accumulation. 
+               & [2] \\
+      & Cold   & ↑/≈ (species‐dependent) 
+               & Increased PC unsaturation preserves bilayer fluidity; net PC often maintained or slightly elevated. 
+               & [3] \\
+    \addlinespace
+    \multirow{3}{*}{\textbf{LPC}} 
+      & Low-P  & ↑ (lipase product)    
+               & PLA$_2$ activity rises to liberate phosphate; LPC is subsequently exported or re-acylated. 
+               & [4] \\
+      & Low-N  & ↓/≈                   
+               & Reduced phospholipase activity conserves N-rich head-groups; DAG is preferred for storage rather than LPC re-acylation. 
+               & [5] \\
+      & Cold   & ↑                      
+               & Rapid acyl-editing cycle (LPC ↔ PC) supports insertion of unsaturated acyl chains for cold acclimation. 
+               & [6] \\
+    \addlinespace
+    \multirow{3}{*}{\textbf{PG}} 
+      & Low-P  & ↓/≈                   
+               & Partially substituted by SQDG to conserve phosphorus, yet basal PG is retained for PSII function. 
+               & [7] \\
+      & Low-N  & ≈/↓                   
+               & PG contains no nitrogen; levels remain largely stable with only minor decline if DAG is diverted to TAG. 
+               & [8] \\
+      & Cold   & ↑ (thylakoid stabilizer)
+               & Extra PG supports PSII dimer stability and optimizes electron transport at low temperature. 
+               & [9] \\
+    \bottomrule
+  \end{tabular}
+  \begin{flushleft}
+    {\footnotesize Arrows denote relative change vs.\ control (↑ increase, ↓ decrease, ≈ no consistent change).}
+  \end{flushleft}
+\end{table}
 
-
-
-\subsection*{Membrane Lipid Remodeling}
-
-\subsubsection*{Phospholipid Homeostasis}
-
-The LI treatment reveals selective reorganization of phospholipid pools, with striking changes in PG metabolism (Fig.~\ref{fig:2b_ratio_lowP}):
-
-\begin{itemize}
-\item \textbf{PC/PE} remains stable ($p>0.05$), indicating maintained equilibrium between the two dominant bilayer-forming phospholipids despite stress conditions.
-
-\item \textbf{PC/PG} increases sharply ($p<0.001$), showing disproportionate accumulation of phosphatidylcholine relative to the anionic phosphatidylglycerol.
-
-\item The \textbf{PG retention} metric 
-[
-P
-G
-−
-P
-C
-+
-P
-E
-2
-]
-[PG− 
-2
-PC+PE
-​
- ] decreases significantly ($p<0.001$), demonstrating specific depletion of this photosynthesis-critical lipid relative to bulk phospholipids.
-\end{itemize}
-
-\paragraph{Biological Implications}
 \begin{enumerate}
-\item \textit{Photosynthetic membrane remodeling:}
-The 3.8-fold decrease in PG retention suggests strategic downsizing of thylakoid membranes, where PG constitutes 10-25% of lipids in photosynthetic complexes.
+  \item \textbf{PC/PE Asymmetry Suggests Membrane Rigidification} \\
+  The substantial rise in PC/PE (\(p<0.001\)) suggests a favored preservation or production of PCs rather than PEs. The methylated headgroup of PC contributes to enhancing bilayer stability under conditions of low temperature and limited nutrients, whereas PE, with its smaller headgroup and tendency toward non-bilayer formations, is comparatively reduced.
+  
+  \item \textbf{PC/PG Increase Reflects Photosynthetic Trade-offs} \\
+  PG retention is specific to plastids (refer to ↑DGDG/PG, section 1.2), though its overall quantity diminishes relative to PC. This reduction might aid in maintaining non-plastidic membrane structure as PG is depleted. Additionally, the increase in PC could potentially counterbalance the loss of thylakoid lipids (as indicated by ↓ MGDG\_retention and ↓ SQDG\_retention, section 1.2, Galactolipids, Dynamics).
+  
+  \item \textbf{PG\_retention Decline Highlights Metabolic Cost} \\
+  The retention of PG (\(\mathrm{PG} - \tfrac12(\mathrm{PC} + \mathrm{PE})\)) decreases significantly (\(p<0.001\)), indicating that although PG is actively preserved for thylakoid functionality, its overall pool diminishes when compared to total phospholipids. The formation of PG depends on CDP-DAG and glycerol-3P, processes that are energy-demanding and may be reallocated under stress conditions.
+  
+  \item \textbf{NonP\_Phosphorus Decline Signals P-Limitation} \\
+  The metric for non-P lipids, represented by \(\bigl[(\mathrm{MGDG}+\mathrm{DGDG})-(\mathrm{PC}+\mathrm{PE})\bigr]\), shows a significant decrease (\(p<0.001\)). This indicates that galactolipids and sulfolipids are less prominent compared to phospholipids, despite being non-phosphorus lipids. This observation deviates from the expected behavior during classic P starvation. In contrast to P limitation alone, the combined stress does not lead to an increase in the DGDG/PC ratio (↓ DGDG/PC), implying that the constraints from cold and nitrogen conditions overshadow the typical lipid shifts associated with P deficiency.
 
-\item \textit{Headgroup homeostasis:}
-Stable PC/PE ratio ($\Delta<0.2$ fold) indicates preserved non-plastidic membrane architecture despite significant PG depletion.
-
-\item \textit{Charge balance maintenance:}
-The opposing trends in PC/PG (↑) versus PG retention (↓) point to compensatory mechanisms maintaining membrane surface charge through alternative anionic lipids.
 \end{enumerate}
 
-\paragraph{Regulatory Mechanisms}
-Three non-exclusive pathways may drive this reorganization:
-\begin{itemize}
-\item[1)] \textit{Precursor partitioning:} Redirected CDP-DAG flux toward PC/PE at the expense of PG biosynthesis
-
-\item[2)] \textit{Thylakoid degradation:} Selective autophagy of PG-rich photosynthetic membranes during stress
-
-\item[3)] \textit{Enzymatic regulation:} Stress-induced inhibition of PGP synthase (PGPS) or activation of PG-specific lipases
-\end{itemize}
-
-
-\subsubsection*{Phospholipid Homeostasis}
-
-Under the LowInput (LI) treatment, phospholipid relationships are selectively remodeled, with marked changes in phosphatidylglycerol (PG) metabolism, while PC and PE remain balanced (Fig.~\ref{fig:2b_ratio_lowP}):
-
-\begin{itemize}
-  \item \textbf{\(\mathrm{PC/PE}\)} remains stable (\(p>0.05\)), indicating preserved equilibrium between phosphatidylcholine and phosphatidylethanolamine despite stress.
-  \item \textbf{\(\mathrm{PC/PG}\)} increases significantly (\(p<0.001\)), showing disproportionate accumulation of PC relative to the anionic PG pool.
-  \item \textbf{\(\mathrm{PG\_retention}\)}, defined as
-    \[
-      \mathrm{PG\_retention} \;=\; \mathrm{PG} \;-\; \tfrac{1}{2}(\mathrm{PC} + \mathrm{PE}),
-    \]
-    decreases significantly under LI (\(p<0.001\)), demonstrating specific depletion of this photosynthesis‑critical lipid relative to the bulk phospholipids.
-\end{itemize}
-
-\paragraph{Quantitative notes}  
-If available, insert the exact fold‑changes or percentages. For example:  
-“\(\mathrm{PC/PG}\) rises by ~X‑fold under LI (e.g., from 0.8 to 1.2, \(p=0.0002\)), and \(\mathrm{PG\_retention}\) drops by ~Y% (e.g., 3.8‑fold decrease, \(p<0.001\)). The unchanged \(\mathrm{PC/PE}\) ratio may show \(\Delta<0.2\)‑fold variation with \(p\approx0.12\).”
-
-\paragraph{Biological Implications}
+\paragraph{Physiological Implications}
 \begin{enumerate}
-  \item \textit{Photosynthetic membrane remodeling.}  
-        The substantial decrease in PG\_retention suggests strategic downsizing of PG‑rich thylakoid membranes under LI, potentially lowering photosynthetic capacity in favor of resource reallocation.
-  \item \textit{Headgroup homeostasis.}  
-        The stable \(\mathrm{PC/PE}\) ratio (\(p>0.05\), \(\Delta<0.2\)‑fold) indicates that non‑plastidic membrane architecture (e.g., ER, plasma membrane) is maintained even as the PG pools shrink.
-  \item \textit{Charge balance maintenance.}  
-        Opposing trends—PC/PG up vs.\ PG\_retention down—imply compensatory shifts in anionic lipid composition. For instance, sulfolipid (SQDG) levels may rise to offset the loss of PG and preserve membrane surface charge.
-  \item \textit{Phosphorus economy.}  
-        PG is a phosphorus‑rich lipid critical for photosystems; its depletion likely reflects P reallocation away from thylakoid maintenance toward other essential pathways under LI.
+  \item \textbf{Bilayer fluidity prioritization.}  \\
+        Elevated PC/PE ratio indicates that plants treated with LI alter headgroup composition to keep membrane viscosity optimal in cold, low N/P environments.
+  
+  \item \textbf{Selective anionic lipid allocation.}  \\
+        While there is an overall reduction in PG, the rise in PC/PG ratios and the dynamics of PG retention suggest a dual approach: most of the PG is forfeited, yet a crucial portion is conserved within photosynthetic membranes.> 
+  
+  \item \textbf{Failure of classic galactolipid replacement.}  \\
+        The decrease in the non-P:P metric indicates that, unlike straightforward P-starvation, LI plants are unable to replace phospholipids with galacto- and sulfolipids, probably due to simultaneous cold, N and P restrictions.
 \end{enumerate}
 
-\paragraph{Potential Regulatory Mechanisms}
-\begin{itemize}
-  \item \textit{Precursor partitioning.}  
-        CDP‑DAG flux may be redirected preferentially toward PC/PE synthesis, reducing substrate availability for PG biosynthesis.
-  \item \textit{Selective PG turnover.}  
-        Enhanced activity of PG‑specific phospholipases or autophagic degradation of PG‑rich thylakoid fragments could accelerate PG loss while sparing PC/PE.
-  \item \textit{Enzymatic regulation.}  
-        LI may inhibit PGPS (phosphatidylglycerolphosphate synthase) or activate PG phosphatases/lipases, shifting the balance away from PG accumulation.
-  \item \textit{Membrane domain reorganization.}  
-        Changes in lipid microdomains may favor PC/PE‑rich membranes (e.g., plasma membrane, endomembranes) over PG‑rich thylakoids under resource limitation.
-\end{itemize}
-
-\paragraph{Metabolic Trade‑offs}
-\begin{itemize}
-  \item Conservation of essential structural phospholipids (PC/PE) for vital cellular membranes.
-  \item Sacrifice of photosynthetic membrane integrity (PG depletion) to conserve phosphorus and carbon under LI.
-  \item Likely compensatory upregulation of sulfolipids (SQDG) or other non‑phosphorus anionic lipids to maintain membrane charge balance.
-\end{itemize}
-
-% Example figure inclusion (ensure the label matches your actual figure)
-% \begin{figure}[ht]
-%   \centering
-%   \includegraphics[width=\textwidth]{fig/main/Fig2_lipid_remodeling.png}
-%   \caption{Membrane lipid remodeling under LowInput vs.\ Control. “Phospholipid Homeostasis” panel shows stable PC/PE, increased PC/PG, and decreased PG_retention under LowInput.}
-%   \label{fig:2b_ratio_lowP}
-% \end{figure}
+%\paragraph{Proposed Regulatory Crossroads}
+%\begin{itemize}
+%  \item \textit{PC/PE Balance Control Point:}  
+%        There might be a preferential activation of the Kennedy pathway's PC branch (via CTP:phosphocholine cytidylyltransferase). Similarly a potential PE N-methyltransferase (PEAMT) up regulation. Selective retention of PC through suprressed phospholipase D (PLD) activity. This makes is contrast with the classic P-starvation response. 
+%  \item \textit{PG Biosynthesis Bottleneck:}  
+%        Declining PG retention despite photosynthetic needs indicates that CDP-DAG:glycerol-3-phosphate phosphatidyltransferase (PGP1) becomes rate-limited. Possible competition for glycerol-3-phosphate (diverted to glycolysis/TAG). There could also be a possible cold-induced enzyme instability in PG synthesis pathway. 
+%  \item \textit{Galactolipid Substitution Blockade:}  
+%        Failed non-P lipid substitution (NonP\_Phosphorus) reveals interesting results. Due to N-limitation, UDP-galactose pool might be depleted which are required for the galactolipids. MGD/DGD synthase that produces the galactolipids might be inhibited due to the cold stress as well. We see that the carbon flux is redirected towards the PC/TAG rather than the galactolipids.      
+%\end{itemize}
 
 
+\subsection*{2. Lipid Turnover and Signaling under LowInput (LI)}
 
-\subsubsection*{Phosphatidylglycerol dynamics under multi-stress conditions}
+LI stress profoundly alters DG dynamics and lysophospholipid metabolism, reflecting a shift from membrane maintenance toward emergency carbon redeployment (Fig.~\ref{fig:lipid_remodeling} “Lipid Turnover and Signaling”):
 
-The \texttt{PG\_retention} metric---defined as%
-\[
-  \log_{10}\!\Bigl(\tfrac{\text{PG}}{\sqrt{\text{PC}\cdot\text{PE}}}\Bigr)
-\]
----decreases sharply under the low-input treatment
-($p<0.001$;
-Fig.~\ref{fig:2a_ratio_lowP}).
-Thus, phosphatidylglycerol (PG) contracts \emph{faster} than the major
-phospholipids PC and PE when phosphorus, nitrogen and temperature
-stresses act simultaneously.
-This behaviour contrasts with the classical single-stress response in
-which Low-P or cold alone promotes PG retention to stabilise photosystem II
-(PSII) membranes.
-
-\paragraph{Metabolic interpretation.}
+\subsubsection*{2.1 Diacylglycerol (DG) Flux Hub}
 \begin{enumerate}
-  \item \textbf{Nitrogen scarcity dominates PG regulation.}  
-        PG biosynthesis relies on the CDP-DAG pathway, which requires
-        nitrogen-rich precursors (CTP, glutamine).  Under Low-N these
-        substrates---and the PG-phosphate synthase protein itself---become
-        limiting, curtailing PG renewal despite any Low-P or cold demand.
-  \item \textbf{Carbon diversion under cold exacerbates loss.}  
-      Cold stress reallocates carbon toward soluble-sugar cryoprotectants
-      and triacylglycerol (TAG) storage.  The highly unsaturated
-      acyl chains that characterise thylakoid PG in grasses
-      (e.g.\ 16:0/18:3 or 34:1 species in sorghum) are costly to
-      assemble under carbon-limited conditions, so PG synthesis is
-      curtailed in favour of stress-protective metabolites.
-  \item \textbf{Photosynthetic downsizing reduces PG demand.}  
-        Maintenance of PG-stabilised PSII complexes is beneficial when
-        phosphorus alone is limited, but under triple stress the plant
-        prioritises survival over maximal photosynthetic output.
-        Thylakoid membranes are remodelled or partially dismantled,
-        further lowering the need for PG.
+  \item \textbf{DG Flux Hub Reveals Metabolic Bottlenecks} \\
+  The significant rise in both DG/DGDG and DG/MGDG (\(p<0.001\)) suggests a quick buildup or insufficient recycling of DG as galactolipids break down, which implies that DAG kinase activity may be inhibited within plastids.
+  
+  \item \textbf{Cytosolic DG Starvation} \\
+  DG/PC and DG/PE show a notable reduction (\(p<0.001\)), indicating that this DG pool is not reintroduced into the principal phospholipids. In the same vein, DG\_Phospho \(\bigl[\mathrm{DG} - \tfrac12(\mathrm{PC}+\mathrm{PE})\bigr]\) also decreases (\(p<0.001\)). This implies that the Kennedy pathway circumvents free DG and utilizes CDP-DAG directly. It also reveals PLD inhibition (↓lysoPLs), which curtails phospholipid-derived DG.
+  
+  \item \textbf{SQDG-DG Coupling}
+  Rising levels of DG/SQDG (\(p<0.001\)) align with the degradation of SQDG providing DG backbones, which initially accumulate temporarily, before being channeled elsewhere (Section 1.1).
 \end{enumerate}
-
-Taken together, the data indicate a regulatory hierarchy \(\text{Low-N} > \text{Cold} > \text{Low-P}\) for PG turnover in sorghum leaves:
-nitrogen limitation constrains PG biosynthesis,
-cold shifts carbon allocation away from PG, and
-phosphorus stress alone is insufficient to sustain PG levels when the
-other two constraints are present.
-
-The observed decline in PG retention under field-relevant multi-stress
-reveals a strategic trade-off: sorghum sacrifices part of its
-photosynthetic membrane capacity to conserve nitrogen and carbon pools
-needed for broader stress resilience.
-
-
-
 
 % ------------------------------------------------------------------
-%  PG behaviour under single stresses (matching Galactolipid layout)
+%  Canonical behaviour of diacylglycerol (DG) under single stresses
 % ------------------------------------------------------------------
 \begin{table}[!ht]
-  \begin{adjustwidth}{-2.25in}{0in} % Remove or comment out if table already fits the column
-    \centering
-    \caption{{\bf Canonical phosphatidylglycerol (PG) responses under single stresses.}}
-    \begin{tabular}{|l|c|p{4in}|}
-      \hline
-      \textbf{Stress} & \textbf{PG response} & \textbf{Underlying mechanism(s)} \\ \hline
-      Low-P  & ↑ Retention (PG spared) & PG is indispensable for photosystem II and can partially substitute for other phospholipids in the thylakoid membrane, so plants preferentially preserve it when phosphate is scarce. \\ \hline
-      Low-N  & ↓ Retention (PG degraded) & PG synthesis relies on nitrogen-dependent CDP-DAG and PG-phosphate synthase; nitrogen limitation restricts head-group supply and enzyme abundance, reducing PG output. \\ \hline
-      Cold   & ↑ Retention (stabilises PSII) & PG’s highly unsaturated acyl chains help maintain membrane fluidity and stabilise photosystems at low temperature, leading to selective retention. \\ \hline
-    \end{tabular}
-    \begin{flushleft}
-      Table notes: Arrows indicate relative changes under stress compared with control. Symbols: ↑ increase, ↓ decrease, ≈ no significant change.
-    \end{flushleft}
-    \label{table:PG_responses}
-  \end{adjustwidth}
+  \centering
+  \caption{\bf Canonical responses of diacylglycerol (DG) under single abiotic stresses.}
+  \label{table:DG_responses}
+  \begin{tabularx}{\textwidth}{@{} l l p{3.5cm} X c @{}}
+    \toprule
+    \textbf{Class}
+      & \textbf{Stress}
+      & \textbf{Response}
+      & \textbf{Mechanism}
+      & \textbf{Ref.} \\
+    \midrule
+    \multirow{3}{*}{\textbf{DG}}
+      & Low-P  
+         & \begin{minipage}[t]{3.5cm}
+             DG: ↑ (phospholipase product)
+           \end{minipage}
+         & PC/PE hydrolysis liberates DAG backbones that serve as precursors for DGDG or TAG when phosphate is scarce.
+         & [1] \\[1ex]
+      & Low-N  
+         & \begin{minipage}[t]{3.5cm}
+             DG: ↑↑ (strong accumulation)
+           \end{minipage}
+         & Choline head-group catabolism from PC generates surplus DAG; limited acyl-CoA supply slows reconversion, so DAG pools rise.
+         & [2] \\[1ex]
+      & Cold   
+         & \begin{minipage}[t]{3.5cm}
+             DG: ↑ / transient pulse
+           \end{minipage}
+         & Rapid phospholipase A/C activity produces DAG for acyl remodelling; a transient DAG spike precedes re-acylation into cold-adapted PC or TAG.
+         & [3] \\
+    \bottomrule
+  \end{tabularx}
+  \begin{flushleft}
+    {\footnotesize Arrows denote relative change vs.\ control (↑ increase, ↑↑ strong increase, ↓ decrease, ≈ no consistent change).  Replace reference placeholders with appropriate citations.}
+  \end{flushleft}
 \end{table}
 
 
-\subsubsection*{Lysophospholipid turnover is globally suppressed under low-P + low-N + cold}
-
-All lysophospholipid metrics decline in the low-input treatment  
-(\textit{LPC/PC}, \textit{LPE/PE}, and the composite \textit{Lyso\_activity};  
-each ***$p<0.001$***; Fig.~\ref{fig:2a_ratio_lowP}).  
-Whereas isolated phosphorus starvation typically increases lysophospholipids
-via phospholipase-mediated Pi salvage, the triple stress produces the
-opposite outcome, pointing to a stress-interaction hierarchy dominated by nitrogen
-limitation.
-
-\paragraph{Metabolic interpretation.}
+\paragraph{Physiological Implications}
 \begin{enumerate}
-  \item \textbf{Nitrogen scarcity inhibits phospholipase turnover.}  
-        PLA\textsubscript{2}/PLD\textsubscript{ζ} enzymes are N-rich; low-N
-        down-regulates their transcription and limits ATP supply for their activity,
-        curtailing production of LPC and LPE.
-  \item \textbf{Carbon conservation discourages the lyso cycle.}  
-        Re-acylation of LPC/LPE demands acyl-CoA and glycerol-3-phosphate,
-        resources redirected toward TAG synthesis and soluble sugar
-        cryoprotectants under cold stress.  Suppressing lyso formation avoids that
-        energetic burden.
-  \item \textbf{Membrane protection outweighs Pi recycling.}  
-        Lysophospholipids destabilise bilayers; preventing their accumulation
-        reduces cold-induced leakiness and free-fatty-acid toxicity.
+  \item \textbf{DG as a transient carbon hub.}  \\
+        The increase in DG (DG/DGDG, DG/MGDG, DG/SQDG), along with its absence from phospholipid pools (DG/PC, DG/PE, DG\_phospho), indicates that DG is being redirected towards storage lipids such as TG, emphasizing the formation of energy reserves over the urgent need for membrane repair.
 \end{enumerate}
 
-Collectively, the data indicate that maintenance of membrane integrity under
-nitrogen and temperature stress overrides the classical P-scavenging
-phospholipase response, even at the cost of reduced long-term phosphorus
-recycling.
+
+ % \item \textit{Shift toward storage lipid synthesis.}  
+ %       Accumulated DG likely feeds into triacylglycerol synthesis (see Section 3), reflecting a strategic rerouting of carbon from membrane maintenance to energy storage during prolonged stress.
+
+\subsubsection*{2.2 Lysophospholipid Remodeling}
+\begin{enumerate}
+  \item \textbf{Global Lyso-phospholipid Reduction} \\
+  LPC/PC, LPE/PE, and Lyso\_activity \(\bigl[(\mathrm{LPC} + \mathrm{LPE}) - (\mathrm{PC} + \mathrm{PE})\bigr]\) exhibit a significant reduction (\(p<0.001\)), suggesting either inhibited phospholipase activity or accelerated removal of lysophospholipids to preserve membrane integrity, indicating an overall reduction in phospholipid turnover. This suggests inhibition of phospholipase A2 (PLA2) under stress conditions. Furthermore, it coincides with ↓DG/Phospho, indicating reduced phospholipid turnover.
+
+\end{enumerate}
+
+\paragraph{Physiological Implications}
+\begin{enumerate}
+  \item \textit{Conservation of membrane integrity.}  
+        The notable reduction in lysophospholipids and overall Lyso\_activity suggests a decreased phospholipase activity for deacylation, thus safeguarding current bilayers from further damage due to simultaneous cold and nutrient scarcity.
+\end{enumerate}
 
 % ------------------------------------------------------------------
-%  Lysophospholipid behaviour under single stresses
+%  Combined canonical behaviour of LPC, LPE and their ratios 
 % ------------------------------------------------------------------
 \begin{table}[!ht]
-  \begin{adjustwidth}{-2.25in}{0in} % Remove/comment if table already fits
+  \begin{adjustwidth}{-2.25in}{0in}  % adjust as needed for your page
     \centering
-    \caption{{\bf Canonical lysophospholipid responses under single stresses.}}
-    \begin{tabular}{|l|c|c|p{4.0in}|}
-      \hline
-      \textbf{Stress} & \textbf{LPC/PC} & \textbf{LPE/PE} & \textbf{Key mechanism(s)} \\ \hline
-      Low-P  & ↑ (transient) & ↑ (transient) &
-      Phospholipase activation liberates Pi from PC/PE; LPC/LPE accumulate
-      before being recycled. \\ \hline
-      Low-N  & ↓ & ↓ &
-      Plants conserve structural PC/PE; phospholipase expression and ATP supply
-      decline, lowering lysophospholipid formation. \\ \hline
-      Cold   & ↑ or ≈ & ↑ or ≈ &
-      Membrane damage can trigger PLA-mediated hydrolysis; magnitude depends on
-      genotype and acclimation. \\ \hline
-    \end{tabular}
+    \caption{\bf Canonical responses of lysophospholipids (LPC, LPE) and their ratios under single abiotic stresses.}
+    \label{table:lyso_combined}
+    %
+    % Part A: LPC & LPE pools
+    %
+    \subcaption*{A) Lysophospholipid Pools}
+    \vspace{-0.5em}
+    \begin{tabularx}{\textwidth}{@{} l l p{3.5cm} X c @{}}
+      \toprule
+      \textbf{Class} & \textbf{Stress} & \textbf{Response} & \textbf{Mechanism} & \textbf{Ref.} \\
+      \midrule
+      \multirow{3}{*}{\textbf{LPC}}
+        & Low-P  & ↑ (lipase product) & PLA\textsubscript{2} activity rises to liberate phosphate; LPC is exported or rapidly reacylated. & [1] \\
+        & Low-N  & ↓ / ≈              & Lipase activity suppressed to conserve N-rich PC; DAG backbone preferentially routed to TAG, not LPC. & [2] \\
+        & Cold   & ↑ (acyl editing)   & Active PC ↔ LPC cycle inserts unsaturated acyl chains for cold acclimation. & [3] \\
+      \addlinespace
+      \multirow{3}{*}{\textbf{LPE}}
+        & Low-P  & ↑ (lipase product) & PE hydrolysis releases phosphate; transient LPE spikes before re-acylation. & [4] \\
+        & Low-N  & ↓ / ≈              & LPE formation limited by N scarcity; DAG diverted to storage lipids. & [5] \\
+        & Cold   & ↑ (remodelling)    & PE ↔ LPE exchange supports insertion of unsaturated fatty acids. & [6] \\
+      \bottomrule
+    \end{tabularx}
+
+    \vspace{1em}
+
+    %
+    % Part B: LPC/PC and LPE/PE ratios
+    %
+    \subcaption*{B) Lysophospholipid / Phospholipid Ratios}
+    \vspace{-0.5em}
+    \begin{tabularx}{\textwidth}{@{} l l p{3cm} X c @{}}
+      \toprule
+      \textbf{Ratio} & \textbf{Stress} & \textbf{Response} & \textbf{Interpretation} & \textbf{Ref.} \\
+      \midrule
+      \multirow{3}{*}{\(\tfrac{\mathrm{LPC}}{\mathrm{PC}}\)}
+        & Low-P  & ↑            & Diagnostic of enhanced PLA\textsubscript{2}-mediated P scavenging. & [7] \\
+        & Low-N  & ↓            & Choline head-group salvage limits LPC formation. & [8] \\
+        & Cold   & ↑ (transient)& Rapid acyl editing before re-acylation restores PC pool. & [9] \\
+      \addlinespace
+      \multirow{3}{*}{\(\tfrac{\mathrm{LPE}}{\mathrm{PE}}\)}
+        & Low-P  & ↑            & Reflects PE hydrolysis under P limitation. & [10] \\
+        & Low-N  & ↓ / ≈        & Lipase repression conserves PE; LPE remains low or unchanged. & [11] \\
+        & Cold   & ↑            & Enzymatic LPEAT-driven exchange introduces unsaturated chains. & [12] \\
+      \bottomrule
+    \end{tabularx}
+
+    \vspace{0.5em}
     \begin{flushleft}
-      Table notes: Arrows denote typical direction of change relative to control.
-      Symbols—↑ increase, ↓ decrease, ≈ no consistent change.
+      {\footnotesize Arrows denote relative change vs.\ control (↑ increase, ↓ decrease, ≈ no consistent change).  
+      Replace reference placeholders with appropriate citations.}
     \end{flushleft}
-    \label{table:lyso_responses}
   \end{adjustwidth}
 \end{table}
 
 
 
-% ==========================================================
-%  Neutral-lipid re-allocation under low-P + low-N + cold
-% ==========================================================
+\subsection*{3. Carbon Sink and Allocation}
 
-\subsubsection*{Nitrogen-dominated diversion of membrane carbon into triacylglycerol storage}
+Under LI stress, carbon is progressively redirected from structural membranes into neutral storage lipids (Fig.~\ref{fig:lipid_remodeling} "Carbon Sink and Allocation"):
 
-All neutral-to-phospholipid ratios shift in the same direction
-(Fig.~\ref{fig:2b_ratio_lowN}):
+% ------------------------------------------------------------------
+%  Canonical behaviour of triacylglycerol (TG) under single stresses
+% ------------------------------------------------------------------
+\begin{table}[!ht]
+  \begin{adjustwidth}{-2.25in}{0in}  % Remove if the table already fits
+    \centering
+    \caption{\bf Canonical responses of triacylglycerol (TG) under single abiotic stresses.}
+    \label{table:TG_responses}
+    \begin{tabularx}{\textwidth}{@{} l l l X c @{}}
+      \toprule
+      \textbf{Class} & \textbf{Stress} & \textbf{Response} & \textbf{Mechanism (summary)} & \textbf{Ref.} \\
+      \midrule
+      \multirow{3}{*}{\textbf{TG}}
+        & Low-P & ↑ / ≈ (species dependent) &
+          Moderate TAG rise when excess DAG is *not* entirely channelled to DGDG;  
+          P-starved cells deposit surplus carbon in TAG while conserving phospholipid-derived P. & [1] \\[0.4em]
+        & Low-N & ↑↑ (strong induction) &
+          Nitrogen shortage limits protein synthesis and sinks carbon into storage lipids;  
+          PC breakdown supplies DAG that is rapidly acylated to TAG via DGAT/PDAT pathways. & [2] \\[0.4em]
+        & Cold  & ↑ (energy buffer) &
+          Cold stress slows growth and promotes TAG accumulation as a temporary carbon/energy reservoir;  
+          unsaturated TAG species also scavenge free fatty acids released during membrane remodelling. & [3] \\
+      \bottomrule
+    \end{tabularx}
+    \begin{flushleft}
+      {\footnotesize Arrows denote relative change vs.\ control (↑ increase, ↓ decrease, ≈ no consistent change).  
+      Replace reference placeholders with appropriate citations.}
+    \end{flushleft}
+  \end{adjustwidth}
+\end{table}
 
-\begin{itemize}
-  \item \textbf{TG/PC} rises by \(+0.50\) log\(_{10}\) units
-        (≈3.2-fold; ***$p<0.001$***),
-        revealing massive diversion of carbon from structural PC into
-        storage TAG.
-  \item \textbf{DG/PC} and \textbf{DG/Phospho} fall (both ***),
-        indicating that the diacylglycerol (DG) pool is not replenished by
-        new PC synthesis and is rapidly depleted.
-  \item \textbf{TG/DG} increases 4.1-fold (***),
-        confirming rapid DG→TAG conversion via DGAT/PDAT.
-  \item \textbf{TG/Phospho} also increases sharply (***),
-        underscoring the global carbon flux toward neutral lipid storage.
-\end{itemize}
 
-\paragraph{Metabolic interpretation.}
+
+
+\subsubsection*{3.1 Storage Lipid Reallocation}
 \begin{enumerate}
-  \item \textbf{Low-N drives the “membrane-to-oil” shift.}\;
-        Nitrogen scarcity blocks protein and phospholipid biosynthesis,
-        leaving excess fixed carbon without a nitrogen sink.
-        DGAT1 and PDAT1 expression is up-regulated, funnelling DG to TAG
-        droplets; PDAT steals acyl chains directly from PC, deepening the
-        TG/PC gap.
-  \item \textbf{Cold stress amplifies TAG demand.}\;
-        TAG droplets buffer free-fatty-acid toxicity and serve as an
-        energy reserve for β-oxidation during low-temperature growth
-        arrest, reinforcing the carbon pull toward storage.
-  \item \textbf{Low-P is relegated.}\;
-        In isolation, P-stress usually sends DG toward
-        galactolipid synthesis; here that pathway is throttled by
-        nitrogen shortage (UDP-Gal limitation), so DG is siphoned to TAG
-        instead.  Hence the canonical non-P lipid replacement is muted,
-        but TAG accumulation is accentuated.
+  \item \textbf{Compartmentalized Carbon Redirection to Storage} \\
+  TG/DG significantly increases (\(p<0.001\)), indicating a potent transformation of DG into TG, likely facilitated by DGAT enzymes external to membrane lipid recycling. Additionally, the TG/Galacto ratio \(\bigl[\mathrm{TG} - \tfrac{1}{2}(\mathrm{MGDG}+\mathrm{DGDG})\bigr]\) rises (\(p<0.001\)), suggesting that DG is directed away from galactolipids in chloroplasts to be stored. The DG\_to\_Gala value \(\bigl[\mathrm{DG} - \tfrac{1}{2}(\mathrm{MGDG}+\mathrm{DGDG})\bigr]\) also grows (\(p<0.001\)), reflecting an accumulation of DG relative to galactolipid pathways.
+
+  \item \textbf{Storage over Phospholipid Maintenance}
+  TG/Phospho \(\bigl[\mathrm{TG} - \tfrac{1}{2}(\mathrm{PC}+\mathrm{PE})\bigr]\) is significantly increased (\(p<0.001\)), suggesting that TG synthesis for storage is more prominent than the upkeep of membrane phospholipids, even with PC/PE conservation.
+  
 \end{enumerate}
 
-\paragraph{Physiological trade-off.}
-The coordinated decrease in DG pools and surge in TAG indicates that
-sorghum under field-relevant multi-stress prioritises long-term survival
-(energy storage, membrane protection) over membrane turnover and rapid
-growth.
-This nitrogen-dominated hierarchy (Low-N \(\!>\) Cold \(\!>\) Low-P) mirrors
-the lysophospholipid and PG trends described above, highlighting a
-concerted re-wiring of lipid metabolism when multiple abiotic stresses
-co-occur.
 
-% ------------------------------------------------------------------
-%  Canonical neutral-lipid responses under single stresses
-% ------------------------------------------------------------------
-\begin{table}[!ht]
-  \begin{adjustwidth}{-2.25in}{0in} % remove/comment if table fits
-    \centering
-    \caption{{\bf Neutral-lipid (DG, TAG) behaviour under single stresses.}}
-    \begin{tabular}{|l|c|c|p{4in}|}
-      \hline
-      \textbf{Stress} & \textbf{DG/PC} & \textbf{TG/PC} &
-      \textbf{Dominant mechanism(s)} \\ \hline
-      Low-P  & ↑ (DG from PL hydrolysis) & ↔ to ↑ &
-      DG and Pi released by PLD/PLC; some DG diverted to galactolipids,
-      modest TAG rise. \\ \hline
-      Low-N  & ↓ (DG quickly consumed) & ↑↑ (strong rise) &
-      DGAT/PDAT channel DG to TAG while PC synthesis slows. \\ \hline
-      Cold   & ↔ or ↑ & ↑ &
-      TAG buffers unsaturated FA surplus and stores excess carbon
-      during growth arrest. \\ \hline
-    \end{tabular}
-    \begin{flushleft}
-      Table notes: arrows indicate typical change vs.\ control
-      (↑ increase, ↓ decrease, ↔ little change).  The triple-stress
-      response matches the Low-N column, confirming nitrogen dominance.
-    \end{flushleft}
-    \label{table:neutral_stress_single}
-  \end{adjustwidth}
-\end{table}
-
-
-
-% ------------------------------------------------------------------
-%  Classic neutral-lipid responses under single stresses
-% ------------------------------------------------------------------
-\begin{table}[!ht]
-  \begin{adjustwidth}{-2.25in}{0in} % remove if table fits page
-    \centering
-    \caption{{\bf Canonical neutral-lipid (DG and TAG) responses under single stresses.}}
-    \begin{tabular}{|l|c|c|p{4in}|}
-      \hline
-      \textbf{Stress} & \textbf{DG/PC} & \textbf{TG/PC} & \textbf{Key mechanism(s)} \\ \hline
-      Low-P  & ↑ (DG from PC hydrolysis) & ↔ or ↑ (TAG may rise slightly) &
-      Phospholipase C/PLD liberate DG and Pi; some DG converted to DGDG, some to TAG. \\ \hline
-      Low-N  & ↓ (DG rapidly consumed) & ↑↑ (strong TAG accumulation) &
-      DAG is channelled to TAG as protein synthesis slows, storing excess carbon. \\ \hline
-      Cold   & ↔ or ↑ (membrane remodelling) & ↑ (carbon sink during growth arrest) &
-      Acyl-editing and DGAT activity increase; TAG buffers FA imbalance under chill. \\ \hline
-    \end{tabular}
-    \begin{flushleft}
-      Table notes: Arrows show typical direction of change relative to control.
-      Symbols—↑ increase, ↓ decrease, ↔ little or no change.
-    \end{flushleft}
-    \label{table:neutral_lipid_responses}
-  \end{adjustwidth}
-\end{table}
-
-
-% ==========================================================
-%  Cold-dominated reshaping of the chloroplast glycolipid triad
-% ==========================================================
-
-\subsubsection*{Cold stress overrides nutrient limitations to prioritise DGDG and suppress SQDG}
-
-Even in the presence of nitrogen and phosphorus shortages, cold imposes a
-distinct thylakoid lipid signature (Fig.~\ref{fig:2c_ratio_cold}):
-
-\begin{itemize}
-  \item \textbf{MGDG/DGDG} decreases by $-0.28$ log$_{10}$ units
-        (***$p<0.001$***), reflecting preferential enrichment of
-        digalactosyldiacylglycerol (DGDG) over monogalactosyldiacylglycerol (MGDG).
-  \item \textbf{SQDG/DGDG} and \textbf{SQDG/MGDG} decline even more steeply
-        (both ***), while \textbf{SQDG/total} also drops (***),
-        indicating a concerted collapse of the sulfolipid pool.
-  \item Despite the lower MGDG/DGDG ratio, both \textbf{DGDG/total} and
-        \textbf{MGDG/total} rise (***), showing that total galactolipid
-        content still increases at the expense of phospholipids; DGDG simply
-        rises faster than MGDG.
-\end{itemize}
-
-\paragraph{Hierarchy of stress priorities: \textit{Cold > Low-P > Low-N}.}
+\subsubsection*{3.2 Metabolic Trade-offs}
 \begin{enumerate}
-  \item \textbf{DGDG is non-negotiable for PSII stability at low temperature.}  
-        Cold induces MGDG\,$\rightarrow$\,DGDG conversion to minimise
-        negative-curvature lipids and prevent hexagonal\,II phase formation.
-        The strong DGDG enrichment persists even when N and P are scarce.
-  \item \textbf{MGDG increases in absolute terms but lags behind DGDG.}  
-        Cold still drives some de-novo MGDG synthesis; however,
-        the faster rise of DGDG tips the MGDG/DGDG ratio downward.
-  \item \textbf{SQDG is sacrificed to conserve sulfur and carbon.}  
-        Low-N constrains sulfite assimilation (glutamine/ATP limitation) and
-        down-regulates SQD1/SQD2; cold diverts carbon to raffinose
-        cryoprotectants.  The plant therefore de-prioritises SQDG,
-        reallocating sulfur to glutathione and other defences.
+  \item \textbf{Photosynthetic Machinery Sacrificed for Storage} \\
+  The metric \(\bigl[\tfrac{1}{2}(\mathrm{TG} + \mathrm{DG}) - \tfrac{1}{2}(\mathrm{MGDG} + \mathrm{DGDG})\bigr]\) shows a substantial increase (\(p<0.001\)), suggesting that carbon is being redirected from not only structural membranes but also from photosynthetic galactolipid reserves to TG storage.
+  
+  \item \textbf{Storage\_vs\_Membrane} \\
+    \(\bigl[\tfrac{1}{2}(\mathrm{TG} + \mathrm{DG}) \;-\; \tfrac{1}{2}(\mathrm{PC} + \mathrm{PE})\bigr]\) rises significantly(\(p<0.001\)), showing net prioritization of carbon into storage lipids instead of major bilayer lipids.
+  
 \end{enumerate}
 
-\paragraph{Physiological consequence.}
-The cold-first hierarchy produces a \emph{DGDG-dominant, SQDG-poor} membrane,
-ensuring thylakoid integrity while tolerating reduced phosphorus recycling
-and sulfur use.  This pattern contrasts with single-stress responses
-(Table~\ref{table:triad_single_stress}) and highlights that field crops in
-cold climates may commit metabolic resources to DGDG maintenance before
-addressing P or N constraints.
-
-% ------------------------------------------------------------------
-%  Canonical chloroplast glycolipid responses under single stresses
-%  (unchanged but repeated for context)
-% ------------------------------------------------------------------
-\begin{table}[!ht]
-  \begin{adjustwidth}{-2.25in}{0in}  % Remove/comment if table already fits
-    \centering
-    \caption{{\bf Typical behaviour of thylakoid glycolipids under single stresses.}}
-    \begin{tabular}{|l|c|c|c|p{3.8in}|}
-      \hline
-      \textbf{Stress} & \textbf{DGDG} & \textbf{MGDG} & \textbf{SQDG} &
-      \textbf{Key mechanism(s)} \\ \hline
-      Low-P  & ↑ (replace PC/PE) & ↑ (replace PC/PE) & ↑ (replace PG) &
-      Galactose pathway activated; SQDG substitutes for anionic PG. \\ \hline
-      Low-N  & ↔ or ↓ & ↓ & ↓ &
-      Nitrogen shortage limits galactolipid synthases and sulfur uptake. \\ \hline
-      Cold   & ↑ (bilayer stabiliser) & ↓ (converted to DGDG) & ↔ or ↑ &
-      Fluidity control via MGDG→DGDG conversion; SQDG depends on S status. \\ \hline
-    \end{tabular}
-    \begin{flushleft}
-      Table notes: arrows indicate usual direction of change (↑ increase, ↓ decrease, ↔ minimal change).  
-      The triple-stress profile (↑ DGDG, modest ↑ MGDG, ↓ SQDG) matches the cold column, confirming cold dominance over nutrient stresses.
-    \end{flushleft}
-    \label{table:triad_single_stress}
-  \end{adjustwidth}
-\end{table}
-
-\subsubsection*{Diacylglycerol as a Central Hub in Stress Lipid Remodeling}
-
-Although our primary focus has been on the balance between membrane and storage lipids (e.g.\ PC vs.\ DGDG/MGDG under low‑P, or DG/TG under low‑N), diacylglycerol (DAG) emerges as a critical intermediate across all three stresses. DAG sits at the crossroads of membrane turnover, TAG synthesis, and signaling, so we summarize its multifaceted roles below.
-
-\paragraph{Cold acclimation.}  
-In cold‑acclimated sorghum leaves, the DAG pool (reflected in the DG\_Phospho and DG\_PC contrasts) is modestly elevated (ΔZ ≈ +1 SD, p < 0.001). This suggests enhanced phospholipid deacylation or reduced PC/PE biosynthesis—both routes liberate DAG. Functionally, increased DAG may help maintain bilayer fluidity at low temperature and feed sn‑1,2‑DAG to DGK enzymes to generate phosphatidic acid (PA), a known cold‐responsive signal.
-
-\paragraph{Phosphorus deprivation.}  
-Under P limitation, while galactolipids take center stage, DAG also shifts (DG\_Phospho ΔZ ≈ +2 SD, p < 0.001), indicating that phospholipid turnover contributes DAG backbones. These DAG molecules may be transient intermediates en route to TAG (via DGAT) or PA, or they may even form alternative non‑P glycerolipids like glucuronosyldiacylglycerol (as reported in other species).
-
-\paragraph{Nitrogen limitation.}  
-The Low‑N treatments show the largest DAG/PC and TG/DG shifts (ΔZ > +3 SD), pinpointing DAG both as the product of membrane phospholipid breakdown and the substrate for TAG accumulation. This dual role—not just as a passive by‑product but as the major conduit of carbon into lipid droplets—highlights DAG’s centrality in rerouting carbon when N for protein synthesis is scarce.
-
----
-
-By weaving DAG’s behavior into each of your three main subsections (Low‑P, Low‑N, Cold), you keep your narrative tight and hierarchical, yet still give DAG the distinct attention it merits.
-
-
+\paragraph{Physiological Implications}
+\begin{enumerate}
+  \item \textit{Energy reserve formation.}  The significant increase in TG synthesis, prioritizing over membrane lipids, suggests an adaptive strategy where carbon is redirected into energy reserves during cold and nutrient scarcity.
+  \item \textit{Membrane down-regulation.}  A decrease in PC, PE, and PG compared to TAG/DG suggests ongoing membrane remodeling or partial disassembly to conserve resources necessary for survival.
+  \item \textit{Dynamic lipid trade-off.}  These metrics together illustrate a coordinated switch from growth-promoting membranes toward stress-tolerant storage lipid pools.
+\end{enumerate}
 
 \subsection*{Multivariate structure of lipid profiles}
 
@@ -1389,36 +1274,84 @@ Magwire MM, Bayer F, Webster CL, Cao C, Jiggins FM.
 
 
 %========================================================
-%  Supplementary Figure S3 - Lipid species/class count   (panels A, B, and C)
+%  Supplementary Figure S3 - Lipid species/class count   (panels A, B, C, and D)
 %========================================================
 \begin{figure}[htp]
   \centering
 
   % ---------- row 1 ----------
   \begin{subfigure}[t]{0.48\textwidth}
-    \includegraphics[width=\linewidth]{fig/supp/SuppFig_3A_Lipid_Counts}
+    \includegraphics[width=\linewidth]{fig/supp/SuppFig_3A_Lipid_Counts.png}
     \caption{Number of lipid \textit{species}.}
     \label{fig:S3A}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.48\textwidth}
-    \includegraphics[width=\linewidth]{fig/supp/SuppFig_3B_Lipid_Class_Counts}
+    \includegraphics[width=\linewidth]{fig/supp/SuppFig_3B_trad_nontrad_counts.png}
     \caption{Number of lipid \textit{classes}.}
     \label{fig:S3B}
   \end{subfigure}
 
   \vspace{1em}
 
-  % ---------- row 2 (centred) ----------
-  \begin{subfigure}[t]{0.55\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{fig/supp/SuppFig_3C_Lipid_Overlap_Venn}
-    \caption{Shared and unique lipid species.}
+  % ---------- row 2 ----------
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\linewidth]{fig/supp/SuppFig_3C_Lipid_Overlap_Venn_traditional.png}
+    \caption{Shared and unique traditional lipid species.}
     \label{fig:S3C}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\textwidth}
+    \includegraphics[width=\linewidth]{fig/supp/SuppFig_3D_Lipid_Overlap_Venn_nontraditional.png}
+    \caption{Shared and unique non-traditional lipid species.}
+    \label{fig:S3D}
   \end{subfigure}
 
-  \caption{Overview of lipid coverage in Control and Low-Input samples.}
+  \caption{Overview of lipid coverage in C and LI samples.}
   \label{fig:S3}
 \end{figure}
+
+
+
+%\begin{figure}[htp]
+%  \centering
+
+  % ---------- row 1 ----------
+  %\begin{subfigure}[t]{0.48\textwidth}
+  %  \includegraphics[width=\linewidth]{fig/supp/SuppFig_3A_Lipid_Counts.png}
+  %  \caption{Number of lipid \textit{species}.}
+  %  \label{fig:S3A}
+  %\end{subfigure}\hfill
+  %\begin{subfigure}[t]{0.48\textwidth}
+  %  \includegraphics[width=\linewidth]{fig/supp/SuppFig_3B_trad_nontrad_counts.png}
+  %  \caption{Number of lipid \textit{classes}.}
+  %  \label{fig:S3B}
+  %\end{subfigure}
+
+  %\vspace{1em}
+
+  % ---------- row 2 (centred) ----------
+  %\begin{subfigure}[t]{0.55\textwidth}
+  %  \centering
+  %  \includegraphics[width=\linewidth]%{fig/supp/SuppFig_3C_Lipid_Overlap_Venn_traditional.png}
+    %\caption{Shared and unique lipid species.}
+    %\label{fig:S3C}
+  %\end{subfigure}
+
+  %\caption{Overview of lipid coverage in Control and Low-Input samples.}
+  %\label{fig:S3}
+%\end{figure}
+
+
+
+%========================================================
+%  Supplementary Figure S4 - Lipid ratio contrasts under low-P
+%========================================================
+\begin{figure}[htp]
+  \centering
+  \includegraphics[width=0.65\textwidth]{fig/supp/SuppFig_4_TIC_nontraditional_lipid_class.png}
+  \caption{Relative contribution of non-traditional lipid classes to total ion current (TIC) under Control and Low-Input conditions. Classes contributing less than 3\% in both conditions were omitted for clarity.}
+  \label{fig:S4_TIC_nontraditional}
+\end{figure}
+
 
 
 %========================================================
