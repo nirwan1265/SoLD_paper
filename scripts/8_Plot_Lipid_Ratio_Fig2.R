@@ -21,15 +21,17 @@ library(ggh4x)
 control  <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
 colnames(control)[1] <- "Compound_Name"  
 
+
 lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
 colnames(lowinput)[1] <- "Compound_Name"  
+
 
 # Valid classes
 valid_classes <- c("TG","DG","MG",
                    "PC","PE","PI",
                    "DGDG","MGDG",
                    "SQDG","SM","AEG",
-                   "LPC","LPE","PG","PA")
+                   "LPC","LPE","PG","PA","PS")
 class_pat <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
 
 # ╔══════════════════════════════════════════════════════════════════╗
@@ -84,6 +86,7 @@ wide_log <- long_all %>%
   pivot_wider(names_from = Class, values_from = class_log,
               values_fill = NA_real_)
 
+wide_log <- wide_log[,-3]
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 4)  COMPUTE CLASS-PAIR                                           ║
 # ╚══════════════════════════════════════════════════════════════════╝
@@ -94,21 +97,8 @@ ratio_tbl <- wide_log %>%
     
     ### Membrane Lipid remodeling
     
-    ## 1. Galactolipid Dynamics
-    DGDG_PC    = DGDG - PC, #  Tests phospholipid replacement capacity under P stress
-    DGDG_PE    = DGDG - PE, #  Tests phospholipid replacement capacity under P stress
-    MGDG_PC    = MGDG - PC,
-    #MGDG_PE    = MGDG - PE,
-    MGDG_DGDG  = MGDG - DGDG, # Monogalactosyl vs. digalactosyl balance (bilayer vs. non-bilayer)
-    DGDG_total = DGDG - ((MGDG + SQDG) / 2), # Absolute digalactolipid shift
-    MGDG_total = MGDG - ((DGDG + SQDG) / 2), # Absolute monogalactolipid shift
-    
-    ## 2. Phospholipid Homeostasis
-    PC_PE        = PC - PE, # Major bilayer asymmetry
-    PC_PG        = PC - PG,
-    PG_retention = PG - ((PC + PE) / 2), # Photosynthetic membrane priority
-    
-    ## 3. Sulfolipid Adjustments
+    ## 1. Sulfolipid Adjustments
+    #SQDG is the most vulnerable lipid:
     SQDG_PC    = SQDG - PC,
     SQDG_PG    = SQDG - PG,
     SQDG_DGDG  = SQDG - DGDG, # Anionic lipid trade-offs
@@ -116,34 +106,72 @@ ratio_tbl <- wide_log %>%
     SQDG_total = SQDG - ((DGDG + MGDG) / 2), # Sulfur allocation balance
     
     
+    ## 2. Galactolipid Dynamics
+    #MGDG is preferentially degraded:
+    MGDG_DGDG  = MGDG - DGDG, # Monogalactosyl vs. digalactosyl balance (bilayer vs. non-bilayer)
+    MGDG_PC    = MGDG - PC,
+    MGDG_total = MGDG - ((DGDG + SQDG) / 2), # Absolute monogalactolipid shift
+    
+    # DGDG is partially spared but outcompeted by phospholipids:
+    DGDG_total = DGDG - ((MGDG + SQDG) / 2), # Absolute digalactolipid shift
+    DGDG_PC    = DGDG - PC, #  Tests phospholipid replacement capacity under P stress
+    DGDG_PE    = DGDG - PE, #  Tests phospholipid replacement capacity under P stress
+    DGDG_PG    = DGDG - PG, #  Assess photosynthetic membrane integrity
+    
+    
+    
+    ## 3. Phospholipid Homeostasis
+    PC_PE        = PC - PE, # Major bilayer asymmetry
+    PC_PG        = PC - PG,
+    PC_PS        = PC - PS, # Phosphatidylserine balance
+    PE_PS        = PE - PS, # Phosphatidylserine balance
+    PG_retention = PG - ((PC + PE) / 2), # Photosynthetic membrane priority
+    NonP_Phospho = (MGDG + DGDG + SQDG) - ((PC + PE) / 2), # Non-phospholipid balance
+    PC_total    = PC - ((PE + PG + PS) / 3), # Phospholipid balance
+    PE_total    = PE - ((PC + PG + PS) / 3), # Phospholipid balance
+    PS_total    = PS - ((PC + PE + PG) / 3), # Phospholipid balance
+    
+    
     ### Lipid Turnover and Signaling
     
-    ## 1. Lysophospholipids Remodeling
+    ## 1. Diacylglycerol Flux Hub
+    # DG Accumulates from Degraded Lipids but is Excluded from Membranes
+    DG_DGDG    = DG   - DGDG,
+    DG_MGDG    = DG   - MGDG, # Precursor flux to galactolipids
+    
+    DG_PC        = DG  - PC,
+    DG_PE        = DG  - PE,
+    DG_Phospho   = DG  - ((PC + PE) / 2), # Phospholipid-derived precursor pool
+    DG_SQDG    = DG   - SQDG,
+   
+    
+    
+    ## 2. Lysophospholipids Remodeling
     LPC_PC       = LPC - PC,
     LPE_PE       = LPE - PE,
     Lyso_activity = (LPC + LPE) - (PC + PE), # Global phospholipase activity
-    
-    ## 2. Diacylglycerol Flux Hub
-    DG_MGDG    = DG   - MGDG, # Precursor flux to galactolipids
-    DG_DGDG    = DG   - DGDG,
-    DG_SQDG    = DG   - SQDG,
-    DG_Phospho   = DG  - ((PC + PE) / 2), # Phospholipid-derived precursor pool
-    DG_PC        = DG  - PC,
-    DG_PE        = DG  - PE,
     
     
     
     ### Carbon sink and allocation
     
     ## 1. Storage Lipid Reallocation
+    
+    # Triacylglycerol (TG) Synthesis Dominates Under Stress
     TG_DG        = TG  - DG, # DAG→TAG conversion efficiency
-    TG_Phospho   = TG  - ((PC + PE) / 2), # Storage vs. membrane lipids
-    DG_to_Gala   = DG - ((MGDG + DGDG)/2), # Precursor flux to galactolipids
     TG_Galacto   = TG - (MGDG + DGDG)/2,  # Storage vs. chloroplast lipids
     
+    
+    
+    TG_Phospho   = TG  - ((PC + PE) / 2), # Storage vs. membrane lipids
+    DG_to_Gala   = DG - ((MGDG + DGDG)/2), # Precursor flux to galactolipids
+    
+    
     ## 2. Metabolic Trade-offs
-    Storage_vs_Membrane = (TG + DG)/2 - (PC + PE)/2,        # Carbon storage vs. membranes
+    # Metabolic Trade-offs Favor Survival Over Growth
     Storage_vs_Photo    = (TG + DG)/2 - (MGDG + DGDG)/2,    # Storage vs. photosynthetic machinery
+    Storage_vs_Membrane = (TG + DG)/2 - (PC + PE)/2,        # Carbon storage vs. membranes
+    #Global_storage_vs_Membrane_balance = TG - ((PC + PE + PG) / 3)
     
   )
 
@@ -155,21 +183,30 @@ ratio_tbl <- wide_log %>%
 # Long format ratio table
 ratio_long <- ratio_tbl %>%
   dplyr::select(Sample,Condition,
-                # Galactolipid Dynamics
-                DGDG_PC, DGDG_PE, MGDG_PC, MGDG_DGDG,
-                DGDG_total, MGDG_total,
-                # Phospholipid Homeostasis
-                PC_PE, PC_PG, PG_retention,
+                
                 # Sulfolipid Adjustments
                 SQDG_PC, SQDG_PG, SQDG_DGDG, SQDG_MGDG, SQDG_total,
+                
+                # Galactolipid Dynamics
+                MGDG_DGDG,  MGDG_PC, MGDG_total, 
+                DGDG_total,  DGDG_PC, DGDG_PE, DGDG_PG,
+                
+                # Phospholipid Homeostasis
+                PC_PE, PC_PG, PC_PS, PE_PS, PG_retention, NonP_Phospho, PC_total, PE_total, PS_total,
+                
+                # Diacylglycerol Flux Hub
+                DG_DGDG, DG_MGDG, 
+                DG_PC, DG_PE,  DG_Phospho, DG_SQDG,
+                
                 # Lysophospholipids Remodeling 
                 LPC_PC, LPE_PE, Lyso_activity,
-                # Diacylglycerol Flux Hub
-                DG_MGDG, DG_DGDG, DG_SQDG, DG_Phospho, DG_PC, DG_PE,
+                
                 # Storage Lipid Reallocation
-                TG_DG, TG_Phospho,DG_to_Gala,TG_Galacto,
+                TG_DG, TG_Galacto, 
+                TG_Phospho,DG_to_Gala,
+                
                 # Metabolic Trade-offs
-                Storage_vs_Membrane,Storage_vs_Photo
+                Storage_vs_Photo, Storage_vs_Membrane
                
 
                 
@@ -200,19 +237,20 @@ stat_df <- ratio_long %>%
 # ╚══════════════════════════════════════════════════════════════════╝
 
 ### Membrane Lipid remodeling
-mem_galactolipid   <- c("DGDG_PC","DGDG_PE","MGDG_PC","MGDG_DGDG","DGDG_total","MGDG_total")
-mem_phospholipid   <- c("PC_PE","PC_PG","PG_retention")
 mem_sulfolipid     <- c("SQDG_PC","SQDG_PG","SQDG_DGDG","SQDG_MGDG","SQDG_total")
+mem_galactolipid   <- c("MGDG_DGDG",  "MGDG_PC", "MGDG_total","DGDG_total",  "DGDG_PC", "DGDG_PE", "DGDG_PG" )
+mem_phospholipid   <- c("PC_PE","PC_PG","PC_PS", "PE_PS","PG_retention","NonP_Phospho","PC_total", "PE_total", "PS_total")
 
 
 ### Lipid Turnover and Signaling
+turn_diacylglycerol<- c("DG_DGDG", "DG_MGDG","DG_PC","DG_PE","DG_Phospho","DG_SQDG")
 turn_lysophospho   <- c("LPC_PC","LPE_PE","Lyso_activity")
-turn_diacylglycerol<- c("DG_MGDG","DG_DGDG","DG_SQDG","DG_Phospho","DG_PC","DG_PE")
+
 
 
 ### Carbon sink and allocation
-carbon_storage     <- c("TG_DG","TG_Phospho","DG_to_Gala","TG_Galacto")
-carbon_photo       <- c("Storage_vs_Membrane","Storage_vs_Photo")
+carbon_storage     <- c("TG_DG","TG_Galacto", "TG_Phospho","DG_to_Gala")
+carbon_photo       <- c( "Storage_vs_Photo","Storage_vs_Membrane")
 
 
 
@@ -237,12 +275,14 @@ nature_theme <- theme_minimal(12) +
 
 # Define a lookup, e.g. via a named vector or case_when:
 ratio_to_group <- function(r) {
-  if (r %in% mem_galactolipid) {
+  if (r %in% mem_sulfolipid) {
+    "Sulfolipid Adjustments"
+    
+  } else if (r %in% mem_galactolipid) {
     "Galactolipid Dynamics"
+    
   } else if (r %in% mem_phospholipid) {
     "Phospholipid Homeostasis"
-  } else if (r %in% mem_sulfolipid) {
-    "Sulfolipid Adjustments"
   } else {
     NA_character_
   }
@@ -252,25 +292,29 @@ ratio_to_group <- function(r) {
 
 ##### Membrane Lipid Remodeling
 
-
+desired_order <- c(mem_sulfolipid,mem_galactolipid,mem_phospholipid)
 # Apply the function to create a new column in ratio_long
 ratio_long2 <- ratio_long %>%
   mutate(Group = vapply(Ratio, ratio_to_group, character(1))) %>%
   filter(!is.na(Group)) %>%
-  mutate(Group = factor(Group, levels = c(
+  mutate(
+    Ratio = factor(Ratio, levels = desired_order),
+    Group = factor(Group, levels = c(
+    "Sulfolipid Adjustments",
     "Galactolipid Dynamics",
-    "Phospholipid Homeostasis",
-    "Sulfolipid Adjustments"
+    "Phospholipid Homeostasis"
   )))
 
 # Apply the function to create a new column in ratio_long
 stat_df2 <- stat_df %>%
   mutate(Group = vapply(Ratio, ratio_to_group, character(1))) %>%
   filter(!is.na(Group)) %>%
-  mutate(Group = factor(Group, levels = c(
+  mutate(
+    Ratio = factor(Ratio, levels = desired_order),
+    Group = factor(Group, levels = c(
+    "Sulfolipid Adjustments",
     "Galactolipid Dynamics",
-    "Phospholipid Homeostasis",
-    "Sulfolipid Adjustments"
+    "Phospholipid Homeostasis"
   )))
 
 # Plotting
@@ -326,31 +370,38 @@ ggsave("nested_lipid_remodeling_analysis.png", p_nested,
 
 # Define a lookup, e.g. via a named vector or case_when:
 ratio_to_group2 <- function(r) {
-  if (r %in% turn_lysophospho) {
-    "Lysophospholipids Remodeling"
-  } else if (r %in% turn_diacylglycerol) {
+  if (r %in% turn_diacylglycerol) {
     "Diacylglycerol Flux Hub"
+    
+  } else if (r %in% turn_lysophospho) {
+    "Lysophospholipids Remodeling"
   } else {
     NA_character_
   }
 }
 
+desired_order <- c(turn_diacylglycerol,turn_lysophospho)
+
 # Apply the function to create a new column in ratio_long
 ratio_long3 <- ratio_long %>%
   mutate(Group = vapply(Ratio, ratio_to_group2, character(1))) %>%
   filter(!is.na(Group)) %>%
-  mutate(Group = factor(Group, levels = c(
-    "Lysophospholipids Remodeling",
-    "Diacylglycerol Flux Hub"
+  mutate(
+    Ratio = factor(Ratio, levels = desired_order),
+    Group = factor(Group, levels = c(
+    "Diacylglycerol Flux Hub",
+    "Lysophospholipids Remodeling"
   )))
 
 # Apply the function to create a new column in stat_df
 stat_df3 <- stat_df %>%
   mutate(Group = vapply(Ratio, ratio_to_group2, character(1))) %>%
   filter(!is.na(Group)) %>%
-  mutate(Group = factor(Group, levels = c(
-    "Lysophospholipids Remodeling",
-    "Diacylglycerol Flux Hub"
+  mutate(
+    Ratio = factor(Ratio, levels = desired_order),
+    Group = factor(Group, levels = c(
+    "Diacylglycerol Flux Hub",
+    "Lysophospholipids Remodeling"
   )))
 
 # Plotting
@@ -414,12 +465,15 @@ ratio_to_group3 <- function(r) {
   }
 }
 
+desired_order <- c(carbon_storage, carbon_photo)
 
 # Apply the function to create a new column in ratio_long
 ratio_long4 <- ratio_long %>%
   mutate(Group = vapply(Ratio, ratio_to_group3, character(1))) %>%
   filter(!is.na(Group)) %>%
-  mutate(Group = factor(Group, levels = c(
+  mutate(
+    Ratio = factor(Ratio, levels = desired_order),
+    Group = factor(Group, levels = c(
     "Storage Lipid Reallocation",
     "Metabolic Trade-offs"
   )))
@@ -427,7 +481,9 @@ ratio_long4 <- ratio_long %>%
 stat_df4 <- stat_df %>%
   mutate(Group = vapply(Ratio, ratio_to_group3, character(1))) %>%
   filter(!is.na(Group)) %>%
-  mutate(Group = factor(Group, levels = c(
+  mutate(
+    Ratio = factor(Ratio, levels = desired_order),
+    Group = factor(Group, levels = c(
     "Storage Lipid Reallocation",
     "Metabolic Trade-offs"
   )))
@@ -466,7 +522,7 @@ p_nested3 <- ggplot(ratio_long4, aes(Condition, Value, fill = Condition, colour 
     panel.grid.major.y = element_line(colour   ="grey90"),
     panel.grid.major.x = element_blank(),
     legend.position    = "none",
-    plot.title         = element_text(hjust   =0.5, face   ="plain", size   =14)
+    plot.title         = element_text(hjßust   =0.5, face   ="plain", size   =14)
   ) +
   ggtitle("Carbon sink and allocation")
 

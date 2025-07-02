@@ -8,9 +8,14 @@ library(dplyr)
 
 # Control
 # Individual
-dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/lowinput/"
-file_list <- list.files(path = "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/lowinput",pattern = "*.txt")
+dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/lowinput/Traditional_lipids/"
+file_list <- list.files(path = dir,pattern = "*.txt")
 
+# Select only strings with lowinput in their name
+file_list <- file_list[grep("lowinput", file_list)]
+
+# Select only strings with DG, TG, DGDG, MG, MGDG, SQDG, PC, PE, LPC, LPE in their name
+file_list <- file_list[grep("DG|TG|DGDG|MG|MGDG|SQDG|PC|PE|LPC|LPE", file_list)]
 
 dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/control/"
 file_list <- list.files(path = "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/control",pattern = "*.txt")
@@ -26,7 +31,7 @@ results <- data.frame()
 # log10 value is 
 
 p_value_threshold <- 0.00001
--log10(0.00001)
+-log10(0.0000001)
 
 #p_value_threshold <- 0.001
 
@@ -55,12 +60,12 @@ head(results)
 
 # Clean up the phenotype column
 results$phenotype <- sub(paste0("^",dir), "", results$phenotype)
-results$phenotype <- str_replace(results$phenotype, "_mod_sub_Lowinput_allLipids_log10_GWAS.part[0-9]+_SAP_bialleles_MAF_0.05.assoc_annotation", "")
-results$phenotype <- str_replace(results$phenotype, "_mod_sub_Control_allLipids_log10_GWAS.part[0-9]+_SAP_bialleles_MAF_0.05_2.assoc_annotation", "")
+results$phenotype <- str_replace(results$phenotype, "mod_sub_lowinput_all_lipids_BLUPs_rename.part[0-9]+_SAP_bialleles_MAF_0.05.assoc_annotation", "")
+results$phenotype <- str_replace(results$phenotype, "mod_sub_lowinput_all_lipids_BLUPs_rename", "")
 
 
 #results$phenotype <- str_replace(results$phenotype, "_mod_sub_summed_lipids_lowinput_with_ratios\\.part[0-9]*_SAP_bialleles_MAF_0.05\\.assoc_annotation", "")
-results$phenotype <- str_replace(results$phenotype, "/Users/nirwantandukar/Documents/Research/results/GWAS/SAP/individual/annotation/", "")
+results$phenotype <- str_replace(results$phenotype, "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/lowinput/Traditional_lipids/", "")
 results$phenotype <- str_replace(results$phenotype, "_annotation", "")
 
 results$gene <- sub("^gene:", "", results$gene)
@@ -123,9 +128,9 @@ combined_results <- combined_results[,c(1,2,7,5,6)]
 
 # save
 #write.table(combined_results, "LPC_lowinput_individual_logpvalue_7.txt", row.names=F, quote=F, sep="\t")
-write.table(combined_results, "common_genes_lowinput_individual_logpvalue_5.txt", row.names=F, quote=F, sep="\t")
+write.table(combined_results, "TradLipid_common_genes_lowinput_individual_logpvalue_5_BLUP.txt", row.names=F, quote=F, sep="\t")
 #write.table(combined_results, "common_genes_control_individual_logpvalue_7.txt", row.names=F, quote=F, sep="\t")
-
+getwd()
 #write.table(combined_results, "VitaminK1_common_genes_control_individual_logpvalue_7.txt", row.names=F, quote=F, sep="\t")
 #write.csv(combined_results, "common_genes_lowinput_individual_logpvalue_5.csv", row.names=F, quote=F)
 getwd()
