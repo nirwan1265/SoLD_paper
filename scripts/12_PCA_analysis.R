@@ -21,7 +21,8 @@ library(patchwork)
 library(scales)
 library(cowplot)
 library(ggh4x)
-
+library(ggtext)
+library(ggpp)
 
 ###############################################################################
 ## 2) READ RAW INTENSITY TABLES AND CLASS             
@@ -132,14 +133,6 @@ lipid_mat <- pca_input %>%
 # 4) Run PCA
 pca_res <- prcomp(lipid_mat, center = TRUE, scale. = TRUE)
 
-# 5) Extract scores and re‐attach metadata
-scores_df <- as.data.frame(pca_res$x[,1:2]) %>%
-  rownames_to_column("Sample_ID") %>%
-  left_join(
-    pca_input %>% select(Compound_Name, Condition, Sample_ID),
-    by = "Sample_ID"
-  )
-
 # 3) Extract scores and merge in metadata
 scores_df <- data.frame(pca_res$x[,1:2], Sample_ID = rownames(pca_res$x))
 scores_df <- merge(
@@ -161,13 +154,10 @@ load_df <- load_df %>% mutate(
   a1 = PC1 * (0.8 * sf),
   a2 = PC2 * (0.8 * sf)
 )
-load_df <- load_df %>%
-  mutate(a1 = PC1 * scale_factor,
-         a2 = PC2 * scale_factor)
 
 # 5) Plot biplot
 quartz()
-ggplot() +
+individual_PCA <- ggplot() +
   # Samples + ellipses
   geom_point(data = scores_df,
              aes(PC1, PC2, color = Condition),
@@ -187,18 +177,19 @@ ggplot() +
   geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
   labs(
-    title = "Biplot: Samples & Lipid-Class Loadings",
+    title = "Biplot: Individual Lipid Species",
     x = paste0("PC1 (", round(100 * pca_res$sdev[1]^2 / sum(pca_res$sdev^2),1), "%)"),
     y = paste0("PC2 (", round(100 * pca_res$sdev[2]^2 / sum(pca_res$sdev^2),1), "%)")
   ) +
-  scale_color_manual(values = c(Control = "#F8766D", LowInput = "#00BFC4")) +
-  scale_fill_manual(values  = c(Control = "#F8766D", LowInput = "#00BFC4")) +
+  scale_color_manual(values = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
+  scale_fill_manual(values  = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
   coord_fixed() +
   theme_bw() +
   theme(legend.position = "right",
         plot.title     = element_text(face = "bold"))
 
-
+# Save the plot
+ggsave("figures/individual_lipid_PCA_biplot.png", individual_PCA, width = 8, height = 6, dpi = 300, bg = "white")
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -327,13 +318,25 @@ scores_df <- as.data.frame(p$x[, 1:2]) %>%
 
 # 5) Loadings (Lipid-class arrows)
 load_df <- as.data.frame(p$rotation[, 1:2]) %>%
-  rownames_to_column("Class") %>%
-  mutate(a1 = PC1 * 5,  # scale for visibility
-         a2 = PC2 * 5)
+  rownames_to_column("Class") #%>%
+  # mutate(a1 = PC1 * 5,  # scale for visibility
+  #        a2 = PC2 * 5)
+
+scale_factor <- 5
+# compute a data‐driven scale factor
+sf <- max(abs(scores_df$PC1), abs(scores_df$PC2)) /
+  max(sqrt(load_df$PC1^2 + load_df$PC2^2))
+# now multiply loadings by, say, 0.8*sf
+load_df <- load_df %>% mutate(
+  a1 = PC1 * (0.8 * sf),
+  a2 = PC2 * (0.8 * sf)
+)
+
 
 # 6) Plot
 quartz()
-ggplot() +
+
+summed_pca <- ggplot() +
   # sample points + ellipses
   geom_point(data = scores_df,
              aes(PC1, PC2, color = Condition),
@@ -355,13 +358,13 @@ ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
   # labels
   labs(
-    title = "Biplot: Samples & Lipid-Class Loadings",
+    title = "Biplot: Summed Lipid Species",
     x = paste0("PC1 (", round(100 * p$sdev[1]^2 / sum(p$sdev^2), 1), "%)"),
     y = paste0("PC2 (", round(100 * p$sdev[2]^2 / sum(p$sdev^2), 1), "%)")
   ) +
   # colors
-  scale_color_manual(values = c(Control = "#F8766D", LowInput = "#00BFC4")) +
-  scale_fill_manual(values  = c(Control = "#F8766D", LowInput = "#00BFC4")) +
+  scale_color_manual(values = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
+  scale_fill_manual(values  = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
   coord_fixed() +
   theme_bw() +
   theme(
@@ -369,8 +372,8 @@ ggplot() +
     plot.title = element_text(face = "bold")
   )
 
-
-
+# Save
+ggsave("figures/summed_lipid_PCA_biplot.png", summed_pca,width = 8, height = 6, dpi = 300, bg = "white")
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -404,12 +407,6 @@ ratios_long <- ratios_long %>%
 
 
 unique(ratios_long$RatioName)
-
-
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(cowplot)
 
 # 1) pivot ratios_long into a wide matrix (rows = each sample×condition, cols = each RatioName)
 wide_ratios <- ratios_long %>%
@@ -445,17 +442,28 @@ load_df <- as.data.frame(pca_ratios$rotation[,1:2], check.names = FALSE) %>%
   tibble::rownames_to_column("RatioName")
 
 # compute scale so that 80% of the longest arrow matches the score‐cloud radius
-max_score <- max(abs(c(scores_df$PC1, scores_df$PC2)))
-max_load  <- max(sqrt(load_df$PC1^2 + load_df$PC2^2))
-arrow_scale <- 0.8 * max_score / max_load
+#max_score <- max(abs(c(scores_df$PC1, scores_df$PC2)))
+#max_load  <- max(sqrt(load_df$PC1^2 + load_df$PC2^2))
+#arrow_scale <- 0.8 * max_score / max_load
 
-load_df <- load_df %>%
-  mutate(a1 = PC1 * arrow_scale,
-         a2 = PC2 * arrow_scale)
+# load_df <- load_df %>%
+#   mutate(a1 = PC1 * arrow_scale,
+#          a2 = PC2 * arrow_scale)
+scale_factor <- 5
+# compute a data‐driven scale factor
+sf <- max(abs(scores_df$PC1), abs(scores_df$PC2)) /
+  max(sqrt(load_df$PC1^2 + load_df$PC2^2))
+# now multiply loadings by, say, 0.8*sf
+load_df <- load_df %>% mutate(
+  a1 = PC1 * (0.8 * sf),
+  a2 = PC2 * (0.8 * sf)
+)
+
 
 # 5) biplot
+
 quartz()
-ggplot() +
+ratio_pca <- ggplot() +
   # samples + ellipses
   geom_point(data = scores_df,
              aes(PC1, PC2, color = Condition),
@@ -484,14 +492,16 @@ ggplot() +
     y = paste0("PC2 (", round(100 * pca_ratios$sdev[2]^2 /
                                 sum(pca_ratios$sdev^2), 1), "%)")
   ) +
-  scale_color_manual(values = c(Control = "#F8766D",
-                                LowInput = "#00BFC4")) +
-  scale_fill_manual(values = c(Control = "#F8766D",
-                               LowInput = "#00BFC4")) +
+  scale_color_manual(values = c(Control = "#440154FF",
+                                LowInput = "#FDE725FF")) +
+  scale_fill_manual(values = c(Control = "#440154FF",
+                               LowInput = "#FDE725FF")) +
   theme_bw() +
   theme(
     legend.position = "right",
     plot.title     = element_text(face = "bold")
   )
 
+# Save
+ggsave("figures/ratios_lipid_PCA_biplot.png", ratio_pca, width = 8, height = 6, dpi = 300, bg = "white")
 
