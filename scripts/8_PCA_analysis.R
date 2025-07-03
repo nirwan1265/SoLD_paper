@@ -23,6 +23,10 @@ library(cowplot)
 library(ggh4x)
 library(ggtext)
 library(ggpp)
+library(textshape)
+library(viridis)
+library(RColorBrewer)
+library(tibble)
 
 ###############################################################################
 ## 2) READ RAW INTENSITY TABLES AND CLASS             
@@ -47,23 +51,28 @@ lowinput <- vroom(
   mutate(Condition = "LowInput") %>%
   rename(Compound_Name = 1)
 
-
+colnames(control)
 ###############################################################################
 ## 3)  SUBSET TRADITIONAL LIPID CLASSES
 ###############################################################################
 
 # Valid classes
-valid_classes <- c("TG","DG","MG",
+# valid_classes <- c("TG","DG","MG",
+#                    "PC","PE","PI",
+#                    "DGDG","MGDG",
+#                    "SQDG","SM","AEG",
+#                    "LPC","LPE","PG","PA","PS","AEG","Cer","FA","GalCer")
+
+valid_classes <- c("DGDG","MGDG","TG","DG","MG",
                    "PC","PE","PI",
-                   "DGDG","MGDG",
-                   "SQDG","SM","AEG",
+                   "SQDG",
                    "LPC","LPE","PG","PA","PS")
 
-valid_classes <- c("TG","DG",
-                   "PC","PE",
-                   "DGDG","MGDG",
-                   "SQDG"
-                   )
+# valid_classes <- c("TG","DG",
+#                    "PC","PE",
+#                    "DGDG","MGDG",
+#                    "SQDG"
+#                    )
 
 
 # build a regex like "^(TG|DG|MG|…)"
@@ -145,6 +154,7 @@ scores_df <- merge(
 # 4) Prepare loadings as arrows
 
 load_df <- data.frame(pca_res$rotation[,1:2], Class = rownames(pca_res$rotation))
+
 scale_factor <- 5
 # compute a data‐driven scale factor
 sf <- max(abs(scores_df$PC1), abs(scores_df$PC2)) /
@@ -154,26 +164,59 @@ load_df <- load_df %>% mutate(
   a1 = PC1 * (0.8 * sf),
   a2 = PC2 * (0.8 * sf)
 )
+load_df <- load_df %>%
+  mutate(
+    LipidClass = str_extract(Class, class_pattern)   # pull off the prefix
+  )
+
+# 3) build a named colour vector
+# build a Paired palette of exactly as many colors as you have classes
+n_classes <- length(valid_classes)
+qual_cols <- brewer.pal(n = max(3, min(12, n_classes)), name = "Paired")
+# Change TG to black
+qual_cols[which(valid_classes == "TG")] <- "#000000"  # black for TG
+
+# if you have more than 12 classes, you can interpolate:
+if(n_classes > length(qual_cols)){
+  qual_cols <- colorRampPalette(qual_cols)(n_classes)
+}
+names(qual_cols) <- valid_classes
+
 
 # 5) Plot biplot
 quartz()
 individual_PCA <- ggplot() +
-  # Samples + ellipses
+  # samples
   geom_point(data = scores_df,
              aes(PC1, PC2, color = Condition),
              size = 3, alpha = 0.8) +
   stat_ellipse(data = scores_df,
                aes(PC1, PC2, fill = Condition),
-               geom = "polygon", alpha = 0.2, color = NA) +
-  # Loading arrows
+               geom = "polygon", alpha = 0.2, colour = NA) +
+  # loading arrows, coloured by lipid class
   geom_segment(data = load_df,
-               aes(x = 0, y = 0, xend = a1, yend = a2),
+               aes(x = 0, y = 0, xend = a1, yend = a2, color = LipidClass),
                arrow = arrow(length = unit(0.2, "cm")),
-               color = "navy", size = 0.8) +
+               size = 0.8) +
   geom_text(data = load_df,
-            aes(x = a1 * 1.05, y = a2 * 1.05, label = Class),
-            color = "navy", size = 3) +
-  # Axes, labels, theme
+            aes(x = a1 * 1.05, y = a2 * 1.05, label = Class, color = LipidClass),
+            size = 2.5) +
+  
+  
+  scale_fill_manual(name   = "Condition",
+                    values = c(Control = "#440154FF", LowInput = "#FDE725FF")
+                    #guide  = guide_legend(override.aes = list(shape = 22, size = 4, alpha = 0.))
+  ) +
+  # guides & palettes
+  scale_color_manual(
+    name   = "Lipid Class", 
+    values = qual_cols
+  ) +
+  # keep your sample‐point colours as before
+  
+  
+  
+  # axes, theme
   geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
   labs(
@@ -181,12 +224,44 @@ individual_PCA <- ggplot() +
     x = paste0("PC1 (", round(100 * pca_res$sdev[1]^2 / sum(pca_res$sdev^2),1), "%)"),
     y = paste0("PC2 (", round(100 * pca_res$sdev[2]^2 / sum(pca_res$sdev^2),1), "%)")
   ) +
-  scale_color_manual(values = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
-  scale_fill_manual(values  = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
   coord_fixed() +
   theme_bw() +
-  theme(legend.position = "right",
-        plot.title     = element_text(face = "bold"))
+  theme(
+    legend.position = "right",
+    plot.title     = element_text(face = "bold")
+  )
+
+# individual_PCA <- ggplot() +
+#   # Samples + ellipses
+#   geom_point(data = scores_df,
+#              aes(PC1, PC2, color = Condition),
+#              size = 3, alpha = 0.8) +
+#   stat_ellipse(data = scores_df,
+#                aes(PC1, PC2, fill = Condition),
+#                geom = "polygon", alpha = 0.2, color = NA) +
+#   # Loading arrows
+#   geom_segment(data = load_df,
+#                aes(x = 0, y = 0, xend = a1, yend = a2),
+#                arrow = arrow(length = unit(0.2, "cm")),
+#                color = "navy", size = 0.8) +
+#   geom_text(data = load_df,
+#             aes(x = a1 * 1.05, y = a2 * 1.05, label = Class),
+#             color = "navy", size = 3) +
+#   # Axes, labels, theme
+#   geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
+#   geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
+#   labs(
+#     title = "Biplot: Individual Lipid Species",
+#     x = paste0("PC1 (", round(100 * pca_res$sdev[1]^2 / sum(pca_res$sdev^2),1), "%)"),
+#     y = paste0("PC2 (", round(100 * pca_res$sdev[2]^2 / sum(pca_res$sdev^2),1), "%)")
+#   ) +
+#   scale_color_manual(values = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
+#   scale_fill_manual(values  = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
+#   coord_fixed() +
+#   theme_bw() +
+#   theme(legend.position = "right",
+#         plot.title     = element_text(face = "bold"))
+# individual_PCA
 
 # Save the plot
 ggsave("figures/individual_lipid_PCA_biplot.png", individual_PCA, width = 8, height = 6, dpi = 300, bg = "white")
@@ -215,12 +290,15 @@ valid_classes <- c("TG","DG","MG",
                    "PC","PE","PI",
                    "DGDG","MGDG",
                    "SQDG","SM","AEG",
-                   "LPC","LPE","PG","PA","PS")
+                   "LPC","LPE","PG","PA","PS","AEG","FA","GalCer")
+
+# valid_classes <- c("TG","DG","MG",
+#                    "PC","PE","PI",
+#                    "DGDG","MGDG",
+#                    "SQDG","SM","AEG",
+#                    "LPC","LPE","PG","PA","PS")
 
 class_pat <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
-
-raw_filt <- raw_all %>%
-  filter(str_detect(Compound_Name, class_pat))
 
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 2) TIC normalisation + log10 per lipid                           ║
@@ -264,7 +342,9 @@ long_prep_global <- function(df) {
 combined  <- bind_rows(control  %>% mutate(Condition = "Control"),
                        lowinput %>% mutate(Condition = "LowInput"))
 long_all  <- long_prep_global(combined)
-
+# Remove rows with string count less than 5 from Sample
+long_all <- long_all %>% 
+  filter(nchar(Sample) >= 5)
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 3)  PIVOT WIDE                                                   ║
 # ╚══════════════════════════════════════════════════════════════════╝
@@ -276,9 +356,15 @@ wide_log <- long_all %>%
 
 # Removing  AEG and PG 
 #wide_log <- wide_log[,-c(3,13)]
-wide_log <- wide_log[,-c(3,8)]
+#wide_log <- wide_log[,-c(3,8)]
 
 
+long_classes <- wide_log %>%
+  pivot_longer(
+    cols      = -c(Sample, Condition),
+    names_to  = "Class",
+    values_to = "Abundance"
+  )
 
 # 1) pivot into “long” so we have one row per Sample/Condition/Class
 lc <- wide_log %>%
@@ -372,6 +458,7 @@ summed_pca <- ggplot() +
     plot.title = element_text(face = "bold")
   )
 
+summed_pca
 # Save
 ggsave("figures/summed_lipid_PCA_biplot.png", summed_pca,width = 8, height = 6, dpi = 300, bg = "white")
 
@@ -399,14 +486,24 @@ ratios_long <- lc %>%
 
 # 3) inspect    
 ratios_long
-
+unique(ratios_long$RatioName)
 
 # Remove rows with string count less than 3 from Sample
 ratios_long <- ratios_long %>% 
   filter(nchar(Sample) >= 5)
 
-
 unique(ratios_long$RatioName)
+
+# Subset the ratios that you got from OPLS-DA from 12_OPLS_analysis.R
+# only_vips <- c("PE/SQDG","MGDG/PC","PC/SQDG","MGDG/PE","SQDG/TG","MG/SQDG",
+#               "MGDG/TG","DGDG/MGDG","DGDG/PC","PC/PS","MG/MGDG","DGDG/PE",
+#               "DGDG/SQDG","DGDG/TG","LPE/PC","PE/PS","PS/TG","MG/PC","LPC/MGDG",
+#               "LPC/SQDG","LPE/TG","LPE/PE","PC/PE","LPC/PC")
+
+# Get this all_combine from below:
+#only_vips <- vip_hits$Lipid
+ratios_long <- ratios_long %>%
+  filter(RatioName %in% all_combine)
 
 # 1) pivot ratios_long into a wide matrix (rows = each sample×condition, cols = each RatioName)
 wide_ratios <- ratios_long %>%
@@ -459,49 +556,162 @@ load_df <- load_df %>% mutate(
   a2 = PC2 * (0.8 * sf)
 )
 
+groups_lipids <- data.frame()
 
+
+sulfolipid_adjustments <- c("PE/SQDG", "PC/SQDG", "MG/SQDG", "DGDG/SQDG", "LPC/SQDG")
+mem_sulfolipid     <- c("SQDG/PG","SQDG/MGDG")
+
+sulfolipid_adjustments <- unique(c(sulfolipid_adjustments,mem_sulfolipid))
+
+
+
+galactolipid_dynamics <- c("MGDG/PC", "MGDG/PE", "DGDG/MGDG", "DGDG/PC", "DGDG/PE")
+mem_galactolipid   <- c( "DGDG/PG" )
+
+galactolipid_dynamics <- unique(c(galactolipid_dynamics,mem_galactolipid))
+
+
+
+
+phospholipid_homeostasis <- c("PC/PS", "PC/PE", "PE/PS")
+mem_phospholipid   <- c("PC/PG")
+
+phospholipid_homeostasis <- unique(c(phospholipid_homeostasis,mem_phospholipid))
+
+
+
+turnover_lysophospho <- c("LPE/PC", "LPE/PE", "LPC/PC")
+
+
+turn_diacylglycerol<- c("DG/DGDG", "DG/MGDG","DG/PC","DG/PE","DG/SQDG")
+
+
+carbon_storage <- c("DG/TG","SQDG/TG","MGDG/TG","DGDG/TG")
+
+all_combine <- c(
+  sulfolipid_adjustments,
+  galactolipid_dynamics,
+  phospholipid_homeostasis,
+  turnover_lysophospho,
+  turn_diacylglycerol,
+  carbon_storage)
+
+
+
+load_df <- load_df %>%
+  mutate(
+    Category = case_when(
+      RatioName %in% sulfolipid_adjustments   ~ "Sulfolipid adjustments",
+      RatioName %in% galactolipid_dynamics    ~ "Galactolipid dynamics",
+      RatioName %in% phospholipid_homeostasis ~ "Phospholipid homeostasis",
+      RatioName %in% turnover_lysophospho      ~ "Lysophospholipid turnover",
+      RatioName %in% carbon_storage           ~ "Carbon storage",
+      RatioName %in% turn_diacylglycerol ~ "Turnover of diacylglycerols",
+      TRUE                                     ~ "Other"
+    )
+  )
+
+# pick a qualititative palette (one colour per category)
+cat_cols <- c(
+  "Sulfolipid adjustments"   = "#1b9e77",
+  "Galactolipid dynamics"    = "#d95f02",
+  "Phospholipid homeostasis" = "#000000",
+  "Lysophospholipid turnover" = "#e7298a",
+  "Turnover of diacylglycerols" = "#7570b3",
+  "Carbon storage"           = "#66a61e",
+  "Other"                    = "grey70"
+)
+
+cat_cols <- c(
+  "Sulfolipid adjustments"      = brewer.pal(7,"Set1")[1],
+  "Galactolipid dynamics"       = brewer.pal(7,"Set1")[2],
+  "Phospholipid homeostasis"    = brewer.pal(7,"Set1")[3],
+  "Lysophospholipid turnover"   = brewer.pal(7,"Set1")[4],
+  "Turnover of diacylglycerols" = brewer.pal(7,"Set1")[5],
+  "Carbon storage"              = "#000000",
+  "Other"                       = "grey70"
+)
+
+# cat_cols <- c(
+#   "Sulfolipid adjustments"     = "#1b9e77",
+#   "Galactolipid dynamics"      = "#d95f02",
+#   "Phospholipid homeostasis"   = "#000000",
+#   "Lysophospholipid turnover"  = "#e7298a",
+#   "Turnover of diacylglycerols"= "#7570b3",
+#   "Carbon storage"             = "#66a61e",
+#   "Other"                      = "grey70"
+# )
 # 5) biplot
 
 quartz()
 ratio_pca <- ggplot() +
-  # samples + ellipses
+  # sample‐scores + ellipses
   geom_point(data = scores_df,
              aes(PC1, PC2, color = Condition),
-             size = 2.5, alpha = 0.7) +
+             size = 2.5, alpha = 0.7, show.legend = FALSE) +    # hide from colour legend
   stat_ellipse(data = scores_df,
                aes(PC1, PC2, fill = Condition),
-               geom = "polygon", alpha = 0.2, color = NA) +
-  # loading arrows
+               geom = "polygon", alpha = 0.2, colour = NA) +
+  
+  # arrows coloured by your ratio‐Category
   geom_segment(data = load_df,
-               aes(x = 0, y = 0, xend = a1, yend = a2),
+               aes(x = 0, y = 0,
+                   xend = a1, yend = a2,
+                   color = Category),
                arrow = arrow(length = unit(0.2, "cm")),
-               color = "navy", size = 0.8) +
-  # loading labels
+               size = 0.8) +
   geom_text(data = load_df,
-            aes(x = a1 * 1.05, y = a2 * 1.05, label = RatioName),
-            color = "navy", size = 3) +
-  # axis lines & fixed aspect
+            aes(x = a1 * 1.05, y = a2 * 1.05,
+                label = RatioName,
+                color = Category),
+            size = 3) +
+  
+  # axes
   geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
   coord_fixed() +
-  # axis labels with % variance
-  labs(
-    title = "Biplot: Samples & Lipid Ratios Loadings",
-    x = paste0("PC1 (", round(100 * pca_ratios$sdev[1]^2 /
-                                sum(pca_ratios$sdev^2), 1), "%)"),
-    y = paste0("PC2 (", round(100 * pca_ratios$sdev[2]^2 /
-                                sum(pca_ratios$sdev^2), 1), "%)")
+  
+  # axes titles with % variance
+  labs(title = "Biplot: Samples & Lipid Ratios Loadings",
+       x = paste0("PC1 (", round(100 * pca_ratios$sdev[1]^2 /
+                                 sum(pca_ratios$sdev^2), 1), "%)"),
+       y = paste0("PC2 (", round(100 * pca_ratios$sdev[2]^2 /
+                                 sum(pca_ratios$sdev^2), 1), "%)")) +
+  
+  # 1) Category colours only in the colour legend
+  scale_color_manual(
+    name   = "Category",
+    values = cat_cols,
+    breaks = names(cat_cols)      # only these show up in the legend
   ) +
-  scale_color_manual(values = c(Control = "#440154FF",
-                                LowInput = "#FDE725FF")) +
-  scale_fill_manual(values = c(Control = "#440154FF",
-                               LowInput = "#FDE725FF")) +
+  # 2) keep your sample fill legend for ellipses
+  scale_fill_manual(
+    name   = "Condition",
+    values = c(Control  = "#440154FF",
+               LowInput = "#FDE725FF")
+  ) +
+  
   theme_bw() +
   theme(
     legend.position = "right",
-    plot.title     = element_text(face = "bold")
+    plot.title      = element_text(face = "bold")
   )
+
+ratio_pca
+
+
+
+
 
 # Save
 ggsave("figures/ratios_lipid_PCA_biplot.png", ratio_pca, width = 8, height = 6, dpi = 300, bg = "white")
+
+
+
+
+
+
+
+
 

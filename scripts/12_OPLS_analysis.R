@@ -11,7 +11,7 @@ library(patchwork)
 library(scales)
 library(cowplot)
 library(ggh4x)
-
+library(ropls)
 
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 1) READ RAW INTENSITY TABLES AND CLASS                           ║
@@ -188,7 +188,7 @@ vip_df <- tibble(
 
 # 2.  Keep VIP > 1.3  (and sort descending)
 vip_hits <- vip_df %>%
-  filter(VIP > 1.3) %>%
+  filter(VIP > 1) %>%
   arrange(desc(VIP))
 
 # How many?
