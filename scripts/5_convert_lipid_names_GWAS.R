@@ -4,8 +4,6 @@ library(tibble)
 
 
 
-
-
 control <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/data/SPATS_fitted/BLUP_GWAS_phenotype/control_all_lipids_BLUPs.csv")
 
 # 1. Store original column names

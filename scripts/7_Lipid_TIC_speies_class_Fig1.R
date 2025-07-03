@@ -70,6 +70,11 @@ pct_tbl <- bind_rows(ctrl_long, low_long) %>%
   mutate(pct = 100 * sum_int / sum(sum_int)) %>%
   ungroup()
 
+# Remove rows with string less than 5 characters from Sample
+pct_tbl <- pct_tbl %>%
+  filter(nchar(Sample) >= 5)
+
+
 pct_mean <- pct_tbl %>%
   group_by(Condition, Class) %>%
   summarise(pct_mean = mean(pct), .groups = "drop")
