@@ -185,69 +185,36 @@ names(qual_cols) <- valid_classes
 
 # 5) Plot biplot
 quartz()
-individual_PCA <- ggplot() +
-  # samples
-  geom_point(data = scores_df,
-             aes(PC1, PC2, color = Condition),
-             size = 3, alpha = 0.8) +
-  stat_ellipse(data = scores_df,
-               aes(PC1, PC2, fill = Condition),
-               geom = "polygon", alpha = 0.2, colour = NA) +
-  # loading arrows, coloured by lipid class
-  geom_segment(data = load_df,
-               aes(x = 0, y = 0, xend = a1, yend = a2, color = LipidClass),
-               arrow = arrow(length = unit(0.2, "cm")),
-               size = 0.8) +
-  geom_text(data = load_df,
-            aes(x = a1 * 1.05, y = a2 * 1.05, label = Class, color = LipidClass),
-            size = 2.5) +
-  
-  
-  scale_fill_manual(name   = "Condition",
-                    values = c(Control = "#440154FF", LowInput = "#FDE725FF")
-                    #guide  = guide_legend(override.aes = list(shape = 22, size = 4, alpha = 0.))
-  ) +
-  # guides & palettes
-  scale_color_manual(
-    name   = "Lipid Class", 
-    values = qual_cols
-  ) +
-  # keep your sample‐point colours as before
-  
-  
-  
-  # axes, theme
-  geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
-  labs(
-    title = "Biplot: Individual Lipid Species",
-    x = paste0("PC1 (", round(100 * pca_res$sdev[1]^2 / sum(pca_res$sdev^2),1), "%)"),
-    y = paste0("PC2 (", round(100 * pca_res$sdev[2]^2 / sum(pca_res$sdev^2),1), "%)")
-  ) +
-  coord_fixed() +
-  theme_bw() +
-  theme(
-    legend.position = "right",
-    plot.title     = element_text(face = "bold")
-  )
-
 # individual_PCA <- ggplot() +
-#   # Samples + ellipses
+#   # samples
 #   geom_point(data = scores_df,
 #              aes(PC1, PC2, color = Condition),
 #              size = 3, alpha = 0.8) +
 #   stat_ellipse(data = scores_df,
 #                aes(PC1, PC2, fill = Condition),
-#                geom = "polygon", alpha = 0.2, color = NA) +
-#   # Loading arrows
+#                geom = "polygon", alpha = 0.2, colour = NA) +
+#   # loading arrows, coloured by lipid class
 #   geom_segment(data = load_df,
-#                aes(x = 0, y = 0, xend = a1, yend = a2),
+#                aes(x = 0, y = 0, xend = a1, yend = a2, color = LipidClass),
 #                arrow = arrow(length = unit(0.2, "cm")),
-#                color = "navy", size = 0.8) +
+#                size = 0.8) +
 #   geom_text(data = load_df,
-#             aes(x = a1 * 1.05, y = a2 * 1.05, label = Class),
-#             color = "navy", size = 3) +
-#   # Axes, labels, theme
+#             aes(x = a1 * 1.05, y = a2 * 1.05, label = Class, color = LipidClass),
+#             size = 2.5) +
+#   
+#   
+#   scale_fill_manual(name   = "Condition",
+#                     values = c(Control = "#440154FF", LowInput = "#FDE725FF")
+#                     #guide  = guide_legend(override.aes = list(shape = 22, size = 4, alpha = 0.))
+#   ) +
+#   # guides & palettes
+#   scale_color_manual(
+#     name   = "Lipid Class", 
+#     values = qual_cols
+#   ) +
+#   # keep your sample‐point colours as before
+#   
+#   # axes, theme
 #   geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
 #   geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
 #   labs(
@@ -255,16 +222,47 @@ individual_PCA <- ggplot() +
 #     x = paste0("PC1 (", round(100 * pca_res$sdev[1]^2 / sum(pca_res$sdev^2),1), "%)"),
 #     y = paste0("PC2 (", round(100 * pca_res$sdev[2]^2 / sum(pca_res$sdev^2),1), "%)")
 #   ) +
-#   scale_color_manual(values = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
-#   scale_fill_manual(values  = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
 #   coord_fixed() +
 #   theme_bw() +
-#   theme(legend.position = "right",
-#         plot.title     = element_text(face = "bold"))
-# individual_PCA
+#   theme(
+#     legend.position = "right",
+#     plot.title     = element_text(face = "bold")
+#   )
+
+individual_PCA <- ggplot() +
+  # Samples + ellipses
+  geom_point(data = scores_df,
+             aes(PC1, PC2, color = Condition),
+             size = 2.5, alpha = 0.8) +
+  stat_ellipse(data = scores_df,
+               aes(PC1, PC2, fill = Condition),
+               geom = "polygon", alpha = 0.2, color = NA) +
+  # Loading arrows
+  # geom_segment(data = load_df,
+  #              aes(x = 0, y = 0, xend = a1, yend = a2),
+  #              arrow = arrow(length = unit(0.2, "cm")),
+  #              color = "navy", size = 0.8) +
+  # geom_text(data = load_df,
+  #           aes(x = a1 * 1.05, y = a2 * 1.05, label = Class),
+  #           color = "navy", size = 3) +
+  # Axes, labels, theme
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
+  labs(
+    #title = "Biplot: Individual Lipid Species",
+    x = paste0("PC1 (", round(100 * pca_res$sdev[1]^2 / sum(pca_res$sdev^2),1), "%)"),
+    y = paste0("PC2 (", round(100 * pca_res$sdev[2]^2 / sum(pca_res$sdev^2),1), "%)")
+  ) +
+  scale_color_manual(values = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
+  scale_fill_manual(values  = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
+  coord_fixed() +
+  theme_bw() +
+  theme(legend.position = "right",
+        plot.title     = element_text(face = "bold"))
+individual_PCA
 
 # Save the plot
-ggsave("figures/individual_lipid_PCA_biplot.png", individual_PCA, width = 8, height = 6, dpi = 300, bg = "white")
+ggsave("fig/main/Fig1c_individual_indv_lipid_PCA_plot.png", individual_PCA, width = 8, height = 6, dpi = 300, bg = "white")
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -434,17 +432,17 @@ summed_pca <- ggplot() +
   geom_segment(data = load_df,
                aes(x = 0, y = 0, xend = a1, yend = a2),
                arrow = arrow(length = unit(0.2, "cm")),
-               color = "navy", size = 0.8) +
+               color = "black", size = 0.8) +
   # loading labels
   geom_text(data = load_df,
             aes(x = a1 * 1.05, y = a2 * 1.05, label = Class),
-            color = "navy", size = 3) +
+            color = "black", size = 3) +
   # axis lines
   geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
   # labels
   labs(
-    title = "Biplot: Summed Lipid Species",
+    #title = "Biplot: Summed Lipid Species",
     x = paste0("PC1 (", round(100 * p$sdev[1]^2 / sum(p$sdev^2), 1), "%)"),
     y = paste0("PC2 (", round(100 * p$sdev[2]^2 / sum(p$sdev^2), 1), "%)")
   ) +
@@ -460,7 +458,7 @@ summed_pca <- ggplot() +
 
 summed_pca
 # Save
-ggsave("figures/summed_lipid_PCA_biplot.png", summed_pca,width = 8, height = 6, dpi = 300, bg = "white")
+ggsave("fig/main/Fig1c_summed_lipid_PCA_biplot.png", summed_pca,width = 8, height = 6, dpi = 300, bg = "white")
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
