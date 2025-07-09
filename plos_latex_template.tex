@@ -535,6 +535,8 @@ to the denominator, and vice versa.
 Each log-ratio metric involved a comparison between C and LI samples conducted via Welch's two-sample \(t\)-test (\texttt{t.test(Value ~ Condition)} in \textsf{R}), noted for its robustness against differences in sample sizes and variances. The \(p\)-values obtained were displayed on violin and box plots, using standard notation: *** for \(p<0.001\), ** for \(p<0.01\), * for \(p<0.05\). Detailed test statistics and adjusted \(p\)-values are available in the github repository.
 
 
+\subsection*{Principal Component Analysis (PCA)}  
+We performed three complementary PCA workflows in R.  First, we ran PCA on the \emph{individual} lipid species abundances (log–TIC normalized).  Second, we summed abundances by \emph{lipid class} (e.g.\ TG, DG, PC, MGDG, SQDG) and repeated PCA to highlight macro-scale shifts in broad functional pools.  Third, we computed key \emph{class–ratio} metrics (e.g.\ galactolipid / phospholipid, TG / DG) and carried out PCA on these derived traits to focus on balance–based reprogramming under nutrient limitation. In all cases, data were mean–centered and unit–scaled prior to analysis.  For each PCA, we retained the first two principal components for visualization with \texttt{ggplot2}, added 95\% confidence ellipses around experimental groups, and overlaid loading vectors to identify the lipid species, classes, or ratios driving the greatest variance.  Scree plots were inspected to confirm that PC1 + PC2 captured the majority of structured variation, and breakpoints in the loading magnitudes guided our interpretation of key biochemical modules.  
 
 
 \subsection*{Genome-wide Association Studies (GWAS)} 
@@ -543,22 +545,35 @@ Separate GWAS analyses were carried out for each lipid trait and under each fiel
 \subsection*{Gene Annotation}  
 Single nucleotide polymorphisms (SNPs) were aligned with the Sorghum bicolor reference genome v3.1 (BTx623). For each marker, a 50 kb segment was designated, spanning 25 kb on either side, and all gene models within this area were retrieved. Functional annotations and homology insights were obtained from Phytozome (https://phytozome.jgi.doe.gov), SorghumBase (https://sorghumbase.com), and TAIR for corresponding Arabidopsis thaliana orthologs. Genes with known roles in N, P, cold tolerance, or lipid metabolism were specifically selected. We aggregated the frequency of each candidate gene within all lipid GWAS findings and marked those with the highest recurrence showing -log10(p-values) of 7 or greater.
 
+\subsection*{Orthogonal Projections to Latent Structures Discriminant Analysis (OPLS-DA)}
+
+This study employed Orthogonal Projections to Latent Structures Discriminant Analysis (OPLS-DA) to identify and classify lipidomic profiles across various experimental conditions. OPLS-DA includes an orthogonal signal correction phase compared to Partial Least Squares Discriminant Analysis (PLS-DA). This phase distinguishes the variation in the predictor matrix \(X\) that is specifically associated with class membership (\(Y\)) from the unrelated variation. By partitioning \(X\) into predictive and orthogonal dimensions, OPLS-DA enhances the model's clarity and reduces confounding effects arising from variability within the same class.
+
+The OPLS-DA model decomposes \(X\) according to the equation
+\[
+  X = T_{p} P_{p}^{T} \;+\; T_{o} P_{o}^{T} \;+\; E,
+\]
+where
+\begin{itemize}
+  \item \(T_{p}\) and \(P_{p}\) are the predictive score and loading matrices capturing variation correlated with \(Y\),
+  \item \(T_{o}\) and \(P_{o}\) are the orthogonal score and loading matrices capturing structured variation orthogonal to \(Y\),
+  \item \(E\) is the residual matrix representing unexplained variation.
+\end{itemize}
+
+
+The analysis was restricted to 15 lipid classes that were accurately identified (TG, DG, MG, PC, PE, PI, DGDG, MGDG, SQDG, SM, AEG, LPC, LPE, PA, PS). To highlight compositional shifts within samples and minimize variability arising from total signals, TIC was used. In order to study the compositional relationships between two distinct environments, lipid ratios were employed. All possible pairwise ratios between the mean log-relative abundances of classes were calculated. The OPLS-DA approach was utilized for all the ratios using the \texttt{ropls} package (v1.34.0) on the matrix of ratio features, \(\mathbf{X}\), and the response vector \(Y\) (C versus LI). A single predictive component (\texttt{predI = 1}) was stipulated, and cross-validation was used for the selection of orthogonal components (\texttt{orthoI = NA}). Features automatically underwent mean-centering and unit-variance scaling by \texttt{ropls} (\texttt{scaleC = "standard"}). Model performance was assessed using cross-validated \(R^{2}_{Y}\) and \(Q^{2}\), and lipid ratios that functioned as discriminators were identified via Variable Importance in Projection (VIP) scores (\(\text{VIP} > 1\)) which were used for further analysis. 
+
+In order to reduce the risk of overfitting, a seven-fold cross-validation (CV) approach with balanced class distributions was employed. Within each CV cycle, the dataset was partitioned into seven segments; six segments were used for model training, while the remaining segment was assigned for evaluating predictive performance. We report the \(R^{2}_{Y}\) (explained variance of \(Y\)) and \(Q^{2}\) (predictive capability), averaged across the folds. To validate that the computed \(Q^{2}\) exceeded the 95th percentile of permuted \(Q^{2}\) values, a permutation test consisting of 200 permutations of the \(Y\) labels was conducted.
+
+
 \subsection*{Hierarchical Clustering}
 For each lipid and genotype, we performed a hierarchical clustering using the \texttt{hclust} function in R.  Before clustering, the lipid intensities were scaled to zero mean and unit variance.  A Euclidean distance matrix was calculated, and the groups were merged according to Ward's minimum variance criterion (Ward.D2).  The dendrograms were rendered with the \texttt{dendextend} package, and two-dimensional clustergrams were generated using the \texttt{ clustergram.R} script.  
 
-\subsection*{Dimensionality Reduction (PCA, UMAP, t-SNE)}  
-To identify common patterns based on lipids and genotypes, we performed three-dimensionality reduction techniques in R: principal component analysis (PCA), uniform manifold approximation and projection (UMAP), and stochastic neighbor embedding distributed by t (t-SNE).  Before all analyzes, each data matrix (lipids or genotypes) was centered and scaled so that each variable contributes equally to the distance calculations.
-
-For PCA, we used the \texttt{prcomp()} function in base R, retaining the first two principal components for visualization.  Scree plots and loading vectors were examined to identify which lipids or variants drive the greatest variance.  
-
-For nonlinear embedding, we employ UMAP via the \texttt{uwot} package (\texttt{umap()} function) with default settings (n\_neighbors = 15, min\_dist = 0.1) to capture both local and global structure.  We also ran t-SNE using the \texttt{Rtsne} package, setting perplexity = 30 (which could be changed) and a maximum of 1,000 iterations.  
-
-The resulting two-dimensional coordinates were plotted with \texttt{ggplot2}, colored by biochemical class.
 
 \subsection*{Pathway Enrichment Analysis}
 
 \subsection*{Data Availability}
-Data processing and statistical analyzes were performed in R (version 4.3.3) using. All the codes, figures, and pipeline are described in the GitHub repository: github.com/nirwan1265/SoLD_paper.
+Data processing and statistical analyzes were performed in R (version 4.3.3) using. All the codes, figures, and pipeline are described in the GitHub repository: github.com/nirwan1265/SoLD\_paper.
 
 % Results and Discussion can be combined.
 \section*{Results}
@@ -622,32 +637,33 @@ In conclusion, in LI samples, there is a systematic alteration in the lipidome, 
 
 
 \subsection*{Overview of lipid profiles}
-We also calculated the contribution of each lipid species and class to the total ion current (TIC) in each sample. The percentage of TIC values was averaged in all C (n = 384) and in all LI (n = 362). Any species or class whose mean percentage fell below 3\% in both conditions was not labeled in our visualization. At the species level, MGDG (2.3 \%) exhibits the largest depletion under LI handling. PC (1.3 \%) and  SQDG (1.2 \%)has the second and third largest depletion (Fig. \ref{fig:1A_lipid_species}). TG species had the largest rise from 2.4\% to 6.0\%. DG also increased from 8.9\% to 10.1\%. Together, these shifts illustrate that mid-abundance triglycerolipid species (TG) become more dominant when input is limited, while key glycerophospholipids (such as PC) and pigment‐derived lipids (SQDG) are comparatively underrepresented (Fig. \ref{fig:1A_lipid_species}).
+The contribution of each lipid class to the total TIC under both C and LI conditions was quantified by calculating the average percent‐TIC across all C (\(n = 384\)) and all LI (\(n = 362\)) samples (Fig.~\ref{fig:1A_lipid_species}–\ref{fig:1B_lipid_class}). The most significant reduction under LI conditions was observed in the primary galactolipid MGDG (35.8\%~\(\rightarrow\)~33.5\%, \(\Delta = -2.3\%\)), followed by the glycerophospholipid PC (26.5\%~\(\rightarrow\)~25.2\%, \(\Delta = -1.3\%\)) and the sulfolipid SQDG (3.0\%~\(\rightarrow\)~1.8\%, \(\Delta = -1.2\%\)). In contrast, the largest absolute increase was noted in TG (2.4\%~\(\rightarrow\)~6.0\%, \(\Delta = +3.6\%\)), along with DG (8.9\%~\(\rightarrow\)~10.1\%, \(\Delta = +1.2\%\)), and a moderate rise in DGDG (13.2\%~\(\rightarrow\)~13.6\%, \(\Delta = +0.4\%\)) and PE (6.1\%~\(\rightarrow\)~6.5\%, \(\Delta = +0.4\%\)). All other species (AEG, Cer, GalCer, LPC/LPE, PA, PG, PS, FA) constituted less than 1\% of TIC or exhibited only minimal changes.
 
-When we divided the lipids into broader lipid classes, the same pattern emerged at the class level as well. In C, glycoglycerolipids (MGDG + DGDG) account for approximately 68.1\% of TIC, while under LI, this increases modestly to approximately 69.7\%. In contrast, glycerophospholipids (PC + PE + PG + LPC + LPE) decrease from 31.8\% in C to 30.3\% in LI, reflecting the loss driven by PC observed at the species level. Negligible changes were observed for sphingolipid and sterols (Fig. \ref{fig:1B_lipid_class}). Among the non-traditional lipids, the most striking class-level increase are terpenoids and tetrapyrrole  (chlorophyll-derived pigments) dropped from 84.3.5\% to 83.9.5\% (Supplementary Figure \ref{fig:S4_TIC_nontraditional}).
+Upon summing of lipids into four primary classes, a consistent trend was observed (Fig.~\ref{fig:1B_lipid_class}). Glycerolipids (MGDG + DGDG + TG + DG + MG) represented the majority of the TIC, with an increase from 68.1\% in C to 69.3\% in LI (\(\Delta = +1.2\%\)). In contrast, glycerophospholipids (PC + PE + PG + LPC + LPE) exhibited a reduction from 31.8\% to 30.3\% (\(\Delta = -1.5\%\)), primarily due to the aforementioned decline in PC. Sphingolipids experienced a marginal increase (0.1\%~\(\rightarrow\)~0.2\%), while sterols remained largely insignificant ($<$0.1\%~\(\rightarrow\)~0.2\%).
 
+A PCA of individual lipid species was conducted, revealing an expected distinct separation between the C and LI samples, with the first and second principal components (PC1 and PC2) accounting for 29.6\% and 22.8\% of the variance, respectively (Fig. \ref{fig:1C_species_pca}). Each sample was plotted based on the log-transformed relative abundance of all detected lipid molecules. The C samples formed a tight cluster in the upper right quadrant, whereas the LI samples were positioned toward the lower left. This shift suggests a comprehensive reprogramming of lipid composition in response to nutrient stress. We also conducted a PCA of aggregated lipid classes, which also demonstrated a distinct separation (Fig. \ref{fig:1D_class_pca}). The first two principal components accounted for 44.8\% (PC1) and 24.9\% (PC2) of the total variance, respectively. The differentiation between conditions is primarily observed along PC2, with C samples clustering at the positive PC2 axis, and LI samples aligning at the negative axis. This distribution signifies an alteration in lipid composition under cold and nutrient stress. PC1 captures variations in membrane fluidity and carbon storage lipids. Lipids associated with photosynthesis such as SQDG, MGDG, DGDG, PG, PS, and FA exhibited a strong positive loading on PC2, positioning themselves in the upper quadrants and closely associating with the C condition. Conversely, phospholipids and storage lipids (e.g., PC, PE, PA, LPC, DG, MG, TG, GalCer) displayed a negative loading on PC2 (and a positive loading on PC1), projecting into the lower quadrants, in alignment with the LI condition. This trend suggests that under LI conditions, plants tend to reallocate membrane lipids towards turnover and neutral lipid storage, exemplified by TG, whereas, under C conditions, the maintenance of photosynthetic membrane integrity is preserved.
 
-
-
-In summary, LI conditions reshaped the distribution of lipid-derived TIC in favor of storage and galactolipid species. The combined contribution of TG, DG, and MGDG rose markedly, reflecting an increased prominence of neutral lipids and chloroplast-associated membranes. In contrast, key glycerophospholipids, specifically PC and pigment-derived SQDG declined in relative abundance. At the class level, glycerophospholipids lost ground while glycoglycerolipids modestly expanded their share, reinforcing the lipidomic shift. These results highlight how LI sampling disproportionately favors energy-dense and galactolipid-rich components, while diminishing representation of phospholipid and pigment-based membrane structures.
-
+Under LI conditions, the lipidome transitions from a photosynthetically driven profile to a membrane restructuring and energy storage profile. Samples subjected to LI exhibit a marked reduction in galactolipids (MGDG decreased by 2.3\%) and crucial phospholipids and sulfolipids (PC decreased by 1.3\% and SQDG by 1.2\%), whereas TGs increase by 3.6\% and DGs by 1.2\%. At the classification level, glycerolipids (both galacto- and neutral lipids) increase from 68.1\% to 69.3\% of the TIC, while glycerophospholipids decrease from 31.8\% to 30.3\%. Principal Component Analysis (PCA) provides further support for these observations. The samples exhibit separation along PC2, contrasting plastidic, photosynthesis-associated lipids (such as SQDG, MGDG, DGDG, PG, and PS) with lipids associated with membrane turnover and storage (such as PC, PE, PA, LPC, DG, MG, TG, and GalCer). Biologically, this pattern reflects the degradation or repurposing of thylakoid membranes due to cold and low nutrient availability, alongside an increase in neutral lipid (TG) synthesis to serve as a carbon reservoir and an enhancement in phospholipid turnover for signaling under stress and membrane repair.
 
 \begin{figure}[htp]
   \centering
+
   %----------------------------------------------------
-  %  (A) Top left: species‐level lipid composition
+  %  (A) Full‐width: species‐level lipid composition
   %----------------------------------------------------
-  \begin{subfigure}[t]{0.48\textwidth}
+  \begin{subfigure}[t]{\textwidth}
     \centering
     \includegraphics[width=\textwidth]{fig/main/Fig1a_lipid_species.png}
     \caption{Species‐level lipid composition (\% of TIC).}
     \label{fig:1A_lipid_species}
   \end{subfigure}
-  \hfill
+
+  \vspace{1em}
+
   %----------------------------------------------------
-  %  (B) Top right: class‐level lipid composition
+  %  (B) Full‐width: class‐level lipid composition
   %----------------------------------------------------
-  \begin{subfigure}[t]{0.48\textwidth}
+  \begin{subfigure}[t]{\textwidth}
     \centering
     \includegraphics[width=\textwidth]{fig/main/Fig1b_lipid_class.png}
     \caption{Class‐level lipid composition (\% of TIC).}
@@ -678,16 +694,17 @@ In summary, LI conditions reshaped the distribution of lipid-derived TIC in favo
 
   \caption{%
     (A) Percent‐of‐TIC breakdown for individual lipid \emph{species}, averaged across all C (n = 384) and LI (n = 362) samples. Only species whose mean contribution ≥ 3 \% are labeled in‐bar.  
-    (B) Percent‐of‐TIC breakdown for broader lipid \emph{classes} averaged across the same sets of samples.  
-    (C) PCA biplot of individual lipid species, with scores colored by condition and vectors showing species loadings.  
+    (B) Percent‐of‐TIC breakdown for broader lipid \emph{classes}, averaged across the same sets of samples.  
+    (C) PCA biplot of individual lipid species, with scores colored by condition and vectors showing species loadings. Each point represents a sample, projected based on the log-transformed relative abundance of all individual lipid molecules. Samples from the Control condition (purple) cluster in the upper-right quadrant, while those from the LowInput condition (yellow) shift toward the lower-left, indicating broad reprogramming of lipid composition under stress. The separation along PC1 (29.6%) and PC2 (22.8%) captures variance driven by both lipid abundance and diversity at the species level.
     (D) PCA biplot of summed lipid \emph{classes}, with sample scores and class‐ratio loadings.  
     In all panels, “Control” is shown in purple and “Low Input” in yellow.}
   \label{fig:lipid_main}
 \end{figure}
 
 
+
 \subsection*{Lipid Changes under LowInput (LI)}
-The multi-year, multi-field experimental design introduced considerable environmental variability into the lipidomic profiles. Although spatial corrections (SPATS) and batch-effect normalization (SEERF) were employed, residual confounding factors necessitated a ratio-based analytical approach. Lipid class ratios, which demonstrate greater resilience to technical and environmental noise than absolute abundances, were prioritized to identify biologically conserved patterns of membrane adaptation. To mitigate these confounding effects, we concentrated on within-plant lipid class ratios, expected to be fairly consistent under a variety of cultivation environments, rather than absolute abundances. We aggregated individual molecular species into their respective lipid classes, computed all possible pairwise ratios on a linear scale, and subsequently applied OPLS-DA to identify the most discriminative ratios. The resulting scores plot demonstrated a robust separation of C versus LI samples, and the model exhibited exemplary performance metrics (R²Y = 0.99; Q²Y = 0.82) alongside a highly significant CV-ANOVA (p < 0.001) (Supp Figure, supp table). Hotelling’s T² analysis confirmed the absence of extreme outliers, and a 1,000-permutation test dismissed overfitting, indicating that our observations are unlikely attributable to chance. From the complete ratio set, 21 features surpassed a conservative VIP threshold of 1.3. Each of these high VIP ratios was then subjected to univariate testing (adjusted p < 0.05) and cross-verified against established pathways of membrane remodeling under cold and nutrient stress. The two-tier selection approach prioritizing statistical power and biological relevance yielded a defined set of lipid-class ratios (supp table) which may differentiate between C and LI.
+The multi-year, multi-field experimental design introduced considerable environmental variability into the lipidomic profiles. Although spatial corrections (SpATS) and batch-effect normalization (SERRF) were employed, residual confounding factors necessitated a ratio-based analytical approach to compare the C and the LI conditions. Lipid class ratios, which demonstrate greater resilience to technical and environmental noise than absolute abundances, were prioritized to identify biologically conserved patterns of membrane adaptation. To mitigate these confounding effects, we concentrated on within-plant lipid class ratios, expected to be fairly consistent under a variety of cultivation environments, rather than absolute abundances. We aggregated individual molecular species into their respective lipid classes, computed all possible pairwise ratios on a linear scale, and subsequently applied OPLS-DA to identify the most discriminative ratios. The resulting scores plot demonstrated a robust separation of C versus LI samples, and the model exhibited exemplary performance metrics (R²Y = 0.99; Q²Y = 0.82) alongside a highly significant CV-ANOVA (p < 0.001) (Supp Figure, supp table). Hotelling’s T² analysis confirmed the absence of extreme outliers, and a 1,000-permutation test dismissed overfitting, indicating that our observations are unlikely attributable to chance. From the complete ratio set, 21 features surpassed a conservative VIP threshold of 1.3. Each of these high VIP ratios was then subjected to univariate testing (adjusted p < 0.05) and cross-verified against established pathways of membrane remodeling under cold and nutrient stress. The two-tier selection approach prioritizing statistical power and biological relevance yielded a defined set of lipid-class ratios (supp table) which may differentiate between C and LI.
 
 \begin{table}[!h]
 \centering
