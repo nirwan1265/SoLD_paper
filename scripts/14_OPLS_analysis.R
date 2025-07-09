@@ -12,6 +12,11 @@ library(scales)
 library(cowplot)
 library(ggh4x)
 library(ropls)
+library(ggbreak)
+library(ggplot2)
+library(dplyr)
+library(grid)
+
 
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 1) READ RAW INTENSITY TABLES AND CLASS                           ║
@@ -114,7 +119,7 @@ ratios_long <- long_classes %>%
   )
 
 # 3) inspect    
-ratios_long
+unique(ratios_long$RatioName)
 
 # Remove rows with string count less than 3 from Sample
 ratios_long <- ratios_long %>% 
@@ -173,12 +178,220 @@ opls_mod <- opls(
 )
 
 # 4) take a look
-print(opls_mod)
-plot(opls_mod)       # scores, loadings, CV‐metrics, etc.
+str(opls_mod)
+
+scores_df <- data.frame(
+  Sample    = rownames(opls_mod@scoreMN),
+  t1        = opls_mod@scoreMN[, 1],
+  to1       = opls_mod@orthoScoreMN[, 1],
+  Condition = class_vec,
+  stringsAsFactors = FALSE
+)
+
+# 2) Make the OPLS-DA score plot
+opls_plot <- ggplot(scores_df, aes(x = t1, y = to1, color = Condition)) +
+  
+  # dashed center lines
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
+  
+  # samples + ellipses
+  geom_point(size = 2.5, alpha = 0.8) +
+  stat_ellipse(aes(fill = Condition),
+               geom   = "polygon",
+               type   = "norm",
+               level  = 0.95,
+               alpha  = 0.2,
+               colour = NA) +
+  
+  # color/fill palette (same as PCA plot)
+  scale_color_manual(
+    values = c(Control = "#440154FF", LowInput = "#FDE725FF")
+  ) +
+  scale_fill_manual(
+    values = c(Control = "#440154FF", LowInput = "#FDE725FF")
+  ) +
+  
+  # fixed aspect and expand limits a bit
+  coord_fixed(
+    xlim = c(min(scores_df$t1) * 1.05, max(scores_df$t1) * 1.05),
+    ylim = c(min(scores_df$to1) * 1.05, max(scores_df$to1) * 1.05)
+  ) +
+  
+  # labels with % of X‐variance on t1
+  labs(
+    #title = "OPLS-DA Scores",
+    x     = paste0(
+      "t1 (", 
+      round(opls_mod@summaryDF$`R2X(cum)` * 100, 1), 
+      "% of X variance)"
+    ),
+    y     = "to1"
+  ) +
+  
+  # styling
+  theme_bw(base_size = 14) +
+  theme_classic(base_size = 14) +
+  nature_theme +
+  # legend inside the panel
+  theme(
+    legend.position      = c(0.95, 0.95),        # 95% from left, 95% from bottom
+    legend.justification = c("right", "top"),     # anchor legend at its top‐right
+    legend.background    = element_rect(
+      fill   = "white",
+      color  = "grey70",
+      size   = 0.4,
+      linetype = "solid"
+    ),
+    legend.direction     = "vertical",
+    legend.spacing.y     = unit(0.2, "cm")
+  )
+quartz()
+print(opls_plot)
+
+# Save the plot
+ggsave("fig/main/Fig2a_OPLS_scores_plot.png", plot = opls_plot, width = 10, height = 6, dpi = 300, bg = "white")
+
+# 2) Run the permutation test (200 label-swaps)
+perm_res <- opls(
+  lipid_mat, class_vec,
+  predI = 1,
+  permI = 200,
+  scaleC = "standard"
+)
+
+# 3) Pull out the observed metrics
+sumDF   <- opls_mod@summaryDF
+obsR2X  <- sumDF$`R2X(cum)`  # e.g. 0.514
+obsR2Y  <- sumDF$`R2Y(cum)`  # e.g. 0.903
+obsQ2   <- sumDF$`Q2(cum)`   # e.g. 0.901
+
+# 4) Extract and clean the permuted distributions
+perm_mat   <- as.data.frame(perm_res@suppLs$permMN)
+colnames(perm_mat) <- c("R2Xcum","R2Ycum","Q2cum","RMSEE","pre","ort","unused")
+perm_only  <- perm_mat[-1, ]    # drop row 1 (the real model)
+
+# 5) Compute “exact” one-sided p-values
+nPerm     <- nrow(perm_only)
+pR2Y_ex   <- (sum(perm_only$R2Ycum >= obsR2Y) + 1) / (nPerm + 1)
+pQ2_ex    <- (sum(perm_only$Q2cum  >= obsQ2 ) + 1) / (nPerm + 1)
+
+# 6) Tidy the permuted metrics for plotting
+plot_df <- perm_only %>%
+  select(R2Ycum, Q2cum) %>%
+  pivot_longer(everything(),
+               names_to  = "metric",
+               values_to = "value") %>%
+  mutate(metric = recode(metric, R2Ycum = "R²Y", Q2cum = "Q²"))
+
+# 7) Build a small table of observed values + p-values
+obs_df <- tibble(
+  metric = c("R²Y","Q²"),
+  obs    = c(obsR2Y, obsQ2),
+  p_ex   = c(pR2Y_ex, pQ2_ex)
+)
+
+# 8) Plot!
+# 1) Define a Nature‐style theme
+nature_theme <- theme_minimal(base_size = 14) +
+  theme(
+    plot.title     = element_text(size   = 14,
+                                  face   = "bold",
+                                  hjust  = 0.5,
+                                  margin = margin(b = 10)),
+    axis.title     = element_text(size = 12, face = "bold"),
+    axis.text      = element_text(color = "black"),
+    axis.line      = element_line(color = "black"),
+    panel.grid     = element_blank(),
+    legend.position = "top",
+    legend.title   = element_blank(),
+    legend.text    = element_text(size = 10),
+    plot.margin    = margin(15, 15, 15, 15)
+  )
+
+# 2) Build the plot with the break
+perm_plot_broken_nature <- ggplot(plot_df, aes(x = value)) + 
+  
+  # Histograms (fill mapped here!)
+  geom_histogram(aes(fill = metric),
+                 position = "identity",
+                 alpha    = 0.6,
+                 bins     = 30,
+                 color    = "white") + 
+  
+  # Dashed lines (manually colored)
+  geom_vline(data = obs_df,
+             aes(xintercept = obs),
+             linetype = "dashed",
+             size     = 0.8,
+             color    = c("#440154FF", "#FDE725FF")) + 
+  
+  # Labels (also manually colored)
+  geom_text(data = obs_df,
+            aes(x = obs, y = Inf,
+                label = sprintf("%s = %.3f\np = %.3f", metric, obs, p_ex)),
+            hjust = -0.1,
+            vjust = c(1.2, 3.5),
+            size  = 3,
+            color = c("#440154FF", "#FDE725FF")) +
+  
+  # R²X arrow and label
+  geom_segment(aes(x = obsR2X, xend = obsR2X, y = 0, yend = -5),
+               arrow = arrow(length = unit(0.2, "cm")),
+               color = "darkgreen") +
+  annotate("text",
+           x     = obsR2X,
+           y     = -8,
+           label = sprintf("R²X = %.3f", obsR2X),
+           color = "darkgreen",
+           size  = 3,
+           hjust = 0.5) +
+  
+  # Manual fill legend
+  scale_fill_manual(
+    values = c("R²Y" = "#440154FF", "Q²" = "#FDE725FF"),
+    labels = c("Perm R²Y", "Perm Q²")
+  ) +
+  
+  labs(x = "Metric value", y = "Frequency") +
+  
+  scale_x_break(c(0.05, 0.85), scales = 0.5) +
+  
+  guides(
+    fill = guide_legend(
+      override.aes = list(alpha = 0.6),
+      title = NULL
+    )
+  ) +
+  
+  nature_theme +
+  theme(
+    legend.position      = "top",
+    legend.justification = "center",
+    legend.background    = element_rect(
+      fill     = "white",
+      color    = "grey70",
+      size     = 0.4,
+      linetype = "solid"
+    ),
+    legend.direction     = "vertical",
+    legend.spacing.y     = unit(0.2, "cm")
+  )
 
 
 
-# xtract VIP scores
+# 3) Draw it
+quartz()
+print(perm_plot_broken_nature)
+
+# Save the plot
+ggsave("fig/main/Fig2b_OPLS_permutation_plot.png", plot = perm_plot_broken_nature, width = 10, height = 6, dpi = 300, bg = "white")
+
+
+
+
+
+# Extract VIP scores
 vip_vec <- slot(opls_mod, "vipVn")     # numeric vector with names = lipid IDs
 
 vip_df <- tibble(
@@ -192,14 +405,13 @@ vip_hits <- vip_df %>%
   arrange(desc(VIP))
 
 # How many?
-cat("Number of discriminatory lipids (VIP > 1.3):", nrow(vip_hits), "\n")
+cat("Number of discriminatory lipids (VIP > 1):", nrow(vip_hits), "\n")
 print(vip_hits, n = Inf)
 
-pg_cv <- raw_peak_tbl %>%     # your raw species-level table
-  filter(Class == "PG") %>% 
-  group_by(SampleGroup) %>%   # QC or pooled injections
-  summarise(CV = sd(Intensity) / mean(Intensity)) 
-
+# pg_cv <- raw_peak_tbl %>%     # your raw species-level table
+#   filter(Class == "PG") %>% 
+#   group_by(SampleGroup) %>%   # QC or pooled injections
+#   summarise(CV = sd(Intensity) / mean(Intensity)) 
 
 quartz()
 ggplot(vip_hits, aes(x = reorder(Lipid, VIP), y = VIP)) +
@@ -230,7 +442,6 @@ ggplot(vip_hits, aes(x = reorder(Lipid, VIP), y = VIP)) +
     legend.position    = "none",
     plot.title         = element_text(hjust = 0.5, face = "plain", size = 10)
   )
-
 
 
 # #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
