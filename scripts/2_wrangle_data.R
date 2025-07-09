@@ -123,6 +123,25 @@ int_cols_A <- setdiff(names(A_unique), c("X.Scan.", "Compound_Name"))
 int_cols_B <- setdiff(names(B_unique), c("X.Scan.", "Compound_Name"))
 
 ##### ── 5. Collapse to **one row per compound** by summing **unique** values ─
+# Taking the max value
+final_A <- A_unique %>%                       # A data
+  group_by(Compound_Name) %>%                 # group by the lipid ID
+  summarise(
+    across(all_of(int_cols_A),                # for every intensity column
+           ~ max(.x, na.rm = TRUE)),          # take the maximum value
+    .groups = "drop"
+  )
+
+final_B <- B_unique %>%                       # B data
+  group_by(Compound_Name) %>%
+  summarise(
+    across(all_of(int_cols_B),
+           ~ max(.x, na.rm = TRUE)),          # take the maximum
+    .groups = "drop"
+  )
+
+
+# Summing
 final_A <- A_unique %>%
   group_by(Compound_Name) %>%
   summarise(
@@ -706,12 +725,14 @@ table(A_clean$Class)  # see your lipid classes left
 # Now A_junk/B_junk hold all the unwanted classes for manual review,
 # and A_clean/B_clean are your lipid‑only tables ready for analysis.
 
-# Save the cleaned data
-#write.csv(A_clean, 
-#          "data/raw_lipid_intensities/A_cleaned_lipids.csv", 
+
+
+# Save the cleaned data - _max for max value and nothing for summed 
+# write.csv(A_clean,
+#          "data/raw_lipid_intensities/A_cleaned_lipids_max.csv",
 #          row.names = FALSE)
-#write.csv(B_clean,
-#          "data/raw_lipid_intensities/B_cleaned_lipids.csv", 
+# write.csv(B_clean,
+#          "data/raw_lipid_intensities/B_cleaned_lipids_max.csv",
 #          row.names = FALSE)
 
 
@@ -719,7 +740,7 @@ table(A_clean$Class)  # see your lipid classes left
 
 # Read the cleaned data to sum the common lipids now:
 A_clean <- vroom("data/raw_lipid_intensities/A_cleaned_lipids.csv")
-B_clean <- vroom("data/raw_lipid_intensities/B_cleaned_lipids.csv")
+B_clean <- vroom("data/raw_lipid_intensities/B_cleaned_lipids_max.csv")
 
 
 
@@ -804,7 +825,7 @@ colnames(B_summed) <- colnames(B_summed) %>%
 
 # Save the cleaned and summed data
 #write.csv(A_summed, "data/summed_lipid_intensities/A_summed_lipids.csv", row.names = FALSE)
-#write.csv(B_summed, "data/summed_lipid_intensities/B_summed_lipids.csv", row.names = FALSE)
+#write.csv(B_summed, "data/summed_lipid_intensities/B_summed_lipids_max.csv", row.names = FALSE)
 
 # Check the multi-names and select the unique names. 
 # Remove shady lipids and mark them as delete and delete them
@@ -835,5 +856,5 @@ B_summed_final <- B_summed %>%
   )
 
 # Save 
-write.csv(A_summed_final, "data/summed_lipid_intensities/A_summed_lipids_final.csv", row.names = FALSE)
-# write.csv(B_summed_final, "data/summed_lipid_intensities/B_summed_lipids_final.csv", row.names = FALSE)
+#write.csv(A_summed_final, "data/summed_lipid_intensities/A_summed_lipids_final.csv", row.names = FALSE)
+ write.csv(B_summed_final, "data/summed_lipid_intensities/B_summed_lipids_final_max.csv", row.names = FALSE)

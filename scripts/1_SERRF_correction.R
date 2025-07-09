@@ -496,3 +496,10 @@ write.csv(B,"/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/
 x <- as.vector(unlist(B[3,]))
 table(x)
 
+
+
+
+
+
+###### GWAS phenotype
+# Log10 and cenetered

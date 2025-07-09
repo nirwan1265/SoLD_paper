@@ -1,0 +1,17 @@
+Chromosome	gene	max_pvalue	phenotype	phenotype_number
+3	SORBI_3003G132200	6.480916e-06	____Abscisic_acid	1
+3	SORBI_3003G132300	6.480916e-06	____Abscisic_acid	1
+5	SORBI_3005G143400	3.8069e-06	____Abscisic_acid	1
+5	SORBI_3005G143500	3.8069e-06	____Abscisic_acid	1
+8	SORBI_3008G099600	4.97597e-06	____Abscisic_acid	1
+8	SORBI_3008G177600	9.865314e-06	____Abscisic_acid	1
+8	SORBI_3008G177700	9.865314e-06	____Abscisic_acid	1
+8	SORBI_3008G177750	9.865314e-06	____Abscisic_acid	1
+8	SORBI_3008G177800	9.865314e-06	____Abscisic_acid	1
+10	SORBI_3010G015200	1.674483e-06	____Abscisic_acid	1
+10	SORBI_3010G015300	1.674483e-06	____Abscisic_acid	1
+10	SORBI_3010G015400	1.674483e-06	____Abscisic_acid	1
+10	SORBI_3010G015500	1.674483e-06	____Abscisic_acid	1
+10	SORBI_3010G015700	1.674483e-06	____Abscisic_acid	1
+10	SORBI_3010G229801	5.567857e-06	____Abscisic_acid	1
+10	SORBI_3010G230000	5.567857e-06	____Abscisic_acid	1

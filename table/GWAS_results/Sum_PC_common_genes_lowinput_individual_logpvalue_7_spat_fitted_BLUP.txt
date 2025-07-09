@@ -1,0 +1,1 @@
+Chromosome	gene	max_pvalue	phenotype	phenotype_number

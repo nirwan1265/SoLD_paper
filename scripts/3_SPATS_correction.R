@@ -21,7 +21,7 @@ ncol(fieldmap_lowinput)
 
 # 1) Read & transpose ----------------------------------------------------------------
 raw <- read.csv(
-  "data/summed_lipid_intensities/B_summed_lipids_final.csv",
+  "data/summed_lipid_intensities/B_summed_lipids_final_max.csv",
   stringsAsFactors = FALSE, check.names = FALSE
 )
 
@@ -97,12 +97,13 @@ pheno <- pheno_num
 #   rename(LineID = Compound_Name) %>%
 #   mutate(LineID = str_extract(LineID, "\\d+"))
 # tail(pheno)
+
 # Assuming filtered_data has columns: LineRaw, LineID, row, col, PlotID, plus all your lipid names
 meta_cols <- c("LineRaw", "LineID", "row", "col", "PlotID")
 
 # Make sure you don’t accidentally include any of those in your trait list:
-trait_names <- setdiff(names(filtered_data), meta_cols)
-print(trait_names)
+# trait_names <- setdiff(names(filtered_data), meta_cols)
+# print(trait_names)
 
 
 # ───────────────────────────────────────────────────────────────────────────────
@@ -211,11 +212,11 @@ fitted_df <- fitted_df %>%
 
 # 3. Write them out
 write.csv(blup_df2,
-          "lowinput_all_lipids_BLUPs.csv",
+          "lowinput_all_lipids_BLUPs_max.csv",
           row.names = FALSE)
 
 write.csv(fitted_df,
-          "lowinput_all_lipids_fitted_phenotype_non_normalized.csv",
+          "lowinput_all_lipids_fitted_phenotype_non_normalized_max.csv",
           row.names = FALSE)
 
 message("Done!  All BLUPs in all_lipids_BLUPs.csv; DG(20:1) plots saved.")

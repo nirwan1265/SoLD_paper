@@ -1,0 +1,17 @@
+Chromosome	gene	max_pvalue	phenotype	phenotype_number
+2	SORBI_3002G022100	6.456318e-06	gibberellic_acid	1
+2	SORBI_3002G022200	6.456318e-06	gibberellic_acid	1
+2	SORBI_3002G022300	6.456318e-06	gibberellic_acid	1
+2	SORBI_3002G022400	6.456318e-06	gibberellic_acid	1
+2	SORBI_3002G022500	6.456318e-06	gibberellic_acid	1
+4	SORBI_3004G168100	7.70651e-06	gibberellic_acid	1
+5	SORBI_3005G110541	5.954423e-06	gibberellic_acid	1
+7	SORBI_3007G090421	4.228982e-06	gibberellic_acid	1
+10	SORBI_3010G030300	2.229559e-06	gibberellic_acid	1
+10	SORBI_3010G030401	1.115387e-06	gibberellic_acid	1
+10	SORBI_3010G030500	1.115387e-06	gibberellic_acid	1
+10	SORBI_3010G030600	1.115387e-06	gibberellic_acid	1
+10	SORBI_3010G030700	1.115387e-06	gibberellic_acid	1
+10	SORBI_3010G030800	1.115387e-06	gibberellic_acid	1
+10	SORBI_3010G030900	1.445407e-06	gibberellic_acid	1
+10	SORBI_3010G031000	1.542709e-06	gibberellic_acid	1
