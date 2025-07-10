@@ -178,6 +178,44 @@ if(n_classes > length(qual_cols)){
 names(qual_cols) <- valid_classes
 
 
+
+# Theme
+nature_theme <- theme_minimal(base_size = 16) +
+  theme(
+    plot.title     = element_text(
+      size   = 14,
+      face   = "bold",
+      hjust  = 0.5,
+      margin = margin(b = 10)
+    ),
+    axis.title.x   = element_text(
+      size = 16,      # X‐axis title size
+      face = "bold"
+    ),
+    axis.title.y   = element_text(
+      size = 16,      # Y‐axis title size
+      face = "bold"
+    ),
+    axis.text.x    = element_text(
+      size = 16,      # X‐axis tick label size
+      color = "black"
+    ),
+    axis.text.y    = element_text(
+      size = 16,      # Y‐axis tick label size
+      color = "black"
+    ),
+    axis.line      = element_line(color = "black"),
+    panel.grid     = element_blank(),
+    
+    legend.position = "top",
+    legend.title    = element_blank(),
+    legend.text     = element_text(
+      size = 16        # legend label size
+    ),
+    
+    plot.margin    = margin(15, 15, 15, 15)
+  )
+
 # 5) Plot biplot
 quartz()
 
@@ -247,7 +285,7 @@ individual_PCA <- ggplot() +
   coord_fixed(xlim = c(min(scores_df$PC1)*1.05, max(scores_df$PC1)*1.05),
               ylim = c(min(scores_df$PC2)*1.05, max(scores_df$PC2)*1.05)) +
   
-  theme_bw(base_size = 14) +  # base theme with box and grid
+  theme_bw(base_size = 16) +  # base theme with box and grid
   theme(
     panel.grid.major = element_line(color = "grey85", size = 0.4),
     panel.grid.minor = element_blank(),

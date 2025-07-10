@@ -158,11 +158,11 @@ p_bar <- ggplot(pct_mean,
                      breaks = seq(0,100,25),
                      labels = function(x) paste0(x, "%")) +
   labs(x = "% of TIC", y = NULL) +
-  theme_classic(base_size = 14) +
+  theme_classic(base_size = 16) +
   theme(axis.line.x = element_line(size = .4),
         axis.line.y = element_line(size = .4),
-        axis.text.x    = element_text(face = "bold", size = 14),  # enlarge x‐axis tick labels
-        axis.text.y    = element_text(face = "bold", size = 14),  # enlarge y‐axis tick labels
+        axis.text.x    = element_text(face = "bold", size = 16),  # enlarge x‐axis tick labels
+        axis.text.y    = element_text(face = "bold", size = 16),  # enlarge y‐axis tick labels
         axis.title.x   = element_text(face = "bold", size = 16)   # enlarge x‐axis label
   ) 
 
