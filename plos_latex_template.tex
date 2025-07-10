@@ -252,8 +252,7 @@ Rubén Rellán Álvarez\textsuperscript{1,3*},
 % \textcurrency b Insert second current address 
 % \textcurrency c Insert third current address
 
-% Deceased author note
-\dag Deceased
+
 
 % Group/Consortium Author Note
 \textpilcrow Membership list can be found in the Acknowledgments section.
@@ -645,6 +644,17 @@ A PCA of individual lipid species was conducted, revealing an expected distinct 
 
 Under LI conditions, the lipidome transitions from a photosynthetically driven profile to a membrane restructuring and energy storage profile. Samples subjected to LI exhibit a marked reduction in galactolipids (MGDG decreased by 2.3\%) and crucial phospholipids and sulfolipids (PC decreased by 1.3\% and SQDG by 1.2\%), whereas TGs increase by 3.6\% and DGs by 1.2\%. At the classification level, glycerolipids (both galacto- and neutral lipids) increase from 68.1\% to 69.3\% of the TIC, while glycerophospholipids decrease from 31.8\% to 30.3\%. Principal Component Analysis (PCA) provides further support for these observations. The samples exhibit separation along PC2, contrasting plastidic, photosynthesis-associated lipids (such as SQDG, MGDG, DGDG, PG, and PS) with lipids associated with membrane turnover and storage (such as PC, PE, PA, LPC, DG, MG, TG, and GalCer). Biologically, this pattern reflects the degradation or repurposing of thylakoid membranes due to cold and low nutrient availability, alongside an increase in neutral lipid (TG) synthesis to serve as a carbon reservoir and an enhancement in phospholipid turnover for signaling under stress and membrane repair.
 
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{main/fig/Fig1.png}
+  \caption{Overview of lipidomics results.  
+    \textbf{A}: Mean lipid‐class composition (% of TIC) for Control vs.\ LowInput.  
+    \textbf{B}: PCA of individual lipid species (PC1 = 29.6\%, PC2 = 22.8\%) with 95\% confidence ellipses.  
+    \textbf{C}: PCA biplot showing class‐level loadings on PC1 (44.8\%) and PC2 (24.9\%).}
+  \label{fig:Fig1_combined}
+\end{figure}
+
 \begin{figure}[htp]
   \centering
 
@@ -704,30 +714,27 @@ Under LI conditions, the lipidome transitions from a photosynthetically driven p
 
 
 \subsection*{Lipid Changes under LowInput (LI)}
-The multi-year, multi-field experimental design introduced considerable environmental variability into the lipidomic profiles. Although spatial corrections (SpATS) and batch-effect normalization (SERRF) were employed, residual confounding factors necessitated a ratio-based analytical approach to compare the C and the LI conditions. Lipid class ratios, which demonstrate greater resilience to technical and environmental noise than absolute abundances, were prioritized to identify biologically conserved patterns of membrane adaptation. To mitigate these confounding effects, we concentrated on within-plant lipid class ratios, expected to be fairly consistent under a variety of cultivation environments, rather than absolute abundances. We aggregated individual molecular species into their respective lipid classes, computed all possible pairwise ratios on a linear scale, and subsequently applied OPLS-DA to identify the most discriminative ratios. The resulting scores plot (Fig. \ref{fig:OPLS}) demonstrated a robust separation of C versus LI samples, and the model exhibited exemplary performance metrics (R²Y = 0.99; Q²Y = 0.82) alongside a highly significant CV-ANOVA (p < 0.001) (Supp Figure, supp table). Hotelling’s T² analysis confirmed the absence of extreme outliers, and a 1,000-permutation test dismissed overfitting, indicating that our observations are unlikely attributable to chance. From the complete ratio set, 21 features surpassed a conservative VIP threshold of 1.3. Each of these high VIP ratios was then subjected to univariate testing (adjusted p < 0.05) and cross-verified against established pathways of membrane remodeling under cold and nutrient stress. The two-tier selection approach prioritizing statistical power and biological relevance yielded a defined set of lipid-class ratios (supp table) which may differentiate between C and LI.
+The multi-year, multi-field experimental design introduced considerable environmental variability into the lipidomic profiles. Although spatial corrections (SpATS) and batch-effect normalization (SERRF) were employed, residual confounding factors necessitated a ratio-based analytical approach to compare the C and the LI conditions. Lipid class ratios, which demonstrate greater resilience to technical and environmental noise than absolute abundances, were prioritized to identify biologically conserved patterns of membrane adaptation. To mitigate these confounding effects, we concentrated on within-plant lipid class ratios, expected to be fairly consistent under a variety of cultivation environments, rather than absolute abundances. We aggregated individual molecular species into their respective lipid classes, computed all possible pairwise ratios on a linear scale, and subsequently applied OPLS-DA to identify the most discriminative ratios. The resulting scores plot (Fig. \ref{fig:OPLS}) demonstrated a robust separation of C versus LI samples, and the model exhibited exemplary performance metrics (R²Y = 0.99; Q²Y = 0.82) alongside a highly significant CV-ANOVA (p < 0.001) (Supp Figure, supp table). Hotelling’s T² analysis confirmed the absence of extreme outliers, and a 1,000-permutation test dismissed overfitting, indicating that our observations are unlikely attributable to chance. From the complete ratio set, 21 features surpassed a conservative VIP threshold of 1. Each of these high VIP ratios was then subjected to univariate testing (adjusted p < 0.05) and cross-verified against established pathways of membrane remodeling under cold and nutrient stress. The two-tier selection approach prioritizing statistical power and biological relevance yielded a defined set of lipid-class ratios (supp table) which may differentiate between C and LI.
 
 
 \begin{figure}[htbp]
   \centering
 
-  \begin{subfigure}[b]{0.48\textwidth}
+  \begin{subfigure}[b]{0.28\textwidth}
     \includegraphics[width=\textwidth]{fig/main/Fig2a_OPLS_scores_plot.png}
     \caption{OPLS-DA score plot.} 
     \label{fig:opls_scores}
   \end{subfigure}
-  \begin{subfigure}[b]{0.48\textwidth}
+  \begin{subfigure}[b]{0.52\textwidth}
     \includegraphics[width=\textwidth]{fig/main/Fig2b_OPLS_permutation_plot.png}
     \caption{Permutation validation. }
     \label{fig:opls_perm}
   \end{subfigure}
 
-  \caption{Orthogonal projections to latent structures discriminant analysis (OPLS-DA) of lipidomic profiles. (a) Score plot showing clear separation between Control and LowInput groups along the predictive axis. Samples from the Control (purple) and LowInput (yellow) groups are projected onto the first predictive component ($t_1$, 51.4\% of $X$-variance) vs.\ the first orthogonal component ($\mathrm{to}_1$). Dashed grey lines mark zero; 95\% confidence ellipses highlight within-group clustering.} (b) Permutation test demonstrating that both R²Y and Q² exceed all values obtained under random class assignments (200 permutations, $p=0.005$). Overlaid histograms of 200 permuted R²Y (yellow) and Q² (purple) show distributions under random label‐swaps; observed R²Y and Q² (dashed lines, $p=0.005$) lie well outside, confirming model significance. Arrow marks cumulative $X$-variance explained (R²X = 0.514).}
-  \label{fig:OPLS_sidebyside}
+  \caption{Orthogonal projections to latent structures discriminant analysis (OPLS-DA) of lipidomic profiles. (a) Score plot showing clear separation between Control and LowInput groups along the predictive axis. Samples from the Control (purple) and LowInput (yellow) groups are projected onto the first predictive component ($t_1$, 51.4\% of $X$-variance) vs.\ the first orthogonal component ($\mathrm{to}_1$). Dashed grey lines mark zero; 95\% confidence ellipses highlight within-group clustering. (b) Permutation test demonstrating that both R²Y and Q² exceed all values obtained under random class assignments (200 permutations, $p=0.005$). Overlaid histograms of 200 permuted R²Y (yellow) and Q² (purple) show distributions under random label‐swaps; observed R²Y and Q² (dashed lines, $p=0.005$) lie well outside, confirming model significance. Arrow marks cumulative $X$-variance explained (R²X = 0.514).}
+  \label{fig:OPLS}
 \end{figure}
 
-\end{document}
-
-\end{document}
 
 
 
