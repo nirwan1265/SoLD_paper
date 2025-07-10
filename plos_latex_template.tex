@@ -647,7 +647,7 @@ Under LI conditions, the lipidome transitions from a photosynthetically driven p
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{main/fig/Fig1.png}
+  \includegraphics[width=\textwidth]{fig/main/Fig1.png}
   \caption{Overview of lipidomics results.  
     \textbf{A}: Mean lipid‐class composition (% of TIC) for Control vs.\ LowInput.  
     \textbf{B}: PCA of individual lipid species (PC1 = 29.6\%, PC2 = 22.8\%) with 95\% confidence ellipses.  
@@ -716,6 +716,16 @@ Under LI conditions, the lipidome transitions from a photosynthetically driven p
 \subsection*{Lipid Changes under LowInput (LI)}
 The multi-year, multi-field experimental design introduced considerable environmental variability into the lipidomic profiles. Although spatial corrections (SpATS) and batch-effect normalization (SERRF) were employed, residual confounding factors necessitated a ratio-based analytical approach to compare the C and the LI conditions. Lipid class ratios, which demonstrate greater resilience to technical and environmental noise than absolute abundances, were prioritized to identify biologically conserved patterns of membrane adaptation. To mitigate these confounding effects, we concentrated on within-plant lipid class ratios, expected to be fairly consistent under a variety of cultivation environments, rather than absolute abundances. We aggregated individual molecular species into their respective lipid classes, computed all possible pairwise ratios on a linear scale, and subsequently applied OPLS-DA to identify the most discriminative ratios. The resulting scores plot (Fig. \ref{fig:OPLS}) demonstrated a robust separation of C versus LI samples, and the model exhibited exemplary performance metrics (R²Y = 0.99; Q²Y = 0.82) alongside a highly significant CV-ANOVA (p < 0.001) (Supp Figure, supp table). Hotelling’s T² analysis confirmed the absence of extreme outliers, and a 1,000-permutation test dismissed overfitting, indicating that our observations are unlikely attributable to chance. From the complete ratio set, 21 features surpassed a conservative VIP threshold of 1. Each of these high VIP ratios was then subjected to univariate testing (adjusted p < 0.05) and cross-verified against established pathways of membrane remodeling under cold and nutrient stress. The two-tier selection approach prioritizing statistical power and biological relevance yielded a defined set of lipid-class ratios (supp table) which may differentiate between C and LI.
 
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{fig/main/Fig2.png}
+  \caption{Orthogonal projections to latent structures discriminant analysis (OPLS‐DA) results.  
+    \textbf{A}: Score plot showing Control (purple) vs LowInput (yellow) samples on the predictive component $t_1$ (51.4\% of $X$‐variance) versus the orthogonal component $\mathrm{to}_1$, with 95\% confidence ellipses and dashed axes at zero.  
+    \textbf{B}: Permutation test: overlaid histograms of 200 permuted R²Y (yellow) and Q² (purple) values, with the true‐model metrics indicated by dashed lines (both $p=0.005$), and an arrow marking the cumulative $X$‐variance explained (R²X = 0.514).}
+  \label{fig:Fig2}
+\end{figure}
 
 \begin{figure}[htbp]
   \centering
