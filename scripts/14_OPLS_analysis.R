@@ -293,21 +293,42 @@ obs_df <- tibble(
 
 # 8) Plot!
 # 1) Define a Nature‐style theme
-nature_theme <- theme_minimal(base_size = 14) +
+nature_theme <- theme_minimal(base_size = 16) +
   theme(
-    plot.title     = element_text(size   = 14,
-                                  face   = "bold",
-                                  hjust  = 0.5,
-                                  margin = margin(b = 10)),
-    axis.title     = element_text(size = 12, face = "bold"),
-    axis.text      = element_text(color = "black"),
+    plot.title     = element_text(
+      size   = 14,
+      face   = "bold",
+      hjust  = 0.5,
+      margin = margin(b = 10)
+    ),
+    axis.title.x   = element_text(
+      size = 16,      # X‐axis title size
+      face = "bold"
+    ),
+    axis.title.y   = element_text(
+      size = 16,      # Y‐axis title size
+      face = "bold"
+    ),
+    axis.text.x    = element_text(
+      size = 16,      # X‐axis tick label size
+      color = "black"
+    ),
+    axis.text.y    = element_text(
+      size = 16,      # Y‐axis tick label size
+      color = "black"
+    ),
     axis.line      = element_line(color = "black"),
     panel.grid     = element_blank(),
+    
     legend.position = "top",
-    legend.title   = element_blank(),
-    legend.text    = element_text(size = 10),
+    legend.title    = element_blank(),
+    legend.text     = element_text(
+      size = 16        # legend label size
+    ),
+    
     plot.margin    = margin(15, 15, 15, 15)
   )
+
 
 # 2) Build the plot with the break
 perm_plot_broken_nature <- ggplot(plot_df, aes(x = value)) + 
