@@ -102,6 +102,43 @@ nature_theme <- theme_minimal(base_size = 14) +
     plot.margin = margin(15, 15, 15, 15)  # Balanced white space
   )
 
+
+nature_theme <- theme_minimal(base_size = 16) +
+  theme(
+    plot.title     = element_text(
+      size   = 14,
+      face   = "bold",
+      hjust  = 0.5,
+      margin = margin(b = 10)
+    ),
+    axis.title.x   = element_text(
+      size = 16,      # X‐axis title size
+      face = "bold"
+    ),
+    axis.title.y   = element_text(
+      size = 16,      # Y‐axis title size
+      face = "bold"
+    ),
+    axis.text.x    = element_text(
+      size = 16,      # X‐axis tick label size
+      color = "black"
+    ),
+    axis.text.y    = element_text(
+      size = 16,      # Y‐axis tick label size
+      color = "black"
+    ),
+    axis.line      = element_line(color = "black"),
+    panel.grid     = element_blank(),
+    
+    legend.position = "top",
+    legend.title    = element_blank(),
+    legend.text     = element_text(
+      size = 16        # legend label size
+    ),
+    
+    plot.margin    = margin(15, 15, 15, 15)
+  )
+
 ###############################################################################
 # 5.  STACKED BAR PLOT (labels ≥ 3 %)
 ###############################################################################
@@ -202,7 +239,7 @@ grid::grid.draw(fig1a)
 # 8.  SAVE THE PLOT
 ###############################################################################
 
-ggsave("Fig1a_lipid_species.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
+ggsave("fig/main/Fig1a_lipid_species.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
 #ggsave("SuppFig_TIC_PC_PA_PE_PG_PS.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
 
 

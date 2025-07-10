@@ -8,14 +8,27 @@ library(stringr)
 
 # Control
 # Individual
+
+# All
+dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation/lowinput/all/"
+file_list <- list.files(path = dir,pattern = "*.txt")
+
+# Traditional lipids
 dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation/lowinput/Traditional_lipids/"
 file_list <- list.files(path = dir,pattern = "*.txt")
 
+# Non-Traditional lipids
 dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation/lowinput/Nontraditional_lipids/"
-dir_sum_ratio <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation/lowinput/Nontraditional_lipids/"
-file_list_sum_ratio <- list.files(path = dir_sum_ratio,pattern = "*.txt")
-file_list_sum_ratio <- file_list_sum_ratio[47]
-file_list <- file_list_sum_ratio
+file_list <- list.files(path = dir,pattern = "*.txt")
+
+# Ratios
+
+dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/sum_ratio_BLUP/annotation/"
+file_list <- list.files(path = dir,pattern = "*.txt")
+
+# file_list_sum_ratio <- list.files(path = dir_sum_ratio,pattern = "*.txt")
+# file_list_sum_ratio <- file_list_sum_ratio[47]
+# file_list <- file_list_sum_ratio
 # 
 # file_list <- c(file_list,file_list_sum_ratio)
 # Select only strings with lowinput in their name
@@ -37,7 +50,7 @@ results <- data.frame()
 # = 0.05/215 = 0.00023
 # log10 value is 
 
-p_value_threshold <- 0.00001
+p_value_threshold <- 0.0000001
 -log10(0.0000001)
 
 #p_value_threshold <- 0.001
@@ -129,6 +142,6 @@ combined_results
 # # save
 # write.table(combined_results, "table/GWAS_results/NonTradLipid_sum_ratio_common_genes_lowinput_individual_logpvalue_7_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 
-write.table(combined_results, "table/GWAS_results/Chlorophyll_a_common_genes_lowinput_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
-
+write.table(combined_results, "table/GWAS_results/Sum_Ratio_lipids_indv_sum_ratio_common_genes_lowinput_individual_logpvalue_7_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+getwd()
 # write.table(combined_results, "table/GWAS_results/SQDG_32_0_common_genes_lowinput_individual_logpvalue_7_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")

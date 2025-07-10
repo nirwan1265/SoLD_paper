@@ -47,8 +47,8 @@ lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_li
 colnames(lowinput)[1] <- "Compound_Name"  
 
 # Remove PC(17:0) from control and lowinput (internal standard) from the columns
-control  <- control %>% dplyr::select(-`PC(17:0)`)
-lowinput <- lowinput %>% dplyr::select(-`PC(17:0)`)
+# control  <- control %>% dplyr::select(-`PC(17:0)`)
+# lowinput <- lowinput %>% dplyr::select(-`PC(17:0)`)
 
 #### CHANGE THE NAME TO COMMONNAME
 # Lipid class
@@ -110,6 +110,43 @@ nature_theme <- theme_minimal(base_size = 12) +
     legend.text = element_text(size = 10),
     plot.margin = margin(15, 15, 15, 15)  # Balanced white space
   )
+
+nature_theme <- theme_minimal(base_size = 16) +
+  theme(
+    plot.title     = element_text(
+      size   = 16,
+      face   = "bold",
+      hjust  = 0.5,
+      margin = margin(b = 10)
+    ),
+    axis.title.x   = element_text(
+      size = 16,      # X‐axis title size
+      face = "bold"
+    ),
+    axis.title.y   = element_text(
+      size = 16,      # Y‐axis title size
+      face = "bold"
+    ),
+    axis.text.x    = element_text(
+      size = 16,      # X‐axis tick label size
+      color = "black"
+    ),
+    axis.text.y    = element_text(
+      size = 16,      # Y‐axis tick label size
+      color = "black"
+    ),
+    axis.line      = element_line(color = "black"),
+    panel.grid     = element_blank(),
+    
+    legend.position = "top",
+    legend.title    = element_blank(),
+    legend.text     = element_text(
+      size = 16        # legend label size
+    ),
+    
+    plot.margin    = margin(15, 15, 15, 15)
+  )
+
 
 # Color scheme (colorblind-friendly)
 #condition_colors <- c(Control = "#4E79A7", LowInput = "#E15759") 
@@ -186,7 +223,7 @@ quartz()
 print(fig1a)
 
 # Save the plot
-ggsave("SuppFig_3A_Lipid_Counts.png",
+ggsave("fig/supp/SuppFig_3A_Lipid_Counts2.png",
        plot = fig1a,
        width = 6, height = 6, dpi = 300,
        units = "in", bg = "white")  # white background for publication quality
@@ -304,7 +341,7 @@ fig1b_updated <- ggplot(class_counts,
     panel.grid.major.y = element_blank(),
     panel.grid.minor   = element_blank(),
     panel.grid.major.x = element_line(colour = "#d0d0d0", linewidth = 0.2),
-    legend.position    = c(0.80, 0.93),
+    legend.position    = c(0.60, 0.93),
     legend.direction   = "horizontal",
     legend.background  = element_rect(fill = "white",
                                       colour = "black", linewidth = 0.2),
@@ -318,9 +355,9 @@ fig1b_updated <- ggplot(class_counts,
 quartz()
 print(fig1b_updated)
 
-ggsave("SuppFig_3B_trad_nontrad_counts.png",
+ggsave("fig/supp/SuppFig_3B_trad_nontrad_counts.png",
        plot = fig1b_updated,
-       width = 6, height = 8, dpi = 300, bg = "white")
+       width = 6, height = 6, dpi = 300, bg = "white")
 
 
 
@@ -364,7 +401,12 @@ p_trad <- ggvenn(
     ),
     plot.margin     = margin(t = 10, r = 20, b = 5, l = 20),
     legend.position = "none"
-  )
+  ) +
+  nature_theme +
+  theme(axis.line=element_blank(),axis.text.x=element_blank(),
+        axis.text.y=element_blank(),axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank())
 
 p_nontrad <- ggvenn(
   venn_nontrad,
@@ -384,21 +426,27 @@ p_nontrad <- ggvenn(
     ),
     plot.margin     = margin(t = 10, r = 20, b = 5, l = 20),
     legend.position = "none"
-  )
+  ) +
+  nature_theme +
+  theme(axis.line=element_blank(),axis.text.x=element_blank(),
+        axis.text.y=element_blank(),axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank())
+
 quartz(); print(p_trad)
 quartz(); print(p_nontrad)
 # 6) (Optional) Save
 # ggsave("Fig_venn_trad_nontrad.png", venn_figure, width = 10, height = 5, dpi = 300)
 
 # Save the plot
-ggsave("SuppFig_3C_Lipid_Overlap_Venn_traditional.png",
+ggsave("fig/supp/SuppFig_3C_Lipid_Overlap_Venn_traditional.png",
        plot = p_trad,
-       width = 10, height = 10, dpi = 300,
+       width = 6, height = 6, dpi = 300,
        units = "in", bg = "white")  # white background for publication quality
 # Save the plot
-ggsave("SuppFig_3D_Lipid_Overlap_Venn_nontraditional.png",
+ggsave("fig/supp/SuppFig_3D_Lipid_Overlap_Venn_nontraditional.png",
        plot = p_nontrad,
-       width = 10, height = 10, dpi = 300,
+       width = 6, height = 6, dpi = 300,
        units = "in", bg = "white")  # white background for publication quality
 
 
