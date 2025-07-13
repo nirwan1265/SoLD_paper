@@ -10,13 +10,14 @@ library(rtracklayer)
 #conda activate /usr/local/usrapps/maize/ntanduk/seqanal
 
 # Set the base directory where the phenotype folders are located
-base_dir_LMM <- "/rsstu/users/r/rrellan/DOE_CAREER/SAP/results/lowinput/raw_gwas"
+base_dir_LMM <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/sum_ratio_BLUP/raw_gwas"
 
 # List all .txt files in the directory
 files <- list.files(path=base_dir_LMM, pattern = "\\.txt$", full.names = TRUE)
 
 # Combine the two lists
 file_all <- files
+
 
 # Function to create Manhattan plots and annotate them
 create_manhattan_and_annotate <- function(file, ref_GRanges, output_prefix) {
@@ -34,11 +35,11 @@ create_manhattan_and_annotate <- function(file, ref_GRanges, output_prefix) {
   data$SNP <- paste0("SNP_", data$Position)
   max_pval <- -log10(min(data$PValue)) + 1
   #Create Manhattan plot
-  CMplot(data, plot.type="m", col=c("grey30", "grey60"), LOG10=TRUE, ylim=c(2, max_pval), threshold=c(1e-7, 1e-5),
-         threshold.lty=c(1, 2), threshold.lwd=c(1, 1), threshold.col=c("black", "grey"), amplify=TRUE,
-         chr.den.col=NULL, signal.col=c("red", "green"), signal.cex=c(0.5, 0.5), signal.pch=c(19, 19),
-         file="jpg", file.name=paste0(output_prefix, "_manhattan"), dpi=300, file.output=TRUE, verbose=TRUE, width=14, height=6, band=0, cex=0.5)
-  
+  # CMplot(data, plot.type="m", col=c("grey30", "grey60"), LOG10=TRUE, ylim=c(2, max_pval), threshold=c(1e-7, 1e-5),
+  #        threshold.lty=c(1, 2), threshold.lwd=c(1, 1), threshold.col=c("black", "grey"), amplify=TRUE,
+  #        chr.den.col=NULL, signal.col=c("red", "green"), signal.cex=c(0.5, 0.5), signal.pch=c(19, 19),
+  #        file="jpg", file.name=paste0(output_prefix, "_manhattan"), dpi=300, file.output=TRUE, verbose=TRUE, width=14, height=6, band=0, cex=0.5)
+  # 
   # Create GRanges object
   gr <- GRanges(
     seqnames = Rle(data_annotate$Chromosome),
@@ -74,6 +75,7 @@ create_manhattan_and_annotate <- function(file, ref_GRanges, output_prefix) {
       "downstream"
     )
   )
+  
   # Calculate distance from gene
   overlap_data$DistanceToGene <- ifelse(
     overlap_data$Relation == "within",
@@ -86,6 +88,9 @@ create_manhattan_and_annotate <- function(file, ref_GRanges, output_prefix) {
   )
   # remove "gene:" string from the second column of overlap_data
   overlap_data$GeneID <- gsub("gene:", "", overlap_data$GeneID)
+  
+  # Only select rows starting with SORBI_ in GeneID
+  overlap_data <- overlap_data[grep("^SORBI_", overlap_data$GeneID), ]
   
   
   collapsed_data <- overlap_data %>%
@@ -110,6 +115,8 @@ create_manhattan_and_annotate <- function(file, ref_GRanges, output_prefix) {
 
 # Load your reference GFF file - replace with the actual path
 ref_GRanges <- rtracklayer::import("/rsstu/users/r/rrellan/DOE_CAREER/SorghumGEA/data/SAP/gene_annotation/Sorghum_bicolor.Sorghum_bicolor_NCBIv3.54.gff3")
+
+ref_GRanges <- rtracklayer::import("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Research/Data/Sorghum.annotation/ensemblgenomes/Sorghum_bicolor.Sorghum_bicolor_NCBIv3.54.gff3")
 
 # Filter ref_GRanges for only genes
 genes_only <- ref_GRanges[mcols(ref_GRanges)$type == "gene"]
