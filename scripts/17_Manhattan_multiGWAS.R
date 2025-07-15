@@ -18,7 +18,7 @@ master <- vroom(files[[1]]) %>%
 
 # 4) for each file, read just rs + p_wald, rename p_wald → file‑name
 pval_list <- imap(files, ~ vroom(.x) %>%
-                    select(rs, p_wald) %>%
+                    dplyr::select(rs, p_wald) %>%
                     rename(!!.y := p_wald)
 )
 

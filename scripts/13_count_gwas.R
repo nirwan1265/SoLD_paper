@@ -12,12 +12,13 @@ library(vroom)
 # file_list <- list.files(path = dir,pattern = "*.txt")
 
 # Traditional lipids
-# dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation/lowinput/Traditional_lipids/"
-# file_list <- list.files(path = dir,pattern = "*.txt")
+dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation/lowinput/Traditional_lipids/"
+file_list <- list.files(path = dir,pattern = "*.txt")
 
 # Non-Traditional lipids
-# dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation/lowinput/Nontraditional_lipids/"
-# file_list <- list.files(path = dir,pattern = "*.txt")
+dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation/lowinput/Nontraditional_lipids/"
+file_list <- list.files(path = dir,pattern = "*.txt")
+file_list <- file_list[60]
 
 # Sums and Ratios
 dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/sum_ratio_BLUP/annotation/"
@@ -28,7 +29,7 @@ file_list <- list.files(path = dir,pattern = "*.txt")
 
 # Empty vectors
 results <- tibble()          
-p_value_threshold <- 1e-7
+p_value_threshold <- 1e-5
 -log10(p_value_threshold)
 
 # Loop through the files
@@ -97,6 +98,8 @@ combined_results <- combined_results %>%
 head(combined_results)
 
 # Save the file
-write.table(combined_results, "table/GWAS_results/Sums_Ratios_lipids_common_genes_lowinput_individual_logpvalue_7_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+# write.table(combined_results, "table/GWAS_results/NonTraditional_lipids_common_genes_lowinput_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 getwd()
-# write.table(combined_results, "table/GWAS_results/SQDG_32_0_common_genes_lowinput_individual_logpvalue_7_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+# write.table(combined_results, "table/GWAS_results/SQDG_32_0_common_genes_lowinput_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+write.table(combined_results, "table/GWAS_results/gibberellic_acid_common_genes_lowinput_individual_logpvalue_4_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+
