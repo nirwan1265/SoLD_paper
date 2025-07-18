@@ -1,5 +1,8 @@
 library(vroom)
 library(dplyr)
+library(caret)
+library(mlr)
+library(tuneRanger)
 rm(list=ls())
 
 ## GET THE LIPID, Log10 transformed
@@ -34,7 +37,7 @@ dat <- lipids %>% inner_join(pheno, by = "Line")
 dim(dat)
 
 ## GET THE PCA
-PC <- vroom("table/PCA_SAP.csv")
+PC <- vroom("table/PCA_SAP.csv") 
 colnames(PC)[1] <- "Line"
 dim(PC)
 str(PC)
@@ -274,7 +277,7 @@ global_rank <- tibble(
 top50 <- global_rank %>% slice_head(n = 50)
 print(top50, n = 50)
 
-#write.csv(top50, "table/top50_lipid_SHAP_plantheight.csv", row.names = FALSE)
+#write.csv(top50, "table/top50_lipid_SHAP_floweringtime.csv", row.names = FALSE)
 # 3) Bar chart of global importance
 quartz()
 ggplot(top50, aes(x = reorder(Feature, MeanAbs), y = MeanAbs)) +
@@ -303,3 +306,132 @@ ggplot(shap_long, aes(x = SHAP, y = Feature)) +
     title = "Beeswarm of Top 50 Lipid SHAP Values"
   ) +
   theme_minimal()
+
+
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Figure 2: Residual distributions (raw vs PC‑residualized FT and example lipid)
+# ─────────────────────────────────────────────────────────────────────────────
+library(ggplot2)
+
+# A: Flowering time
+df_ft <- tibble(
+  raw   = dat2$FlowerTime,
+  resid = rFT
+)
+p1 <- ggplot(df_ft, aes(x = raw)) +
+  geom_density(fill = "gray80") +
+  labs(title = "Raw Flowering Time", x = "log10(FT+1)", y = "Density") +
+  theme_minimal()
+p2 <- ggplot(df_ft, aes(x = resid)) +
+  geom_density(fill = "steelblue", alpha = 0.6) +
+  labs(title = "PC‑residualized Flowering Time", x = "Residual FT", y = "Density") +
+  theme_minimal()
+
+# B: Example lipid (first column of lipids_adj after Line)
+lipid_name <- colnames(lipids_adj)[2]
+df_lip <- tibble(
+  raw   = lipid_mat[,1],
+  resid = lipids_adj[[lipid_name]]
+)
+p3 <- ggplot(df_lip, aes(x = raw)) +
+  geom_density(fill = "gray80") +
+  labs(title = paste0("Raw ", lipid_name), x = lipid_name, y = "Density") +
+  theme_minimal()
+p4 <- ggplot(df_lip, aes(x = resid)) +
+  geom_density(fill = "tomato", alpha = 0.6) +
+  labs(title = paste0("PC‑residualized ", lipid_name), x = "Residual abundance", y = "Density") +
+  theme_minimal()
+
+# Arrange and save
+library(patchwork)
+quartz()
+(p1 + p2) / (p3 + p4)
+
+ggsave("fig2_residual_distributions.png", width = 8, height = 8, dpi = 300)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Figure 3: Observed vs Predicted FT
+# ─────────────────────────────────────────────────────────────────────────────
+df_pred <- tibble(obs = test_y, pred = preds)
+p_obs_pred <- ggplot(df_pred, aes(x = obs, y = pred)) +
+  geom_point(alpha = 0.6) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "gray50") +
+  labs(title = "Observed vs Predicted Flowering Time",
+       x = "Observed residual FT",
+       y = "RF predicted residual FT") +
+  annotate("text", x = Inf, y = -Inf, hjust = 1.1, vjust = -0.5,
+           label = sprintf("RMSE = %.3f\nR² = %.3f", metrics$RMSE, metrics$R2)) +
+  theme_minimal()
+p_obs_pred
+ggsave("fig3_obs_vs_pred.png", width = 6, height = 5, dpi = 300)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Figure 4: OOB error vs number of trees
+# ─────────────────────────────────────────────────────────────────────────────
+ntree_seq <- c(100, 250, 500, 750, 1000, 1500)
+oob_rmse   <- sapply(ntree_seq, function(nt) {
+  m <- ranger(x = train_X, y = train_y,
+              num.trees = nt,
+              mtry = tune_res$recommended.pars$mtry,
+              min.node.size = tune_res$recommended.pars$min.node.size,
+              sample.fraction = tune_res$recommended.pars$sample.fraction,
+              importance = "none",
+              num.threads = 10,
+              seed = 42)
+  sqrt(m$prediction.error)
+})
+df_oob <- tibble(ntree = ntree_seq, OOB_RMSE = oob_rmse)
+p_oob <- ggplot(df_oob, aes(x = ntree, y = OOB_RMSE)) +
+  geom_line() + geom_point() +
+  labs(title = "OOB RMSE vs Number of Trees",
+       x = "Number of Trees", y = "OOB RMSE (days)") +
+  theme_minimal()
+p_oob
+ggsave("fig4_oob_vs_trees.png", width = 6, height = 4, dpi = 300)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Figure 5: Hyperparameter tuning surface (mtry × min.node.size)
+# ─────────────────────────────────────────────────────────────────────────────
+tuning_df <- tune_res$results
+p_tune <- ggplot(tuning_df, aes(x = factor(mtry), y = factor(min.node.size), fill = rmse)) +
+  geom_tile() +
+  scale_fill_viridis_c(name = "OOB RMSE") +
+  labs(title = "Hyperparameter Tuning Landscape",
+       x = "mtry", y = "min.node.size") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+p_tune
+ggsave("fig5_tuning_surface.png", width = 6, height = 5, dpi = 300)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Figures 6 & 7: Global SHAP importance & Beeswarm for top 20
+# ─────────────────────────────────────────────────────────────────────────────
+# Global bar chart (top 20)
+top20 <- shap_rank %>% slice_head(n = 20)
+p_shap_bar <- ggplot(top20, aes(x = reorder(Lipid, MeanAbsSHAP), y = MeanAbsSHAP)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Top 20 Lipids by Mean |SHAP|",
+       x = NULL, y = "Mean |SHAP| (days)") +
+  theme_minimal()
+p_shap_bar
+ggsave("fig6_shap_bar.png", width = 6, height = 5, dpi = 300)
+
+# Beeswarm
+shap_long <- as_tibble(ts$shaps) %>%
+  mutate(Sample = row_number()) %>%
+  pivot_longer(-Sample, names_to = "Lipid", values_to = "SHAP") %>%
+  filter(Lipid %in% top20$Lipid)
+p_shap_bee <- ggplot(shap_long, aes(x = SHAP, y = reorder(Lipid, -SHAP))) +
+  geom_jitter(height = 0.2, alpha = 0.4, size = 1) +
+  labs(title = "Beeswarm of Top 20 Lipid SHAP Values",
+       x = "SHAP value (days)", y = NULL) +
+  theme_minimal()
+p_shap_bee
+ggsave("fig7_shap_beeswarm.png", width = 6, height = 6, dpi = 300)
