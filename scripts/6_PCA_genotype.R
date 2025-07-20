@@ -53,8 +53,9 @@ pca_tab <- data.frame(
 # NOTE: look at the scree plot and save the correct no. of PCA. which is 5 here
 pca_tab
 # Write to CSV
-write.csv(pca_tab[,1:6], "PCA_SAP.csv", row.names = FALSE)
+write.csv(pca_tab, "PCA_SAP.csv", row.names = FALSE)
 getwd()
+
 # Scree plot data (percentage variance explained)
 scree <- data.frame(
   PC = paste0("PC", 1:length(pca$varprop)),
@@ -193,8 +194,7 @@ pca_plot <- ggplot(pc_df, aes(x = PC1, y = PC2, color = group)) +
 quartz()
 pca_plot
 
-
-
+getwd()
 pca_plot <- ggplot(pc_df, aes(x = PC1, y = PC2, color = group)) +
   geom_point(alpha = 0.8, size = 3, stroke = 0.5) +
   theme_minimal(base_size = 18) +

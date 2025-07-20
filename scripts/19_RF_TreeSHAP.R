@@ -1,13 +1,37 @@
+#################################################################################
+###### LOAD THE LIBRARIES
+#################################################################################
+
+### Libraries
 library(vroom)
 library(dplyr)
 library(caret)
 library(mlr)
 library(tuneRanger)
+library(ggplot2)
+library(treeshap)
+library(shapviz)
+library(patchwork)
+library(stringr)
+library(viridis) 
+library(tidyr)
+# Clear the list
 rm(list=ls())
 
-## GET THE LIPID, Log10 transformed
+################################################################################
+###### LOAD THE LIPIDS, PCA, AND PHENOTYPES
+################################################################################
+
+## Get the lipids, Log10 transformed
 lipids <- vroom("data/SPATS_fitted/log10_median_centered/control_all_lipids_fitted_phenotype_log_centered.csv")
+dim(lipids)
 colnames(lipids)[1] <- "Line"
+
+# 2) rename that long column to “GABA”
+colnames(lipids)[
+  colnames(lipids) == ".beta.-Phenyl-.gamma.-aminobutyric acid"
+] <- "GABA"
+
 # lipids <- lipids %>%
 #   dplyr::select(Line,
 #                 starts_with("TG("),
@@ -22,107 +46,92 @@ colnames(lipids)[1] <- "Line"
 #                 starts_with("DG(")
 #   )
 
-
-### GET THE PHENOTYPES, FLOWERING TIME AND BLOCK AND ROW
+### Get the phenotypes in the field
 pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,2))
 colnames(pheno)[1] <- "Line"
 colnames(pheno)[2] <- "FlowerTime"
-# Add this: drop any rows where FlowerTime is NA
+
+### Drop any rows with NA
 keep_rows <- !is.na(pheno$FlowerTime)
 pheno    <- pheno[keep_rows, ]
-pheno$FlowerTime <- log10(pheno$FlowerTime + 1)  # Log10 transform FlowerTime
+#pheno$FlowerTime <- log10(pheno$FlowerTime + 1)  # Log10 transform 
+pheno$FlowerTime <- pheno$FlowerTime  # Log10 transform 
 
-## Combine
+### Combine the phenotypes and lipids
 dat <- lipids %>% inner_join(pheno, by = "Line")
 dim(dat)
 
-## GET THE PCA
-PC <- vroom("table/PCA_SAP.csv") 
+
+### Get the PCA - first 3 6
+PC <- vroom("table/PCA_SAP.csv") %>% dplyr::select(c(1:4))
 colnames(PC)[1] <- "Line"
 dim(PC)
 str(PC)
 
-
-# 1) Align and parse FlowerTime as numeric  
+### Align and parse the phenotype as numeric  
 common <- intersect(dat$Line, PC$Line)
+
 dat2   <- dat %>% 
   filter(Line %in% common) %>% 
   arrange(Line) %>% 
   mutate(FlowerTime = as.numeric(FlowerTime))
+
 PC2    <- PC  %>% 
   filter(Line %in% common) %>% 
   arrange(Line) %>% 
-  select(-Line)           # ✂ DROP the ID column
+  select(-Line)           
 
 
-# 2) Build a pure‑numeric data.frame for residualization
+################################################################################
+###### POPULATION STRUCTURE ADJUSTMENT
+################################################################################
+
+### Build a pure‑numeric data.frame for residualization
 df_resid <- data.frame(
   FlowerTime = dat2$FlowerTime,
-  PC2      # columns EV1…EV5 only
+  PC2   
 )
 
-
-### Population structure adjustment
-## Residualise both the phenotype and the lipids on PCs so RF doesn’t learn population structure instead of biology:
+### Residualise both the phenotype and the lipids on PCs so RF doesn’t learn population structure instead of biology:
 adj_formula <- as.formula(paste("~", paste(colnames(PC2), collapse = " + ")))
 
-# 3) Residualize FlowerTime on PCs  
+### Residualize the phenotype on PCs  
 rFT <- resid( lm(FlowerTime ~ ., data = df_resid) )
 
-# 4) Sanity check  
+# Sanity check  
 length(rFT)       # should equal nrow(df_resid)
 summary(rFT)      # non‑zero residuals with mean ≈0
 
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# ASSUMING you’ve already done:
-#  • aligned ‘dat’ and ‘PC’ on the same set of Lines
-#  • parsed FlowerTime to numeric in dat2
-#  • created PC2 by filtering+sorting PC and then dropping Line
-#  • created dat2 by filtering+sorting dat and converting FlowerTime
-# ─────────────────────────────────────────────────────────────────────────────
-
-# 1) Extract the lipid matrix (numeric only: drop Line & FlowerTime)
+### Extract the lipid matrix (numeric only: drop Line & FlowerTime)
 lipid_mat <- dat2 %>%
   select(-Line, -FlowerTime) %>%
   as.matrix()
 
-# 2) Build the design matrix X from your PCs only (no Line column)
+### Build the design matrix X from your PCs only (no Line column)
 #adj_formula still = "~ EV1 + EV2 + EV3 + EV4 + EV5"
 X <- model.matrix(adj_formula, data = PC2)
 
-# 3) Compute the projection matrix P
+### Compute the projection matrix P
 P <- X %*% solve(crossprod(X)) %*% t(X)
 
-# 4) Residualize each lipid:  
-#    lipids_adj_mat[i,j] = lipid_mat[i,j] - (P %*% lipid_mat)[i,j]
+### Residualize each lipid:  
 lipids_adj_mat <- lipid_mat - (P %*% lipid_mat)
 
-# 5) Convert back to a tibble and restore column names
+### Convert back to a tibble and restore column names
 lipids_adj <- as_tibble(lipids_adj_mat)
 colnames(lipids_adj) <- colnames(lipid_mat)
 
-# 6) (Optional) re‑attach the Line IDs so you can keep track
+### Re‑join the Line IDs so you can keep track
 lipids_adj <- bind_cols(Line = dat2$Line, lipids_adj)
 
-# Now lipids_adj has the same number of rows as dat2 (no ID column was used
-# in computing the projection), and each column is the PC‑residualized lipid.
 
 
+################################################################################
+###### STRATIFIED TRAIN/TEST SPLIT ON PCS, TUNING, AND MODEL FITTING
+################################################################################
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Assume you already have:
-#  • lipids_adj: a data.frame or matrix of PC‑residualized lipids (rows = lines)
-#  • rFT       : a numeric vector of PC‑residualized flowering times (same order)
-#  • PC2      : a data.frame of numeric PCs (no Line column), same rows/order as lipids_adj
-# ─────────────────────────────────────────────────────────────────────────────
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 1) Stratified train/test split on PCs
-# ─────────────────────────────────────────────────────────────────────────────
-set.seed(42)
+### Split the training and testing 80-20
+set.seed(22)
 lipids_num <- lipids_adj %>% select(-Line)
 clusters  <- kmeans(PC2, centers = 6)$cluster
 train_idx <- createDataPartition(clusters, p = 0.8, list = FALSE)
@@ -133,19 +142,13 @@ train_y <- rFT      [train_idx]
 test_X  <- lipids_num[-train_idx, ]
 test_y  <- rFT      [-train_idx]
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 2) Create an mlr regression task for tuning
-# ─────────────────────────────────────────────────────────────────────────────
+
+### Create an mlr regression task for tuning
 train_df   <- data.frame(train_X, FlowerTime = train_y)
 regr_task  <- makeRegrTask(data = train_df, target = "FlowerTime")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 3) Hyperparameter tuning with tuneRanger
-#    - up to 10 threads
-#    - optimize RMSE
-# ─────────────────────────────────────────────────────────────────────────────
-# rm(rmse) if you want to re run. 
-#rm(rmse) 
+
+### Hyperparameter tuning with tuneRanger
 tune_res <- tuneRanger(
   task            = regr_task,
   measure         = list(rmse),
@@ -154,38 +157,163 @@ tune_res <- tuneRanger(
   num.threads     = 10
 )
 
-# View recommended hyperparameters:
+# SANITY CHECK
 print(tune_res$recommended.pars)
-# $mtry
-# $min.node.size
-# $sample.fraction
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 4) Fit the final RF model with tuned parameters
-# ─────────────────────────────────────────────────────────────────────────────
+
+################################################################################
+###### 5‑FOLD CV ON THE TRAINING SET USING MLR
+################################################################################
+
+###Build the mlr learner with the tuned parameters
+rf_learner <- makeLearner(
+  "regr.ranger",
+  par.vals = list(
+    num.trees       = 1000,
+    mtry            = tune_res$recommended.pars$mtry,
+    min.node.size   = tune_res$recommended.pars$min.node.size,
+    sample.fraction = tune_res$recommended.pars$sample.fraction
+  ),
+  predict.type = "response"
+)
+
+### Define the CV
+rdesc <- makeResampleDesc("CV", iters = 5L)
+
+### Run the resampling
+cv_res <- resample(
+  learner    = rf_learner,
+  task       = regr_task,
+  resampling = rdesc,
+  measures   = list(rmse, mae, rsq),
+  show.info  = TRUE
+)
+
+### Get the raw per‑fold metrics
+df_meas <- as.data.frame(cv_res$measures.test)
+
+### Add a simple iteration index
+df_meas$Iteration <- seq_len(nrow(df_meas))
+
+### Pivot to long form and clean up names
+df_long <- pivot_longer(
+  df_meas,
+  cols = c("rmse", "mae", "rsq"),
+  names_to = "Metric",
+  values_to = "Value"
+)
+
+### Change to metrics labels
+df_long$Metric <- recode(df_long$Metric,
+                         "rmse.test.rmse" = "RMSE",
+                         "mae.test.mean"  = "MAE",
+                         "rsq.test.mean"  = "R²"
+)
+
+### Compute the mean for each metric
+mean_df <- df_long %>%
+  group_by(Metric) %>%
+  summarize(Mean = mean(Value))
+
+### Plot
+
+# Pre-set theme
+nature_theme <- theme_minimal(base_size = 16) +
+  theme(
+    plot.title     = element_text(
+      size   = 14,
+      face   = "bold",
+      hjust  = 0.5,
+      margin = margin(b = 10)
+    ),
+    axis.title.x   = element_text(
+      size = 16,      # X‐axis title size
+      face = "bold"
+    ),
+    axis.title.y   = element_text(
+      size = 16,      # Y‐axis title size
+      face = "bold"
+    ),
+    axis.text.x    = element_text(
+      size = 16,      # X‐axis tick label size
+      color = "black"
+    ),
+    axis.text.y    = element_text(
+      size = 16,      # Y‐axis tick label size
+      color = "black"
+    ),
+    axis.line      = element_line(color = "black"),
+    panel.grid     = element_blank(),
+    
+    legend.position = "top",
+    legend.title    = element_blank(),
+    legend.text     = element_text(
+      size = 16        # legend label size
+    ),
+    
+    plot.margin    = margin(15, 15, 15, 15)
+  )
+
+mid_iter <- mean(df_long$Iteration)
+
+cv_plot <- ggplot(df_long, aes(x = Iteration, y = Value, color = Metric)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  # dashed horizontal line at each mean
+  geom_hline(data = mean_df,
+             aes(yintercept = Mean, color = Metric),
+             linetype = "dashed", size = 0.8) +
+  # centered text at the middle iteration
+  geom_text(data = mean_df,
+            aes(x = mid_iter, y = Mean,
+                label = sprintf("%s mean = %.3f", Metric, Mean),
+                color = Metric),
+            angle = 30,      # tilt a bit
+            hjust = 0.5,     # center horizontally
+            vjust = -0.5,    # nudge above the line
+            size = 4) +
+  scale_x_continuous(breaks = df_long$Iteration,
+                     limits = c(min(df_long$Iteration), max(df_long$Iteration) + 1)) +
+  scale_color_viridis_d(option = "D", end = 0.8) + 
+  labs(
+    title = "5 Fold CV Metrics by Iteration (RF)",
+    x     = "CV iteration",
+    y     = "Metric value"
+  ) +
+  nature_theme
+
+
+quartz()
+print(cv_plot)
+
+# Save the plot
+# ggsave("Fig5a_CV_RF_metrics.png",cv_plot, width = 8, height = 6, dpi = 300, 
+#        units = "in", bg = "white")
+
+################################################################################
+###### FINAL MODEL FITTING AND EVALUATION
+################################################################################
+
+### Fit the final RF model with tuned parameters
 rf_model <- ranger(
   x               = train_X,
   y               = train_y,
   num.trees       = 1000,
   mtry            = tune_res$recommended.pars$mtry,
-  #mtry            = 5,
   min.node.size   = tune_res$recommended.pars$min.node.size,
-  #min.node.size   = 10,
   sample.fraction = tune_res$recommended.pars$sample.fraction,
   importance      = "none",
   num.threads     = 10,
   seed            = 42
 )
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 5) Evaluate on the test set
-# ─────────────────────────────────────────────────────────────────────────────
+### Evaluate on the test set
 preds <- predict(rf_model, data = test_X)$predictions
 rmse  <- sqrt(mean((preds - test_y)^2))
 print(paste0("Test RMSE: ", round(rmse, 4)))
 
 
-# 1) Make sure you’re using exactly the same test set for both:
+### Make sure you’re using exactly the same test set for both:
 length(preds)    # how many predictions did you get?
 length(test_y)   # how many observations are in your test set?
 
@@ -217,29 +345,21 @@ metrics <- tibble(
 print(metrics)
 
 
+################################################################################
+###### TreeSHAP ANALYSIS
+################################################################################
 
-
-
-# 1) Install & load
-library(treeshap)
-library(dplyr)
-
-# 2) Compute TreeSHAP values
-# rf_model is your trained ranger object
-# lipids_adj is your PC‐residualized lipid tibble with a “Line” column
-
-# Extract feature matrix (no Line column)
+### Extract feature matrix
 X <- lipids_adj %>% select(-Line) %>% as.data.frame()
 
-# 1) Convert your ranger forest into a "unified" model
+### Convert your ranger forest into a "unified" model
 um <- unify(rf_model,X)
 
-# treeshap wants an “unwrapped” ranger forest + the same data.frame
+### treeshap wants an “unwrapped” ranger forest + the same data.frame
 ts <- treeshap(um, X)
-
 # ts$shaps is an (n_samples × n_features) matrix of exact SHAP values
 
-# 3) Global ranking: mean absolute SHAP per lipid
+### Mean absolute SHAP per lipid
 mean_abs <- colMeans(abs(ts$shaps))
 shap_rank <- tibble(
   Lipid       = names(mean_abs),
@@ -247,37 +367,30 @@ shap_rank <- tibble(
 ) %>%
   arrange(desc(MeanAbsSHAP))
 
-# View top 20
+### View top 20
 top20 <- shap_rank %>% slice_head(n = 20)
 print(top20)
 
-# 4) (Optional) Convert to shapviz and plot
-library(shapviz)
+### Convert to shapviz and plot
 sv <- shapviz(ts, X = X)   # TreeSHAP under the hood
 
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-
-# ts is your treeshap result, ts$shaps is an (n_samples × n_features) matrix
+### ts is your treeshap result, ts$shaps is an (n_samples × n_features) matrix
 shap_mat <- ts$shaps
 
-# 1) Build a global‐importance table by mean(|SHAP|)
+### Build a global‐importance table by mean(|SHAP|)
 global_rank <- tibble(
   Feature = colnames(shap_mat),
   MeanAbs = colMeans(abs(shap_mat))
 ) %>% 
   arrange(desc(MeanAbs))
 
-# 2) Grab the top 20
-top50 <- global_rank %>% slice_head(n = 50)
-print(top50, n = 50)
+### Grab the top 20
+top50 <- global_rank %>% slice_head(n = 24)
+print(top50, n = 24)
 
 #write.csv(top50, "table/top50_lipid_SHAP_floweringtime.csv", row.names = FALSE)
+
+
 # 3) Bar chart of global importance
 quartz()
 ggplot(top50, aes(x = reorder(Feature, MeanAbs), y = MeanAbs)) +
@@ -309,52 +422,108 @@ ggplot(shap_long, aes(x = SHAP, y = Feature)) +
 
 
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Figure 2: Residual distributions (raw vs PC‑residualized FT and example lipid)
-# ─────────────────────────────────────────────────────────────────────────────
-library(ggplot2)
-
-# A: Flowering time
+### Residual distributions (raw vs PC‑residualized phenotype and an example lipid)
 df_ft <- tibble(
   raw   = dat2$FlowerTime,
   resid = rFT
 )
-p1 <- ggplot(df_ft, aes(x = raw)) +
-  geom_density(fill = "gray80") +
-  labs(title = "Raw Flowering Time", x = "log10(FT+1)", y = "Density") +
-  theme_minimal()
-p2 <- ggplot(df_ft, aes(x = resid)) +
-  geom_density(fill = "steelblue", alpha = 0.6) +
-  labs(title = "PC‑residualized Flowering Time", x = "Residual FT", y = "Density") +
-  theme_minimal()
 
-# B: Example lipid (first column of lipids_adj after Line)
-lipid_name <- colnames(lipids_adj)[2]
+df_ft_long <- tibble(
+  raw   = dat2$FlowerTime,
+  resid = rFT
+) %>%
+  pivot_longer(
+    cols      = c(raw, resid),
+    names_to  = "Type",
+    values_to = "Value"
+  ) %>%
+  # give each level a short code that we can re‐label
+  mutate(Type = recode(Type,
+                       raw   = "Raw FT",
+                       resid = "Residual FT"))
+
+
+residuals <- ggplot(df_ft_long, aes(x = Value, fill = Type)) +
+  geom_density(alpha = 0.6, color = NA) +
+  facet_wrap(
+    ~Type,
+    scales   = "free_x",
+    labeller = labeller(Type = c(
+      "Raw FT"      = "Flowering time (days)",
+      "Residual FT" = "PC‑residualized FT (days)"
+    ))
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Raw FT"      = "#440154FF",
+      "Residual FT" = "#FDE725FF"
+    )
+  ) +
+  # label the axis so it's not blank
+  labs(
+    x = "Phenotypic value",
+    y = "Density"
+  ) +
+  nature_theme +
+  theme(legend.position = "none")
+
+quartz()
+print(residuals)
+
+# Save the plot 
+# ggsave("Fig5b_Residuals_phenotype.png", residuals, width = 8, height = 6, dpi = 300, 
+#        units = "in", bg = "white")
+
+
+# Some lipid (first column of lipids_adj after Line)
+lipid_name <- colnames(lipids_adj)[251]
+
 df_lip <- tibble(
   raw   = lipid_mat[,1],
   resid = lipids_adj[[lipid_name]]
 )
-p3 <- ggplot(df_lip, aes(x = raw)) +
-  geom_density(fill = "gray80") +
-  labs(title = paste0("Raw ", lipid_name), x = lipid_name, y = "Density") +
-  theme_minimal()
-p4 <- ggplot(df_lip, aes(x = resid)) +
-  geom_density(fill = "tomato", alpha = 0.6) +
-  labs(title = paste0("PC‑residualized ", lipid_name), x = "Residual abundance", y = "Density") +
-  theme_minimal()
+# assume lipid_name is already set, and df_lip has columns `raw` and `resid`
+df_lip_long <- df_lip %>%
+  pivot_longer(
+    cols      = c(raw, resid),
+    names_to  = "Type",
+    values_to = "Value"
+  ) %>%
+  mutate(
+    Type = recode(
+      Type,
+      raw   = paste0("Raw ", lipid_name),
+      resid = paste0("PC residualized ", lipid_name)
+    )
+  )
 
-# Arrange and save
-library(patchwork)
+
+lipid_residuals <- ggplot(df_lip_long, aes(x = Value, fill = Type)) +
+  geom_density(alpha = 0.6, color = NA) +
+  facet_wrap(~ Type, scales = "free_x", ncol = 2) +
+  scale_fill_manual(values = c(
+    "Raw Zeaxanthin"              = "#440154FF",
+    "PC residualized Zeaxanthin"  = "#FDE725FF"
+  )) +
+  labs(
+    x = "Abundance",
+    y = "Density"
+  ) +
+  nature_theme +
+  theme(
+    strip.text      = element_text(size = 12, face = "bold"),
+    legend.position = "none"
+  )
+
 quartz()
-(p1 + p2) / (p3 + p4)
+print(lipid_residuals)
 
-ggsave("fig2_residual_distributions.png", width = 8, height = 8, dpi = 300)
+# Save the lipid residuals plot
+# ggsave("Fig5c_Residuals_lipid.png", lipid_residuals, width = 8, height = 6, dpi = 300, 
+#        units = "in", bg = "white")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Figure 3: Observed vs Predicted FT
-# ─────────────────────────────────────────────────────────────────────────────
+### Observed vs Predicted FT
 df_pred <- tibble(obs = test_y, pred = preds)
 p_obs_pred <- ggplot(df_pred, aes(x = obs, y = pred)) +
   geom_point(alpha = 0.6) +
@@ -364,14 +533,14 @@ p_obs_pred <- ggplot(df_pred, aes(x = obs, y = pred)) +
        y = "RF predicted residual FT") +
   annotate("text", x = Inf, y = -Inf, hjust = 1.1, vjust = -0.5,
            label = sprintf("RMSE = %.3f\nR² = %.3f", metrics$RMSE, metrics$R2)) +
-  theme_minimal()
+  nature_theme
+quartz()
 p_obs_pred
-ggsave("fig3_obs_vs_pred.png", width = 6, height = 5, dpi = 300)
 
+# Save the plot
+# ggsave("Fig3d_obs_vs_pred.png", p_obs_pred, width = 6, height = 6, dpi = 300, units = "in", bg = "white")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Figure 4: OOB error vs number of trees
-# ─────────────────────────────────────────────────────────────────────────────
+### OOB error vs number of trees
 ntree_seq <- c(100, 250, 500, 750, 1000, 1500)
 oob_rmse   <- sapply(ntree_seq, function(nt) {
   m <- ranger(x = train_X, y = train_y,
@@ -388,50 +557,207 @@ df_oob <- tibble(ntree = ntree_seq, OOB_RMSE = oob_rmse)
 p_oob <- ggplot(df_oob, aes(x = ntree, y = OOB_RMSE)) +
   geom_line() + geom_point() +
   labs(title = "OOB RMSE vs Number of Trees",
-       x = "Number of Trees", y = "OOB RMSE (days)") +
-  theme_minimal()
+       x = "Number of Trees", y = "OOB RMSE") +
+  nature_theme
+
+quartz()
 p_oob
-ggsave("fig4_oob_vs_trees.png", width = 6, height = 4, dpi = 300)
 
+# save the plot
+# ggsave("SuppFig_Hyperparameter_oob_vs_trees.png", width = 8, height = 6, dpi = 300)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Figure 5: Hyperparameter tuning surface (mtry × min.node.size)
-# ─────────────────────────────────────────────────────────────────────────────
+### Hyperparameter tuning surface (mtry × min.node.size)
 tuning_df <- tune_res$results
 p_tune <- ggplot(tuning_df, aes(x = factor(mtry), y = factor(min.node.size), fill = rmse)) +
   geom_tile() +
   scale_fill_viridis_c(name = "OOB RMSE") +
   labs(title = "Hyperparameter Tuning Landscape",
        x = "mtry", y = "min.node.size") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme_minimal(base_size = 16) +
+  nature_theme
+quartz()
 p_tune
-ggsave("fig5_tuning_surface.png", width = 6, height = 5, dpi = 300)
+
+# Save the plot
+# ggsave("SuppFig_Hyperparameter_Tuning_surface.png", width = 16, height = 6, dpi = 300)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Figures 6 & 7: Global SHAP importance & Beeswarm for top 20
-# ─────────────────────────────────────────────────────────────────────────────
-# Global bar chart (top 20)
-top20 <- shap_rank %>% slice_head(n = 20)
-p_shap_bar <- ggplot(top20, aes(x = reorder(Lipid, MeanAbsSHAP), y = MeanAbsSHAP)) +
+
+# ###Global SHAP importance & Beeswarm for top 50
+top50 <- shap_rank %>% slice_head(n = 24)
+# p_shap_bar <- ggplot(top50, aes(x = reorder(Lipid, MeanAbsSHAP), y = MeanAbsSHAP)) +
+#   geom_col(fill = "steelblue") +
+#   coord_flip() +
+#   labs(title = "Top 20 Lipids by Mean |SHAP|",
+#        x = NULL, y = "Mean |SHAP| (days)") +
+#   nature_theme
+# quartz()
+# p_shap_bar
+# ggsave("fig6_shap_bar.png", width = 6, height = 5, dpi = 300)
+# 
+# # Beeswarm
+# shap_long <- as_tibble(ts$shaps) %>%
+#   mutate(Sample = row_number()) %>%
+#   pivot_longer(-Sample, names_to = "Lipid", values_to = "SHAP") %>%
+#   filter(Lipid %in% top20$Lipid)
+# 
+# p_shap_bee <- ggplot(shap_long, aes(x = SHAP, y = reorder(Lipid, -SHAP))) +
+#   geom_jitter(height = 0.2, alpha = 0.4, size = 1) +
+#   labs(title = "Beeswarm of Top 50 Lipid SHAP Values",
+#        x = "SHAP value (days)", y = NULL) +
+#   theme_minimal()
+# quartz()
+# p_shap_bee
+
+
+# prepare the bar chart (right panel)
+p_shap_bar <- ggplot(top50, aes(
+  x = reorder(Lipid, MeanAbsSHAP),
+  y = MeanAbsSHAP
+)) +
   geom_col(fill = "steelblue") +
   coord_flip() +
-  labs(title = "Top 20 Lipids by Mean |SHAP|",
-       x = NULL, y = "Mean |SHAP| (days)") +
-  theme_minimal()
-p_shap_bar
-ggsave("fig6_shap_bar.png", width = 6, height = 5, dpi = 300)
+  labs(
+    title = "Top 50 Lipids by Mean |SHAP|",
+    x     = NULL,
+    y     = "Mean |SHAP| (days)"
+  ) +
+  nature_theme
 
-# Beeswarm
+
+# 1) compute cumulative‐importance and select features covering 80%
+shap_cum <- shap_rank %>%
+  arrange(desc(MeanAbsSHAP)) %>%
+  mutate(cum_pct = cumsum(MeanAbsSHAP) / sum(MeanAbsSHAP))
+
+# 1) pick the top‐80% lipids as a character vector
+selected_lipids <- shap_cum %>% 
+  filter(cum_pct <= 0.7183362) %>% 
+  pull(Lipid)
+
+# 2) reverse it once, to make the top feature end up at the top of a flipped axis
+levels_order <- rev(selected_lipids)
+
+# 2) bar chart of those lipids
+p_shap_bar <- shap_rank %>% 
+  filter(Lipid %in% levels_order) %>% 
+  mutate(Lipid = factor(Lipid, levels = levels_order)) %>% 
+  ggplot(aes(x = Lipid, y = MeanAbsSHAP)) +
+  geom_col(fill = "#440154FF") +
+  coord_flip() +
+  labs(
+    #title = "Top Lipids Covering 80% of SHAP Importance",
+    x     = NULL,
+    y     = "Mean |SHAP|"
+  ) + 
+  nature_theme +
+  theme(
+    axis.text.y  = element_blank(),  # remove the lipid names
+    axis.ticks.y = element_blank()   # remove the tick marks
+  )
+
+
+# 3) beeswarm, using the exact same levels (so the top‐item is at the top)
 shap_long <- as_tibble(ts$shaps) %>%
   mutate(Sample = row_number()) %>%
   pivot_longer(-Sample, names_to = "Lipid", values_to = "SHAP") %>%
-  filter(Lipid %in% top20$Lipid)
-p_shap_bee <- ggplot(shap_long, aes(x = SHAP, y = reorder(Lipid, -SHAP))) +
-  geom_jitter(height = 0.2, alpha = 0.4, size = 1) +
-  labs(title = "Beeswarm of Top 20 Lipid SHAP Values",
-       x = "SHAP value (days)", y = NULL) +
-  theme_minimal()
-p_shap_bee
-ggsave("fig7_shap_beeswarm.png", width = 6, height = 6, dpi = 300)
+  left_join(
+    train_X %>% 
+      as_tibble() %>%
+      mutate(Sample = row_number()) %>%
+      pivot_longer(-Sample, names_to = "Lipid", values_to = "FeatureValue"),
+    by = c("Sample","Lipid")
+  ) %>%
+  filter(Lipid %in% selected_lipids) %>%
+  mutate(Lipid = factor(Lipid, levels = rev(selected_lipids)))  # reverse so top is at top
+
+# Beeswarm
+shap_long2 <- as_tibble(ts$shaps) %>%
+  mutate(Sample = row_number()) %>%
+  pivot_longer(-Sample, names_to = "Lipid", values_to = "SHAP") %>%
+  left_join(
+    train_X %>% 
+      as_tibble() %>% 
+      mutate(Sample = row_number()) %>% 
+      pivot_longer(-Sample, names_to = "Lipid", values_to = "FeatureValue"),
+    by = c("Sample","Lipid")
+  ) %>%
+  filter(Lipid %in% levels_order) %>%
+  mutate(Lipid = factor(Lipid, levels = levels_order))
+
+p_shap_bee <- ggplot(shap_long2, aes(
+  x     = SHAP, 
+  y     = Lipid, 
+  color = FeatureValue
+)) +
+  geom_jitter(height = 0.2, size = 1, alpha = 0.6) +
+  scale_color_gradient(low  = "blue", high = "red", name = "Feature\nvalue") +
+  labs(
+    #title = "SHAP Beeswarm of Lipids Covering 80% Importance",
+    x     = "SHAP value",
+    y     = NULL
+  ) +
+  nature_theme +
+  theme(
+    legend.position = "right",
+    #plot.title      = element_text(hjust = 0.5),
+    #axis.text.y     = element_text(size = 8)
+  )
+
+
+# 4) combine side by side, giving more room on the left
+quartz()
+(p_shap_bee + p_shap_bar) +
+  plot_layout(ncol = 2, widths = c(2, 1))
+
+
+# Save the plot
+x <- (p_shap_bee + p_shap_bar)
+
+ggsave("Fig5f_SHAP_beeswarm.png", x, width = 24, height = 12, dpi = 300, units = "in", bg = "white")
+
+# 5) stitch side‑by‑side
+quartz()
+(p_shap_bee + p_shap_bar) +
+  plot_layout(ncol = 2, widths = c(2,1))
+
+
+
+
+
+### Cut off for SHAP importance
+shap_cum <- shap_rank %>% 
+  arrange(desc(MeanAbsSHAP)) %>% 
+  mutate(cum_pct = cumsum(MeanAbsSHAP) / sum(MeanAbsSHAP))
+
+# figure out which rank first exceeds 80%
+cutoff_idx <- which(shap_cum$cum_pct >= 0.80)[1]
+
+quartz()
+cutoff_shap <- ggplot(shap_cum, aes(x = seq_along(MeanAbsSHAP), y = cum_pct)) +
+  geom_line(size = 1) +
+  # vertical line at the cutoff rank
+  geom_vline(xintercept = cutoff_idx, linetype = "dashed", color = "red") +
+  # horizontal line at 80%
+  geom_hline(yintercept = 0.80,    linetype = "dashed", color = "red") +
+  # annotation text at the intersection
+  annotate(
+    "text",
+    x    = cutoff_idx + 5,      # nudge to the right
+    y    = 0.80 + 0.03,         # nudge upward
+    label = sprintf("rank = %d\n80%% cum. imp.", cutoff_idx),
+    color = "red",
+    hjust = 0,
+    size  = 4
+  ) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+  labs(
+    x     = "Feature rank (by mean |SHAP|)",
+    y     = "Cumulative importance",
+    title = "Pareto plot of SHAP importance"
+  ) +
+  nature_theme
+
+#save the plot
+ggsave("SuppFig_SHAP_cumulative_importance.png", cutoff_shap, width = 8, height = 6, dpi = 300, units = "in", bg = "white")
