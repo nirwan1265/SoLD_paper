@@ -2,8 +2,7 @@
 library(dplyr)
 library(stringr)
 library(vroom)
-
-
+library(purrr)
 
 # List all .txt files in the directory
 
@@ -12,7 +11,7 @@ library(vroom)
 # file_list <- list.files(path = dir,pattern = "*.txt")
 
 # Traditional lipids
-dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation/lowinput/Traditional_lipids/"
+dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation_100kb/Traditional_lipids/"
 file_list <- list.files(path = dir,pattern = "*.txt")
 
 # Non-Traditional lipids
@@ -21,7 +20,7 @@ file_list <- list.files(path = dir,pattern = "*.txt")
 file_list <- file_list[60]
 
 # Sums and Ratios
-dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/sum_ratio_BLUP/annotation/"
+dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/sum_ratio_BLUP/annotation_100kb/"
 file_list <- list.files(path = dir,pattern = "*.txt")
 
 
@@ -29,7 +28,7 @@ file_list <- list.files(path = dir,pattern = "*.txt")
 
 # Empty vectors
 results <- tibble()          
-p_value_threshold <- 1e-5
+p_value_threshold <- 1e-7
 -log10(p_value_threshold)
 
 # Loop through the files
@@ -43,9 +42,9 @@ for (fp in paste0(dir, file_list)) {
   
   ## ---------- keep only significant rows ----------------------------------
   sig <- dat %>%
-    filter(MinPValue < p_value_threshold)                         %>%
-    select(Chromosome, GeneID, SNPs, MinPValue)                   %>%
-    mutate(
+    dplyr::filter(MinPValue < p_value_threshold)                         %>%
+    dplyr::select(Chromosome, GeneID, SNPs, MinPValue)                   %>%
+    dplyr::mutate(
       Phenotype = phen,
       n_snps    = str_count(SNPs, ",") + 1,                       # count SNPs
       best_snp  = str_split(SNPs, ",") |>                         # first SNP
@@ -98,8 +97,8 @@ combined_results <- combined_results %>%
 head(combined_results)
 
 # Save the file
-# write.table(combined_results, "table/GWAS_results/NonTraditional_lipids_common_genes_lowinput_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+write.table(combined_results, "table/GWAS_results/Sum_ratios_lipids_common_genes_lowinput_individual_logpvalue_7_100kb_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 getwd()
-# write.table(combined_results, "table/GWAS_results/SQDG_32_0_common_genes_lowinput_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
-write.table(combined_results, "table/GWAS_results/gibberellic_acid_common_genes_lowinput_individual_logpvalue_4_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+# write.table(combined_results, "table/GWAS_results/11_14_17_Eicosatrienoic_acid__Z_Z_Z___common_genes_lowinput_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+# write.table(combined_results, "table/GWAS_results/gibberellic_acid_common_genes_lowinput_individual_logpvalue_4_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 

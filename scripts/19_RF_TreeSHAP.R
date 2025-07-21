@@ -47,7 +47,18 @@ colnames(lipids)[
 #   )
 
 ### Get the phenotypes in the field
-pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,2))
+# Our data: Plant height and Flowering Time
+pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,3))
+
+# Plant Height and Stem Diameter
+pheno <- vroom("data/phenotypes/plantheight_diameter_SAP.csv") %>% dplyr::select(c(1,2))
+
+# Grain carotenoids
+pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,7))
+
+# Yield Traits
+pheno <- vroom("data/phenotypes/yield_traits_Richard_E_Boyles.csv") %>% dplyr::select(c(1,4))
+
 colnames(pheno)[1] <- "Line"
 colnames(pheno)[2] <- "FlowerTime"
 
@@ -388,7 +399,7 @@ global_rank <- tibble(
 top50 <- global_rank %>% slice_head(n = 24)
 print(top50, n = 24)
 
-#write.csv(top50, "table/top50_lipid_SHAP_floweringtime.csv", row.names = FALSE)
+write.csv(global_rank, "table/SuppTable_lipid_SHAP_Flowering_time_Ruben_Rellan_Alvarez.csv", row.names = FALSE)
 
 
 # 3) Bar chart of global importance
@@ -568,16 +579,18 @@ p_oob
 
 ### Hyperparameter tuning surface (mtry × min.node.size)
 tuning_df <- tune_res$results
-p_tune <- ggplot(tuning_df, aes(x = factor(mtry), y = factor(min.node.size), fill = rmse)) +
-  geom_tile() +
-  scale_fill_viridis_c(name = "OOB RMSE") +
-  labs(title = "Hyperparameter Tuning Landscape",
-       x = "mtry", y = "min.node.size") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  theme_minimal(base_size = 16) +
-  nature_theme
-quartz()
-p_tune
+
+# Uncomment this
+# p_tune <- ggplot(tuning_df, aes(x = factor(mtry), y = factor(min.node.size), fill = rmse)) +
+#   geom_tile() +
+#   scale_fill_viridis_c(name = "OOB RMSE") +
+#   labs(title = "Hyperparameter Tuning Landscape",
+#        x = "mtry", y = "min.node.size") +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+#   theme_minimal(base_size = 16) +
+#   nature_theme
+# quartz()
+# p_tune
 
 # Save the plot
 # ggsave("SuppFig_Hyperparameter_Tuning_surface.png", width = 16, height = 6, dpi = 300)
@@ -715,7 +728,8 @@ quartz()
 # Save the plot
 x <- (p_shap_bee + p_shap_bar)
 
-ggsave("Fig5f_SHAP_beeswarm.png", x, width = 24, height = 12, dpi = 300, units = "in", bg = "white")
+# ggsave("Fig5f_SHAP_beeswarm.png", x, width = 24, height = 12, dpi = 300, units = "in", bg = "white")
+ggsave("SuppFig_SHAP_StemDiameter.png", x, width = 32, height = 24, dpi = 300, units = "in", bg = "white")
 
 # 5) stitch side‑by‑side
 quartz()

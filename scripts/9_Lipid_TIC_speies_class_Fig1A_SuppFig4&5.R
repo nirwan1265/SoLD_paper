@@ -22,28 +22,25 @@ suppressPackageStartupMessages({
 ################################################################################
 # 1.  LOAD DATA  (Control & LowInput)
 ################################################################################
-#control  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
-#lowinput <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
-# control <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/results/spats_correction/control/control_all_lipids_fitted_phenotype_non_normalized.csv")
 
-control  <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
-colnames(control)[1] <- "Compound_Name"  
+control <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_control_all_lipids_fitted_phenotype_non_normalized.csv") %>%
+  select(-c(2,3,4)) %>%
+  rename(Compound_Name = 1)
 
-lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_lipids_fitted_phenotype_non_normalized_max.csv") %>% dplyr::select(-c(2,3,4))
-colnames(lowinput)[1] <- "Compound_Name"  
+lowinput <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>%
+  select(-c(2,3,4)) %>%
+  rename(Compound_Name = 1) 
 
 
 ################################################################################
 # 2.  SELECT THE CLASSES 
 ################################################################################
 
-valid_classes <- c("TG","DG","MG","PC","PE","PG","PI",
-                   "LPC","LPE","DGDG","MGDG","Cer","GalCer","SM","FA","SQDG","AEG","PA","PS")
-                   
-#valid_classes <- c("LPE","LPC")
-#valid_classes <- c("PC","PE","PA","PG","PS")
-#valid_classes <- c("TG","DG","MG","PC","PE",
-#                   "DGDG","MGDG","SQDG")
+valid_classes <- c("TG","DG","MG",
+                   "PC","PE","PI",
+                   "DGDG","MGDG",
+                   "SQDG","SM","AEG",
+                   "LPC","LPE","PG","PA","Cer","GalCer","FA")
 
 class_pat <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
 
@@ -164,7 +161,8 @@ p_bar <- ggplot(pct_mean,
         axis.text.x    = element_text(face = "bold", size = 16),  # enlarge x‐axis tick labels
         axis.text.y    = element_text(face = "bold", size = 16),  # enlarge y‐axis tick labels
         axis.title.x   = element_text(face = "bold", size = 16)   # enlarge x‐axis label
-  ) 
+  ) + 
+  nature_theme
 
 ###############################################################################
 # 6.  NUMERIC TABLE  +  COLOUR SWATCH COLUMN FOR LEGENDS
@@ -251,56 +249,26 @@ ggsave("fig/main/Fig1a_lipid_species.png",fig1a, width = 21, height = 8, units =
 
 ################################################################################
 ################################################################################
-#### FIGURE 1B
+#### Supplementary Figure 4
 ################################################################################
 ################################################################################
 
-###############################################################################
-# 1.  libraries
-###############################################################################
 
-suppressPackageStartupMessages({
-  library(vroom);    library(dplyr);    library(tidyr);   library(stringr)
-  library(ggplot2);  library(viridis);  library(gridExtra); library(grid)
-})
-
-###############################################################################
-# 2.  LOAD THE DATA
-###############################################################################
-
-#control   <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Control_all_lipids_final_non_normalized.csv")
-#lowinput  <- vroom("/Users/nirwantandukar/Documents/Research/data/SAP/non_normalized_intensities/Lowinput_all_lipids_final_non_normalized.csv")
-
-control  <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
-colnames(control)[1] <- "Compound_Name"  
-
-lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
-colnames(lowinput)[1] <- "Compound_Name"  
-
-
-# Lipid Class
-lipid_class_info <- vroom("data/lipid_class/lipid_classes.csv",
+### Lipid Class
+lipid_class_info <- vroom("data/lipid_class/final_lipid_classes.csv",
                           show_col_types = FALSE) %>%
   #filter(!is.na(SubClass)) %>%
   transmute(Lipid = Lipids, SuperClass = Class)
 
-# keep only the five super-classes you want on the pie
-
-# traditional_lipid_classes
-wanted_super<- c("Glycerolipid", "Glycerophospholipid", "Glycoglycerolipid",
-                               "Sphingolipid", "Sterol", "Fatty acid and derivative")
-# nontraditional_lipid_class
-wanted_super <- c("N-acylethanolamine","Terpenoid","Prenol","Tetrapyrrole","Vitamin","Steroid",
-                                "Fatty acid amide")
-
+# All the super class
+wanted_super <- c("Glycerolipid", "Glycerophospholipid",
+                   "Sphingolipid", "Sterol", "Betaine lipid", "Fatty acid","Ether lipid","Terpenoid")
 
 lipid_class_info <- lipid_class_info %>% 
   filter(SuperClass %in% wanted_super)
 
-###############################################################################
-# 3.  HELPER FUNCTION TO SUM THE PER CLASS
-###############################################################################
 
+### Sum per class
 reshape_plate_SC <- function(df, label){
   df %>%
     pivot_longer(-Compound_Name, names_to = "Lipid", values_to = "Intensity") %>%
@@ -315,10 +283,7 @@ ctrl_SC  <- reshape_plate_SC(control,  "Control")
 low_SC   <- reshape_plate_SC(lowinput, "LowInput")
 
 
-###############################################################################
-# 4.  PERC OF TOTAL INTENSITIES PER SAMPLE → mean % per condition
-###############################################################################
-
+### Percentage of total intensities per sample → mean % per condition
 pct_SC <- bind_rows(ctrl_SC, low_SC) %>%
   group_by(Sample, Condition) %>%
   mutate(pct = 100 * sum_int / sum(sum_int)) %>%
@@ -328,17 +293,14 @@ pct_SC_mean <- pct_SC %>%
   group_by(Condition, SuperClass) %>% 
   summarise(pct_mean = mean(pct), .groups = "drop")
 
-###############################################################################
-# 5.  FIXED PALETTE
-###############################################################################
 
+### Get the classes and define the colors
 classes_all <- wanted_super
 pal          <- viridis(length(classes_all), option = "D")
 names(pal)   <- classes_all
 
-###############################################################################
-#  6.  STACKED BAR PLOT (labels ≥ 3 %)
-###############################################################################
+
+### Plot (labels ≥ 3 %)
 threshold <- 3         # print label only if slice ≥ 3 %
 
 p_sc <- ggplot(pct_SC_mean,
@@ -361,12 +323,11 @@ p_sc <- ggplot(pct_SC_mean,
         axis.line.y = element_line(size = .4),
         axis.text.x    = element_text(face = "bold", size = 14),  # enlarge x‐axis tick labels
         axis.text.y    = element_text(face = "bold", size = 14),  # enlarge y‐axis tick labels
-        axis.title.x   = element_text(face = "bold", size = 16))   # enlarge x‐axis label)
+        axis.title.x   = element_text(face = "bold", size = 16)) +  # enlarge x‐axis label)
+  nature_theme
 
-###############################################################################
-# 7.  NUMERIC TABLE  +  COLOUR SWATCH COLUMN FOR LEGENDS
-###############################################################################
 
+### Numeric table + color swatch for legends
 tbl_sc <- pct_SC_mean %>%
   dplyr::group_by(SuperClass, Condition) %>%
   dplyr::summarise(pct = mean(pct_mean), .groups = "drop") %>%
@@ -412,10 +373,8 @@ for (i in seq_along(core_rows)) {
     )
 }
 
-###############################################################################
-# 8.  LAYOUT:  STACKED BAR | TABLE
-###############################################################################
 
+### Layout of the plot
 fig1b <- gridExtra::arrangeGrob(
   p_sc, tg_sc,
   ncol   = 2,
@@ -427,15 +386,8 @@ quartz()
 grid::grid.draw(fig1b)
 
 
-###############################################################################
-# 9.  SAVE THE PLOT
-###############################################################################
-
-ggplot2::ggsave("Fig1b_traditional_lipid_class.png",
-                fig1b,
-                width = 21, height = 8, units = "in", bg = "white")
-
-ggplot2::ggsave("SuppFig_nontraditional_lipid_class.png",
+### Save the plot
+ggplot2::ggsave("fig/supp/SuppFig4A_lipid_class.png",
                 fig1b,
                 width = 21, height = 8, units = "in", bg = "white")
 
@@ -444,166 +396,168 @@ ggplot2::ggsave("SuppFig_nontraditional_lipid_class.png",
 
 
 
+###############################################################################
+### Supplementary Figure 5
+###############################################################################
 
-library(vroom); library(dplyr); library(tidyr)
-library(ggplot2); library(viridis); library(patchwork); library(stringr)
-
-# ── 1.  Load the class dictionary with Super- & SubClass info ────────────────
-lipid_info <- vroom("/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SoLD/data/lipid_class.csv",
+### Load the class dictionary with Super- & SubClass info
+lipid_info <- vroom("data/lipid_class/final_lipid_classes.csv",
                     show_col_types = FALSE) %>%
   filter(!is.na(SubClass)) %>% 
-  filter(Class %in% c("Terpenoid",
-                      "Glycerophospholipid",
-                      "Glycerolipid",
-                      "Glycoglycerolipid","Tetrapyrrole")) %>%
-  
   transmute(Lipid = Lipids,
             SuperClass = Class,
             SubClass)
 
-# ── 2.  Helper: sample × SubClass sums for one condition ─────────────────────
-reshape_plate_sub <- function(df, label){
+# SUM intensities per Sample × Class × SubClass ─────────────────────────
+agg_plate <- function(df, condition_label) {
   df %>%
-    pivot_longer(-Compound_Name,
-                 names_to  = "Lipid",
-                 values_to = "Intensity") %>%
-    left_join(lipid_info, by = "Lipid") %>%        # add Super/Sub info
-    filter(!is.na(SuperClass)) %>%                 # keep mapped lipids
-    group_by(Sample = Compound_Name,
-             Condition = label,
-             SuperClass,
-             SubClass) %>%                         # <- aggregation level
-    summarise(sum_int = sum(Intensity, na.rm = TRUE),
-              .groups = "drop")
+    pivot_longer(
+      -Compound_Name,
+      names_to  = "Lipid",
+      values_to = "Intensity"
+    ) %>%
+    left_join(lipid_info, by = "Lipid") %>%
+    filter(!is.na(SuperClass)) %>%
+    group_by(
+      Sample    = Compound_Name,
+      Condition = condition_label,
+      SuperClass,
+      SubClass
+    ) %>%
+    summarise(sum_int = sum(Intensity, na.rm = TRUE), .groups = "drop")
 }
 
-control_sub  <- reshape_plate_sub(control,  "Control")
-lowinput_sub <- reshape_plate_sub(lowinput, "LowInput")
+control_sub  <- agg_plate(control,  "Control")
+lowinput_sub <- agg_plate(lowinput, "LowInput")
 
-# ── 3.  Convert to % of SuperClass total per sample, then average ─────────────
+# ── 4. COMPUTE percent of each Class’s total per sample ─────────────────────────
 pct_tbl <- bind_rows(control_sub, lowinput_sub) %>%
   group_by(Sample, Condition, SuperClass) %>%
-  mutate(pct = 100 * sum_int / sum(sum_int)) %>%
+  mutate(
+    total_cls = sum(sum_int, na.rm = TRUE),
+    pct       = if_else(total_cls > 0, 100 * sum_int / total_cls, 0)
+  ) %>%
   ungroup()
 
+# ── 5. AVERAGE across samples to get mean % per Condition × Class × SubClass ──
 pct_mean <- pct_tbl %>%
   group_by(Condition, SuperClass, SubClass) %>%
-  summarise(pct_mean = mean(pct), .groups = "drop")
+  summarise(pct_mean = mean(pct, na.rm = TRUE), .groups = "drop") %>%
+  # replace any NaN (0/0) with 0
+  mutate(pct_mean = if_else(is.nan(pct_mean), 0, pct_mean))
 
+# ── 6. SET UP color palettes ───────────────────────────────────────────────────
+classes_all <- unique(pct_mean$SuperClass)
+pal_class   <- viridis(length(classes_all), option = "D")
+names(pal_class) <- classes_all
 
-###############################################################################
-# 0. libraries (already loaded above)  – no changes
-###############################################################################
-
-###############################################################################
-# 1–3  load + reshape  (exactly the code you already have)
-###############################################################################
-# ── 1. class dictionary kept as `lipid_info`
-# ── 2. reshape_plate_sub() + control_sub / lowinput_sub
-# ── 3. pct_tbl  →  pct_mean  (mean % of superclass total)
-#     pct_mean columns:  Condition | SuperClass | SubClass | pct_mean
-###############################################################################
-
-###############################################################################
-# 4.  single, fixed palette for every sub-class
-###############################################################################
-subclasses_all <- sort(unique(pct_mean$SubClass))
-pal_sub        <- viridis::viridis(length(subclasses_all), option = "C")
-names(pal_sub) <- subclasses_all
-
-###############################################################################
-# 1. helper: build one “bar + table” grob   for a given super-class
-###############################################################################
-make_panel <- function(df_long, super_name,
-                       thr = 3,            # label threshold
-                       pal_fun = viridis::viridis) {
+# ── 7. FUNCTION to build one Class‑panel ──────────────────────────────────────
+make_class_panel <- function(df, cls, label_thresh = 3) {
+  # 1) subset & ensure both Conditions
+  dat <- df %>%
+    filter(SuperClass == cls) %>%
+    complete(
+      SubClass,
+      Condition = c("Control","LowInput"),
+      fill      = list(pct_mean = NA_real_)
+    )
   
-  ## -------- data for this super-class ----------
-  dat <- df_long %>% filter(SuperClass == super_name)
+  # 2) build a local palette
+  subs    <- sort(unique(dat$SubClass))
+  pal_sub <- viridis(length(subs), option = "C")
+  names(pal_sub) <- subs
   
-  ## 1-A  local palette for its sub-classes
-  sub_levels <- sort(unique(dat$SubClass))
-  pal_local  <- pal_fun(length(sub_levels), option = "D")
-  names(pal_local) <- sub_levels
-  
-  ## 1-B  bar plot (no legend)
-  p <- ggplot(dat,
-              aes(x = pct_mean, y = Condition,
-                  fill = factor(SubClass, levels = sub_levels))) +
-    geom_col(width = .8, colour = "white") +
-    geom_text(aes(label = ifelse(pct_mean >= thr,
-                                 sprintf("%.1f%%", pct_mean), "")),
-              position = position_stack(vjust = 0.5),
-              colour = "white", size = 2.8) +
-    scale_x_continuous(expand = c(0,0), limits = c(0,100),
-                       breaks = c(0,25,50,75,100),
-                       labels = function(x) paste0(x,"%")) +
-    scale_fill_manual(values = pal_local, guide = "none") +
-    labs(title = super_name, x = NULL, y = NULL) +
+  # 3) bar plot with <0.1% labels
+  p <- ggplot(dat, aes(x = pct_mean, y = Condition, fill = SubClass)) +
+    geom_col(colour = "white", width = .8, na.rm = TRUE) +
+    geom_text(aes(
+      label = case_when(
+        pct_mean >= label_thresh                ~ sprintf("%.1f%%", pct_mean),
+        pct_mean > 0 & pct_mean < label_thresh  ~ "<0.1%",
+        TRUE                                    ~ ""
+      )
+    ),
+    position = position_stack(vjust = .5),
+    colour = "white", size = 3, na.rm = TRUE) +
+    scale_fill_manual(values = pal_sub) +
+    scale_x_continuous(
+      expand = c(0,0),
+      limits = c(0,100),
+      breaks = seq(0,100,25),
+      labels = function(x) paste0(x,"%")
+    ) +
+    labs(title = cls, x = NULL, y = NULL) +
     theme_classic(base_size = 14) +
-    theme(plot.title  = element_text(face = "bold", hjust = .5),
-          axis.line.x = element_line(size=.35),
-          axis.line.y = element_line(size=.35))
+    theme(
+      plot.title   = element_text(face="bold", hjust=.5),
+      axis.text    = element_text(size=12)
+    )
   
-  ## 1-C  numeric table
+  # 4) numeric table with <0.1% formatting
   tbl <- dat %>%
-    dplyr::select(SubClass, Condition, pct_mean) %>%
-    dplyr::mutate(pct = sprintf("%.1f %%", pct_mean)) %>%
-    dplyr::select(-pct_mean) %>%
-    pivot_wider(names_from = Condition, values_from = pct) %>%
-    dplyr::arrange(match(SubClass, sub_levels)) %>%
-    dplyr::mutate(Swatch = "") %>%
-    dplyr::select(Swatch, SubClass, Control, LowInput)
+    select(SubClass, Condition, pct_mean) %>%
+    mutate(
+      pct = case_when(
+        is.na(pct_mean)          ~ NA_character_,
+        pct_mean < 0.1 & pct_mean > 0 ~ "<0.1 %",
+        TRUE                     ~ sprintf("%.1f %%", pct_mean)
+      )
+    ) %>%
+    select(-pct_mean) %>%
+    pivot_wider(
+      names_from  = Condition,
+      values_from = pct,
+      values_fill = list(pct = NA_character_)
+    ) %>%
+    arrange(match(SubClass, subs)) %>%
+    mutate(Swatch = "") %>%
+    select(Swatch, SubClass, Control, LowInput)
   
-  tg <- tableGrob(tbl, rows = NULL,
-                  theme = ttheme_minimal(base_size = 14,
-                                         core    = list(fg_params=list(hjust=.5)),
-                                         colhead = list(fg_params=list(fontface="bold"))))
+  tg <- tableGrob(
+    tbl, rows = NULL,
+    theme = ttheme_minimal(
+      core    = list(fg_params=list(hjust=.5, fontsize=12)),
+      colhead = list(fg_params=list(fontface="bold", fontsize=13))
+    )
+  )
   
-  # place a coloured square in every core row, column 1
+  # fill the swatch squares
   core_rows <- which(tg$layout$name == "core-bg" & tg$layout$l == 1)
-  for (i in seq_along(core_rows))
+  for (i in seq_along(core_rows)) {
+    fill_col <- pal_sub[tbl$SubClass[i]]
     tg$grobs[[core_rows[i]]] <-
-    rectGrob(width = unit(3.5,"mm"), height = unit(3.5,"mm"),
-             gp=gpar(fill = pal_local[tbl$SubClass[i]],
-                     col  = pal_local[tbl$SubClass[i]]))
+      rectGrob(
+        gp    = gpar(fill = fill_col, col = fill_col),
+        width = unit(4, "mm"),
+        height= unit(4, "mm")
+      )
+  }
   
-  # header cell blank
-  tg$grobs[[ which(tg$layout$name=="colhead-fg" & tg$layout$l==1) ]] <-
-    textGrob(" ")
+  # blank the Swatch header
+  head_idx <- which(tg$layout$name=="colhead-fg" & tg$layout$l==1)
+  tg$grobs[[head_idx]] <- textGrob(" ")
   
-  ## 1-D  combine bar + table
-  arrangeGrob(p, tg, ncol=2,
-              widths = unit.c(unit(1,"null"), unit(0.55,"null")))
+  # 5) combine bar + table
+  arrangeGrob(
+    p, tg,
+    ncol   = 2,
+    widths = unit.c(unit(1, "null"), unit(0.4, "null"))
+  )
 }
 
-###############################################################################
-# 2. build panels for every super-class
-###############################################################################
-supers <- c("Terpenoid","Glycerophospholipid",
-            "Glycerolipid","Glycoglycerolipid","Tetrapyrrole")
 
-panel_list <- lapply(supers, make_panel, df_long = pct_mean)
+# ── 8. BUILD ALL PANELS ───────────────────────────────────────────────────────
+panel_list <- lapply(classes_all, make_class_panel, df = pct_mean)
 
-###############################################################################
-# 3. arrange everything   (2 columns × 5 rows)
-###############################################################################
-library(gridExtra)
+# ── 9. DISPLAY (e.g. 2 columns) ───────────────────────────────────────────────
+quartz()
+grid.arrange(grobs = panel_list, ncol = 2)
 
-combo <- arrangeGrob(grobs = panel_list,
-                     ncol = 2,
-                     top = textGrob("Sub-class composition of each super-class",
-                                    gp=gpar(fontface="bold", fontsize=10)))
+quartz()
 
-quartz()                      # view
-grid::grid.draw(combo)
-
-ggsave("subclass_panels_with_tables.png",
-       combo, width = 16, height = 6, units = "in", bg = "white")
-
-
-# find version of R
-R.version.string
-
+#save
+ggsave("fig/supp/SuppFig5_lipid_class_subclass.png",
+       arrangeGrob(grobs = panel_list, ncol = 2),
+       width = 40, height = 16, units = "in", bg = "white")
 
 
