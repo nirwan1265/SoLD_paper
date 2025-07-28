@@ -499,6 +499,7 @@ name_change <- read.csv(
   stringsAsFactors = FALSE
 )
 glimpse(name_change)
+
 # 2. Define a helper to apply to any df with a Compound_Name column
 apply_common_names <- function(df) {
   df %>%
@@ -520,6 +521,13 @@ B_final_named <- apply_common_names(B_norm)
 
 # Inspect
 head(A_final_named$Compound_Name, 20)
+
+
+
+### THIS IS WHERE THE FINAL DF IS. 
+
+
+
 
 
 
@@ -582,6 +590,8 @@ A_final_named <- A_final_named %>%
 
 B_final_named <- B_final_named %>%
   relocate(Class, SubClass, `Sub-subclass`, .after = Compound_Name)
+
+
 
 
 
@@ -729,11 +739,238 @@ table(A_clean$Class)  # see your lipid classes left
 
 # Save the cleaned data - _max for max value and nothing for summed 
 # write.csv(A_clean,
-#          "data/raw_lipid_intensities/A_cleaned_lipids_max.csv",
+#          "data/raw_lipid_intensities/A_cleaned_lipids_unsummed.csv",
 #          row.names = FALSE)
 # write.csv(B_clean,
-#          "data/raw_lipid_intensities/B_cleaned_lipids_max.csv",
+#          "data/raw_lipid_intensities/B_cleaned_lipids_unsummed.csv",
 #          row.names = FALSE)
+
+
+
+
+#### Remove the repeats like Lipid1::Lipid2 67776 - one signal
+
+# ---- 1) Define metadata vs sample columns --------------------
+meta_cols    <- c("Compound_Name", "Class", "SubClass", "Sub_subclass")
+sample_cols  <- setdiff(names(A_clean), meta_cols)
+
+# (Optional) If you want to treat numbers that differ at the 10^-6 level as "same":
+# A_work <- A_clean %>% mutate(across(all_of(sample_cols), ~round(.x, 6)))
+# Otherwise just use A_clean directly:
+A_work <- A_clean
+
+# ---- 2) Collapse rows that have IDENTICAL intensities across all samples ----
+A_collapsed <- A_work %>%
+  group_by(across(all_of(sample_cols))) %>%   # same signal ⇒ same group
+  summarise(
+    Compound_Name = paste(unique(Compound_Name), collapse = "%%"),
+    Class         = first(na.omit(Class)),
+    SubClass      = first(na.omit(SubClass)),
+    Sub_subclass  = first(na.omit(Sub_subclass)),
+    .groups = "drop"
+  ) %>%
+  # put columns back in original order
+  dplyr::select(all_of(meta_cols), all_of(sample_cols))
+
+
+# For B
+meta_cols    <- c("Compound_Name", "Class", "SubClass", "Sub_subclass")
+sample_cols  <- setdiff(names(B_clean), meta_cols)
+
+B_work <- B_clean
+
+B_collapsed <- B_work %>%
+  group_by(across(all_of(sample_cols))) %>%
+  summarise(
+    Compound_Name = paste(unique(Compound_Name), collapse = "%%"),
+    Class         = first(na.omit(Class)),
+    SubClass      = first(na.omit(SubClass)),
+    Sub_subclass  = first(na.omit(Sub_subclass)),
+    .groups = "drop"
+  ) %>%
+  dplyr::select(all_of(meta_cols), all_of(sample_cols))
+
+
+
+
+# Save the cleaned data 
+# write.csv(A_collapsed,
+#          "data/raw_lipid_intensities/A_cleaned_lipids_unsummed.csv",
+#          row.names = FALSE)
+# write.csv(B_collapsed,
+#          "data/raw_lipid_intensities/B_cleaned_lipids_unsummed.csv",
+#          row.names = FALSE)
+
+
+
+
+### Now based on Precursor_MZ, RT_Query, MQScore, SharedPeaks, MZErrorPPM, only keep 1 compound. 
+
+library(dplyr)
+library(tidyr)
+library(stringr)
+
+## ── 0) Define cols --------------------------------------------------------
+meta_cols   <- c("Compound_Name", "Class", "SubClass", "Sub_subclass")
+sample_cols <- setdiff(names(A_collapsed), meta_cols)
+
+## ── 1) Keep only the score fields you need from the library ---------------
+lib_scores <- lipid_A %>%
+  select(Compound_Name, X.Scan., Precursor_MZ, RT_Query,
+         MQScore, SharedPeaks, MZErrorPPM)
+
+## ── 2) Expand names split by %% -------------------------------------------
+A_long <- A_collapsed %>%
+  mutate(rowid = row_number()) %>%
+  separate_rows(Compound_Name, sep = "%%")
+
+## ── 3) Join each candidate to library hits --------------------------------
+A_joined <- A_long %>%
+  left_join(lib_scores, by = "Compound_Name")
+
+## ── 4) Pick best candidate per rowid (MQScore, tie‑breakers optional) -----
+A_best <- A_joined %>%
+  group_by(rowid) %>%
+  arrange(desc(MQScore), desc(SharedPeaks), MZErrorPPM) %>%
+  slice(1) %>%
+  ungroup() %>%
+  dplyr::rename(Compound_Name_best = Compound_Name) %>%
+  dplyr::select(rowid, Compound_Name_best, X.Scan., Precursor_MZ, RT_Query,
+         MQScore, SharedPeaks, MZErrorPPM)
+
+## ── 5) Collapse all candidate names, flag ambiguity -----------------------
+A_all <- A_joined %>%
+  group_by(rowid) %>%
+  summarise(
+    all_names    = paste(unique(Compound_Name), collapse = "%%"),
+    n_candidates = n_distinct(Compound_Name),
+    ambiguous    = n_candidates > 1,
+    .groups = "drop"
+  )
+
+## ── 6) Rebuild final table -------------------------------------------------
+A_final <- A_collapsed %>%
+  mutate(rowid = row_number()) %>%
+  left_join(A_best, by = "rowid") %>%
+  left_join(A_all,  by = "rowid") %>%
+  select(
+    # chosen ID + meta
+    Compound_Name = Compound_Name_best,
+    all_names, n_candidates, ambiguous,
+    Class, SubClass, Sub_subclass,
+    X.Scan., Precursor_MZ, RT_Query, MQScore, SharedPeaks, MZErrorPPM,
+    # intensities
+    all_of(sample_cols)
+  )
+
+# A_final is your cleaned table
+
+
+# Do the same for B
+
+## ── 0) Define cols --------------------------------------------------------
+meta_cols   <- c("Compound_Name", "Class", "SubClass", "Sub_subclass")
+sample_cols <- setdiff(names(B_collapsed), meta_cols)
+
+## ── 1) Keep only the score fields you need from the library ---------------
+lib_scores_B <- lipid_B %>%
+  select(Compound_Name, X.Scan., Precursor_MZ, RT_Query,
+         MQScore, SharedPeaks, MZErrorPPM)
+
+## ── 2) Expand names split by %% -------------------------------------------
+B_long <- B_collapsed %>%
+  mutate(rowid = row_number()) %>%
+  separate_rows(Compound_Name, sep = "%%")
+
+
+## ── 3) Join each candidate to library hits --------------------------------
+B_joined <- B_long %>%
+  left_join(lib_scores_B, by = "Compound_Name")
+
+## ── 4) Pick best candidate per rowid (MQScore, tie‑breakers optional) -----
+B_best <- B_joined %>%
+  group_by(rowid) %>%
+  arrange(desc(MQScore), desc(SharedPeaks), MZErrorPPM) %>%
+  slice(1) %>%
+  ungroup() %>%
+  dplyr::rename(Compound_Name_best = Compound_Name) %>%
+  dplyr::select(rowid, Compound_Name_best, X.Scan., Precursor_MZ, RT_Query,
+         MQScore, SharedPeaks, MZErrorPPM)
+
+
+## ── 5) Collapse all candidate names, flag ambiguity -----------------------
+B_all <- B_joined %>%
+  group_by(rowid) %>%
+  summarise(
+    all_names    = paste(unique(Compound_Name), collapse = "%%"),
+    n_candidates = n_distinct(Compound_Name),
+    ambiguous    = n_candidates > 1,
+    .groups = "drop"
+  )
+
+
+## ── 6) Rebuild final table -------------------------------------------------
+B_final <- B_collapsed %>%
+  mutate(rowid = row_number()) %>%
+  left_join(B_best, by = "rowid") %>%
+  left_join(B_all,  by = "rowid") %>%
+  select(
+    # chosen ID + meta
+    Compound_Name = Compound_Name_best,
+    all_names, n_candidates, ambiguous,
+    Class, SubClass, Sub_subclass,
+    X.Scan., Precursor_MZ, RT_Query, MQScore, SharedPeaks, MZErrorPPM,
+    # intensities
+    all_of(sample_cols)
+  )
+
+
+# save
+# write.csv(A_final, "data/raw_lipid_intensities/A_final_lipids.csv", row.names = FALSE)
+# write.csv(B_final, "data/raw_lipid_intensities/B_final_lipids.csv", row.names = FALSE)
+
+# Remove the isomers like PC(18:1/0:0/16:1) and PC(16:1/0:0/18:1)
+# and the repeats
+
+# ANd then i did another round of identification. 
+A <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/data/raw_lipid_intensities/A_final_lipids.csv")
+B <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/data/raw_lipid_intensities/B_final_lipids.csv")
+
+lipid_class <- vroom("data/lipid_class/final_second_lipid_classes.csv")
+
+
+# key: Lipids -> CommonName
+name_map <- lipid_class %>% 
+  select(Lipids, CommonName)
+
+A_fixed <- A %>%
+  left_join(name_map, by = c("Compound_Name" = "Lipids")) %>%
+  mutate(Compound_Name = if_else(!is.na(CommonName) & CommonName != "Remove",
+                                 CommonName,
+                                 Compound_Name)) %>%
+  select(-CommonName)
+
+B_fixed <- B %>%
+  left_join(name_map, by = c("Compound_Name" = "Lipids")) %>%
+  mutate(Compound_Name = if_else(!is.na(CommonName) & CommonName != "Remove",
+                                 CommonName,
+                                 Compound_Name)) %>%
+  select(-CommonName)
+
+
+# Save again 
+# write.csv(A_fixed, "data/summed_lipid_intensities/A_final_summed_lipids.csv", row.names = FALSE)
+# write.csv(B_fixed, "data/summed_lipid_intensities/B_final_summed_lipids.csv", row.names = FALSE)
+
+
+################################################################################
+## END
+################################################################################
+
+
+
+
+
 
 
 # NOTE: GO TO EXCEL AND CHECK WITH THE LIPID CLASSES AND SUM THE C AND H BONDS

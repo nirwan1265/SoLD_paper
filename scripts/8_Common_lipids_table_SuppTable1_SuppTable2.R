@@ -1,24 +1,17 @@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-################################################################################
-#### SOrghum Lipidomics Database (SOLD)
-################################################################################
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
 ###############################################################################
-## Supplementary Tables – Overlap of Control vs Low‑input lipid lists
-## Three panels:
-##   S1 – All detected lipids               
-##   S2 – Traditional classes only          
-##   S3 – Curated “Class” annotation set    
+###############################################################################
+## Supplementary Table
+##   Table S1 – Glycerolipid and Glycerophosphlipid species table
+##   Table S2 – Lipid Class table
+###############################################################################
 ###############################################################################
 
 
-
 ###############################################################################
-### Suuplmentary Table 1
+### Load the libraries
 ###############################################################################
 
-### Load the packages
+# Load
 library(vroom)      
 library(dplyr)      
 library(tidyr)      
@@ -35,29 +28,79 @@ library(ggVennDiagram)
 library(viridis)
 
 
-### Read and combine the raw intensities for control and lowinput
+###############################################################################
+### Load the data
+###############################################################################
+
 # Control
-control <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_control_all_lipids_fitted_phenotype_non_normalized.csv") %>%
-  select(-c(2,3,4)) %>%
-  rename(Compound_Name = 1) %>%
+control  <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4)) %>%
   mutate(Condition = "Control")
+colnames(control)[1] <- "Compound_Name"  
 
 # Lowinput
-lowinput <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>%
-  select(-c(2,3,4)) %>%
-  rename(Compound_Name = 1) %>%
+lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4)) %>%
   mutate(Condition = "LowInput")
+colnames(lowinput)[1] <- "Compound_Name"  
 
 # Combine
 raw_all <- bind_rows(control, lowinput)
 
 
-### Sub the different lipid species
+###############################################################################
+### Define aesthetics for plotting
+###############################################################################
+plot_theme <- theme_minimal(base_size = 16) +
+  theme(
+    plot.title     = element_text(
+      size   = 16,
+      face   = "bold",
+      hjust  = 0.5,
+      margin = margin(b = 10)
+    ),
+    axis.title.x   = element_text(
+      size = 16,      # X‐axis title size
+      face = "bold"
+    ),
+    axis.title.y   = element_text(
+      size = 16,      # Y‐axis title size
+      face = "bold"
+    ),
+    axis.text.x    = element_text(
+      size = 16,      # X‐axis tick label size
+      color = "black"
+    ),
+    axis.text.y    = element_text(
+      size = 16,      # Y‐axis tick label size
+      color = "black"
+    ),
+    axis.line      = element_line(color = "black"),
+    panel.grid     = element_blank(),
+    
+    legend.position = "top",
+    legend.title    = element_blank(),
+    legend.text     = element_text(
+      size = 16        # legend label size
+    ),
+    
+    plot.margin    = margin(15, 15, 15, 15)
+  )
+
+# Color scheme (colorblind-friendly)
+group_colors <- viridis(2)
+condition_colors <- c(Control = "#440154FF", LowInput = "#FDE725FF") 
+
+
+###############################################################################
+### Extract Glycerolipid and Glycerophosholipid species table
+###############################################################################
+
+# Define the species
 valid_classes <- c("TG","DG","MG",
-                   "PC","PE","PI",
-                   "DGDG","MGDG",
-                   "SQDG","SM","AEG",
-                   "LPC","LPE","PG","PA","Cer","GalCer","FA")
+                   "PC","PE","PG","PS",
+                   "LPC","LPE",
+                   "DGDG","MGDG","SQDG")
+
+# Create a regex pattern to match valid lipid classes
 class_pat <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
 
 # Long format
@@ -74,7 +117,7 @@ df_long <- raw_all %>%
   filter(!is.na(Class))
 
 
-### Compute within lipid species percentages
+# Compute within lipid species percentages
 compute_pct <- function(df, cond) {
   df %>%
     filter(Condition == cond) %>%
@@ -97,14 +140,19 @@ compute_pct <- function(df, cond) {
     arrange(Class, desc(as.numeric(sub("<","",mean_pct))))
 }
 
-
 table_control  <- compute_pct(df_long, "Control")
 table_lowinput <- compute_pct(df_long, "LowInput")
 
-### Merge for comparison
+# Merge for comparison
 ctrl <- table_control  %>% rename(Pct_Control    = mean_pct, Species = Lipid)
 lwp  <- table_lowinput %>% rename(Pct_LowInput  = mean_pct, Species = Lipid)
 
+
+###############################################################################
+### Supplementary Table 1
+###############################################################################
+
+# Combine Control and LowInput percentages
 combined <- full_join(ctrl, lwp, by = c("Class", "Species")) %>%
   # sort by Class, then by the *sum* of Control+LowInput percentages
   arrange(
@@ -120,8 +168,6 @@ combined <- full_join(ctrl, lwp, by = c("Class", "Species")) %>%
   # drop any helper mean_prop columns if they remain
   select(-matches("^mean_prop"))
 
-    
-
 # Clean column names
 colnames(combined)[3:4] <- c("Control_Percentage", "LowInput_Percentage")
 
@@ -129,19 +175,18 @@ colnames(combined)[3:4] <- c("Control_Percentage", "LowInput_Percentage")
 print(combined, n = Inf)
 
 # Save:
-write.csv(combined, "SuppTable1_overlap_control_lowinput_lipid_species_percentages.csv", row.names = FALSE)
+write.csv(combined, "table/supp/SuppTable1_overlap_control_lowinput_lipid_species_percentages.csv", row.names = FALSE)
 
 
 ###############################################################################
-### Suuplmentary Table 2
+### Extract the lipid classes
 ###############################################################################
 
-
-#### Get the lipid class
-lipid_class_info <- vroom::vroom("data/lipid_class/final_lipid_classes.csv", show_col_types = FALSE) %>%
+# Get the lipid class
+lipid_class_info <- vroom::vroom("data/lipid_class/Final_lipid_classes.csv", show_col_types = FALSE) %>% 
   dplyr::filter(!is.na(Class))
 
-# Create a named vector of replacements: names = original, values = new names
+# Create a named vector of replacements
 name_map <- lipid_class_info %>%
   filter(!is.na(CommonName)) %>%
   dplyr::select(Lipids, CommonName) %>%
@@ -164,25 +209,25 @@ rename_lipid_columns <- function(df, name_map) {
 control  <- rename_lipid_columns(control,  name_map)
 lowinput <- rename_lipid_columns(lowinput, name_map)
 
+# Check
+unique_lipid_class <- unique(lipid_class_info$Class)
 
-table(lipid_class_info$Class)
+# Remove Steroid, Flavonoid, Tetrapyrrole from unique_lipid_class
+unique_lipid_class <- unique_lipid_class[!unique_lipid_class %in% c("Steroid", "Flavonoid", "Tetrapyrrole")]
 
 # Lipid class Traditional lipids
-lipid_classes <- c("Glycerolipid", "Glycerophospholipid",
-                   "Sphingolipid", "Sterol", "Betaine lipid", "Fatty acid","Ether lipid","Terpenoid")
+lipid_classes <- unique_lipid_class
 
-
-
-# 1) First, make sure you have a lookup from final_name → Class:
+# First, make sure you have a lookup from final_name → Class:
 lookup <- lipid_class_info %>%
   mutate(final_name = ifelse(is.na(CommonName), Lipids, CommonName)) %>%
   dplyr::select(final_name, Class)
 
-# 2) Grab the lipid‐column names (minus the sample ID) for each condition/set
+# Grab the lipid‐column names (minus the sample ID) for each condition/set
 ctr   <- setdiff(names(control),    "Compound_Name")
 low   <- setdiff(names(lowinput),   "Compound_Name")
 
-# 3) A helper that, for a vector of classes, builds the summary table
+# Function that builds the summary table
 make_summary <- function(classes, ctrl_cols, low_cols){
   lapply(classes, function(cl){
     # which lipids in this class?
@@ -198,18 +243,22 @@ make_summary <- function(classes, ctrl_cols, low_cols){
   }) %>% bind_rows()
 }
 
-# 4) Build both tables
+
+###############################################################################
+### Supplementary Table 2
+###############################################################################
+
+# Build both tables
 lipid_summary <- make_summary(
   lipid_classes,
   ctr, low
 )
 
-
-# 5) Inspect
+# CHECK
 print(lipid_summary)
 
-# 6) (Optional) write out
-write.csv(lipid_summary,    "SuppTable_2_lipid_class_overlap.csv",    row.names = FALSE)
+# Save the table
+write.csv(lipid_summary,  "table/supp/SuppTable_2_lipid_class_overlap.csv",    row.names = FALSE)
 
 
 

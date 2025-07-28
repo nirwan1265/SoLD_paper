@@ -1,3 +1,6 @@
+
+### LOW INPUT ###
+
 # ───────────────────────────────────────────────────────────────────────────────
 # 0.  Load packages
 # ───────────────────────────────────────────────────────────────────────────────
@@ -21,9 +24,9 @@ ncol(fieldmap_lowinput)
 
 # 1) Read & transpose ----------------------------------------------------------------
 raw <- read.csv(
-  "data/summed_lipid_intensities/B_summed_lipids_final_max.csv",
+  "data/summed_lipid_intensities/B_final_summed_lipids.csv",
   stringsAsFactors = FALSE, check.names = FALSE
-)
+) %>% dplyr::select(-c(2:13))
 
 # transpose to get lines as rows, compounds as columns
 pheno_mat <- as.data.frame(t(raw), stringsAsFactors = FALSE)
@@ -169,7 +172,19 @@ for(tr in trait_names) {
   
   
   # if this is DG(20:1), save the diagnostic plot + variogram
-  if (tr == "DG(20:1)") {
+  # if (tr == "TG(10:0/10:0/10:0)") {
+  #   safe <- gsub("[^[:alnum:]]", "_", tr)
+  #   
+  #   png(paste0(safe, "_SpATS_diagnostics.png"), width = 12, height = 12, res = 300, units = "in", bg = "white")
+  #   plot(m)
+  #   dev.off()
+  #   
+  #   png(paste0(safe, "_variogram.png"),width = 12, height = 12, res = 300, units = "in", bg = "white")
+  #   plot(SpATS::variogram(m))
+  #   dev.off()
+  # }
+  
+  if (tr == "PC(18:0/20:2)") {
     safe <- gsub("[^[:alnum:]]", "_", tr)
     
     png(paste0(safe, "_SpATS_diagnostics.png"), width = 12, height = 12, res = 300, units = "in", bg = "white")
@@ -180,7 +195,6 @@ for(tr in trait_names) {
     plot(SpATS::variogram(m))
     dev.off()
   }
-  
   # png(paste0(safe, "_variogram.png"),
   #     width = 12, height = 12, res = 300, units = "in", bg = "white")
   # var.m0 <- SpATS::variogram(m)
@@ -212,11 +226,11 @@ fitted_df <- fitted_df %>%
 
 # 3. Write them out
 write.csv(blup_df2,
-          "lowinput_all_lipids_BLUPs_max.csv",
+          "data/SPATS_fitted/BLUP_GWAS_phenotype/Final_lowinput_all_lipids_BLUPs.csv",
           row.names = FALSE)
 
 write.csv(fitted_df,
-          "lowinput_all_lipids_fitted_phenotype_non_normalized_max.csv",
+          "data/SPATS_fitted/non_normalized_intensities/Final_subset_lowinput_all_lipids_fitted_phenotype_non_normalized.csv",
           row.names = FALSE)
 
 message("Done!  All BLUPs in all_lipids_BLUPs.csv; DG(20:1) plots saved.")
@@ -243,9 +257,13 @@ ncol(fieldmap_control)
 
 # 1) Read & transpose ----------------------------------------------------------------
 raw <- read.csv(
-  "data/summed_lipid_intensities/A_summed_lipids_final.csv",
+  "data/summed_lipid_intensities/A_final_summed_lipids.csv",
   stringsAsFactors = FALSE, check.names = FALSE
-)
+) %>% dplyr::select(-c(2:13))
+# raw <- read.csv(
+#   "data/summed_lipid_intensities/A_summed_lipids_final_old.csv",
+#   stringsAsFactors = FALSE, check.names = FALSE
+#)
 
 # transpose to get lines as rows, compounds as columns
 pheno_mat <- as.data.frame(t(raw), stringsAsFactors = FALSE)
@@ -393,7 +411,20 @@ for(tr in trait_names) {
   
   
   # if this is DG(20:1), save the diagnostic plot + variogram
-  if (tr == "DG(20:1)") {
+  # if this is DG(20:1), save the diagnostic plot + variogram
+  if (tr == "TG(10:0/10:0/10:0)") {
+    safe <- gsub("[^[:alnum:]]", "_", tr)
+
+    png(paste0(safe, "_SpATS_diagnostics.png"), width = 12, height = 12, res = 300, units = "in", bg = "white")
+    plot(m)
+    dev.off()
+
+    png(paste0(safe, "_variogram.png"),width = 12, height = 12, res = 300, units = "in", bg = "white")
+    plot(SpATS::variogram(m))
+    dev.off()
+  }
+  
+  if (tr == "PC(18:0/20:2)") {
     safe <- gsub("[^[:alnum:]]", "_", tr)
     
     png(paste0(safe, "_SpATS_diagnostics.png"), width = 12, height = 12, res = 300, units = "in", bg = "white")
@@ -434,13 +465,101 @@ fitted_df <- fitted_df %>%
   dplyr::select(LineRaw, everything()) %>%
   dplyr::select(-LineID)
 
-# 3. Write them out
+# 3. Write them outs
 write.csv(blup_df2,
-          "control_all_lipids_BLUPs.csv",
+          "data/SPATS_fitted/BLUP_GWAS_phenotype/Final_control_all_lipids_BLUPs.csv",
           row.names = FALSE)
 
 write.csv(fitted_df,
-          "control_all_lipids_fitted_phenotype_non_normalized.csv",
+          "data/SPATS_fitted/non_normalized_intensities/Final_subset_control_all_lipids_fitted_phenotype_non_normalized.csv",
           row.names = FALSE)
 
 message("Done!  All BLUPs in all_lipids_BLUPs.csv; DG(20:1) plots saved.")
+
+
+
+
+# ##### Get the lipid class #####
+# control_class <- raw <- read.csv(
+#   "data/summed_lipid_intensities/B_final_summed_lipids.csv",
+#   stringsAsFactors = FALSE, check.names = FALSE
+# ) %>% dplyr::select(c(1,5:7))
+# 
+# lowinput_class <- raw <- read.csv(
+#   "data/summed_lipid_intensities/A_final_summed_lipids.csv",
+#   stringsAsFactors = FALSE, check.names = FALSE
+# ) %>% dplyr::select(c(1,5:7))
+# 
+# # Combine the two classes and remove the repeats please
+# lipid_class <- bind_rows(
+#   control_class %>% mutate(Source = "Control"),
+#   lowinput_class %>% mutate(Source = "Lowinput")
+# ) %>%
+#   mutate(CommonName = Compound_Name)
+#   distinct()
+# 
+# lipid_class <- lipid_class[,-c((ncol(lipid_class))-1)]
+# colnames(lipid_class)[1] <- "Lipids"
+# # Write the lipid class
+# write.csv(lipid_class, "data/lipid_class/Final_lipid_classes.csv", row.names = FALSE)
+
+
+
+##### CHANGE THE negative values to the 1/3rd lowest. 
+# Control
+control  <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_control_all_lipids_fitted_phenotype_non_normalized.csv") 
+
+# Lowinput
+lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_lowinput_all_lipids_fitted_phenotype_non_normalized.csv") 
+
+
+
+control_fixed <- control %>%
+  mutate(
+    across(
+      where(is.numeric),
+      ~ {
+        # find smallest strictly positive value in this column
+        min_pos <- min(.x[.x > 0], na.rm = TRUE)
+        # set the “floor” at one‐third of that
+        floor_val <- min_pos / 3
+        # replace negatives
+        if_else(.x < 0, floor_val, .x)
+      }
+    )
+  )
+
+# Remove rows with string count less than 4 
+control_clean <- control %>%
+  mutate(LineRaw = as.character(LineRaw)) %>%
+  filter(str_length(LineRaw) >= 4)
+
+
+
+# For lowinput
+lowinput_fixed <- lowinput %>%
+  mutate(
+    across(
+      where(is.numeric),
+      ~ {
+        # find smallest strictly positive value in this column
+        min_pos <- min(.x[.x > 0], na.rm = TRUE)
+        # set the “floor” at one‐third of that
+        floor_val <- min_pos / 3
+        # replace negatives
+        if_else(.x < 0, floor_val, .x)
+      }
+    )
+  )
+
+# Remove rows with string count less than 4
+lowinput_clean <- lowinput %>%
+  mutate(LineRaw = as.character(LineRaw)) %>%
+  filter(str_length(LineRaw) >= 4)
+
+
+# Save
+write.csv(control_fixed, "data/SPATS_fitted/non_normalized_intensities/Final_subset_control_all_lipids_fitted_phenotype_non_normalized.csv", row.names = FALSE)
+write.csv(lowinput_fixed, "data/SPATS_fitted/non_normalized_intensities/Final_subset_lowinput_all_lipids_fitted_phenotype_non_normalized.csv", row.names = FALSE)
+
+

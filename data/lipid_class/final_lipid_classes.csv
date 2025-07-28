@@ -1,264 +1,320 @@
 Lipids,CommonName,Class,SubClass,Sub_subclass
-DGTS(34:5),NA,Betaine lipid,"Diacylglyceryl_N,N,N_trimethylhomoserine",NA
-PC(44:2),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-"[2,3-dihydroxypropoxy][3-(hexadecanoyloxy)-2-[octadec-9-enoyloxy]propoxy]phosphinic acid",NA,Ether lipid,Phosphonolipids,Phosphinic acid glycerol ether
-AEG(o-30:2),NA,Ether lipid,Acyl-ether glycerol,AEG
-AEG(o-32:2),NA,Ether lipid,Acyl-ether glycerol,AEG
-AEG(o-34:4),NA,Ether lipid,Acyl-ether glycerol,AEG
-AEG(o-34:5),NA,Ether lipid,Acyl-ether glycerol,AEG
-AEG(o-36:6),NA,Ether lipid,Acyl-ether glycerol,AEG
-DG(34:1),NA,Glycerolipid,Diacylglycerol,DG
-MG(18:2),NA,Glycerolipid,Monoacylglycerol,MG
-DG(16:0),NA,Glycerolipid,Diacylglycerol,NA
-DG(18:0),NA,Glycerolipid,Diacylglycerol,DG
-DG(18:3),NA,Glycerolipid,Diacylglycerol,NA
-DG(20:1),NA,Glycerolipid,Diacylglycerol,NA
-DG(24:0),NA,Glycerolipid,Diacylglycerol,NA
-DG(32:0),NA,Glycerolipid,Diacylglycerol,DG
-DG(34:0),NA,Glycerolipid,Diacylglycerol,DG
-DG(34:1),NA,Glycerolipid,Diacylglycerol,DG
-DG(34:2),NA,Glycerolipid,Diacylglycerol,DG
-DG(34:3),NA,Glycerolipid,Diacylglycerol,DG
-DG(34:4),NA,Glycerolipid,Diacylglycerol,DG
-DG(35:3),DG(35:3),Glycerolipid,Diacylglycerol,DG
-DG(36:0),NA,Glycerolipid,Diacylglycerol,NA
-DG(36:2),NA,Glycerolipid,Diacylglycerol,DG
-DG(36:3),NA,Glycerolipid,Diacylglycerol,DG
-DG(36:4),NA,Glycerolipid,Diacylglycerol,DG
-DG(36:5),NA,Glycerolipid,Diacylglycerol,DG
-DG(36:6),NA,Glycerolipid,Diacylglycerol,DG
-DG(38:3),DG(38:3),Glycerolipid,Diacylglycerol,DG
-DGDG(34:1),NA,Glycerolipid,Glycosyldiacylglycerol,Digalactosyldiacylglycerol
-DGDG(34:2),NA,Glycerolipid,Glycosyldiacylglycerol,Digalactosyldiacylglycerol
-DGDG(34:3),NA,Glycerolipid,Glycosyldiacylglycerol,Digalactosyldiacylglycerol
-DGDG(36:2),NA,Glycerolipid,Glycosyldiacylglycerol,Digalactosyldiacylglycerol
-DGDG(36:3),NA,Glycerolipid,Glycosyldiacylglycerol,Digalactosyldiacylglycerol
-DGDG(36:5),NA,Glycerolipid,Glycosyldiacylglycerol,Digalactosyldiacylglycerol
-DGDG(36:6),NA,Glycerolipid,Glycosyldiacylglycerol,Digalactosyldiacylglycerol
-MG(12:0),NA,Glycerolipid,Monoacylglycerol,NA
-MG(16:0),NA,Glycerolipid,Monoacylglycerol,MG
-MG(16:1),NA,Glycerolipid,Monoacylglycerol,NA
-MG(18:0),NA,Glycerolipid,Monoacylglycerol,NA
-MG(18:1),NA,Glycerolipid,Monoacylglycerol,MG (18:1)
-MG(18:2),NA,Glycerolipid,Monoacylglycerol,MG
-MG(18:3),NA,Glycerolipid,Monoacylglycerol,NA
-MG(20:4),NA,Glycerolipid,Monoacylglycerol,NA
-MGDG(34:1),NA,Glycerolipid,Glycosyldiacylglycerol,Monogalactosyldiacylglycerol
-MGDG(34:3),NA,Glycerolipid,Glycosyldiacylglycerol,Monogalactosyldiacylglycerol
-MGDG(36:4),NA,Glycerolipid,Glycosyldiacylglycerol,Monogalactosyldiacylglycerol
-MGDG(36:5),NA,Glycerolipid,Glycosyldiacylglycerol,Monogalactosyldiacylglycerol
-MGDG(36:6),NA,Glycerolipid,Glycosyldiacylglycerol,Monogalactosyldiacylglycerol
-"NCGC00380867-01_C27H46O9_9,12,15-Octadecatrienoic acid, 3-(hexopyranosyloxy)-2-hydroxypropyl ester,(9Z,12Z,15Z)-",Panaxcerol B,Glycerolipid,Monoacylglycerol,
-SQDG(30:0),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-SQDG(32:0),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-SQDG(33:3),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-SQDG(34:0),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-SQDG(34:1),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-SQDG(34:2),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-SQDG(34:3),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-SQDG(34:4),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-SQDG(35:3),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-SQDG(36:3),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-SQDG(36:4),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-SQDG(36:5),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-SQDG(36:6),NA,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
-TG(24:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(28:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(30:0),NA,Glycerolipid,Triacylglycerol,NA
-TG(34:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(36:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(38:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(40:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(40:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(42:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(42:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(42:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(44:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(44:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(44:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(44:3),NA,Glycerolipid,Triacylglycerol,TG
-TG(45:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(46:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(46:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(46:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(46:3),NA,Glycerolipid,Triacylglycerol,TG
-TG(47:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(47:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(47:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(48:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(48:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(48:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(48:3),NA,Glycerolipid,Triacylglycerol,TG
-TG(48:4),NA,Glycerolipid,Triacylglycerol,TG
-TG(48:5),NA,Glycerolipid,Triacylglycerol,TG
-TG(49:0),NA,Glycerolipid,Triacylglycerol,NA
-TG(49:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(49:3),NA,Glycerolipid,Triacylglycerol,TG
-TG(50:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(50:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(50:3),NA,Glycerolipid,Triacylglycerol,TG
-TG(50:4),NA,Glycerolipid,Triacylglycerol,TG
-TG(50:5),NA,Glycerolipid,Triacylglycerol,TG
-TG(50:6),NA,Glycerolipid,Triacylglycerol,TG
-TG(51:0),NA,Glycerolipid,Triacylglycerol,TG
-TG(51:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(51:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(51:3),NA,Glycerolipid,Triacylglycerol,TG
-TG(51:4),NA,Glycerolipid,Triacylglycerol,TG
-TG(51:5),NA,Glycerolipid,Triacylglycerol,TG
-TG(51:6),NA,Glycerolipid,Triacylglycerol,TG
-TG(51:7),NA,Glycerolipid,Triacylglycerol,TG
-TG(52:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(52:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(52:3),NA,Glycerolipid,Triacylglycerol,NA
-TG(52:4),NA,Glycerolipid,Triacylglycerol,TG
-TG(52:5),NA,Glycerolipid,Triacylglycerol,TG
-TG(52:6),NA,Glycerolipid,Triacylglycerol,TG
-TG(52:7),NA,Glycerolipid,Triacylglycerol,TG
-TG(53:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(53:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(53:3),NA,Glycerolipid,Triacylglycerol,TG
-TG(53:4),NA,Glycerolipid,Triacylglycerol,TG
-TG(53:5),NA,Glycerolipid,Triacylglycerol,TG
-TG(53:6),NA,Glycerolipid,Triacylglycerol,TG
-TG(53:7),NA,Glycerolipid,Triacylglycerol,TG
-TG(53:8),NA,Glycerolipid,Triacylglycerol,TG
-TG(54:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(54:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(54:3),NA,Glycerolipid,Triacylglycerol,TG
-TG(54:4),NA,Glycerolipid,Triacylglycerol,TG
-TG(54:5),NA,Glycerolipid,Triacylglycerol,TG
-TG(54:6),NA,Glycerolipid,Triacylglycerol,TG
-TG(54:7),NA,Glycerolipid,Triacylglycerol,TG
-TG(54:8),NA,Glycerolipid,Triacylglycerol,TG
-TG(54:9),NA,Glycerolipid,Triacylglycerol,TG
-TG(55:6),NA,Glycerolipid,Triacylglycerol,TG
-TG(56:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(56:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(56:3),NA,Glycerolipid,Triacylglycerol,TG
-TG(56:4),NA,Glycerolipid,Triacylglycerol,TG
-TG(56:5),NA,Glycerolipid,Triacylglycerol,TG
-TG(56:6),NA,Glycerolipid,Triacylglycerol,TG
-TG(56:8),NA,Glycerolipid,Triacylglycerol,TG
-TG(56:9),NA,Glycerolipid,Triacylglycerol,TG
-TG(57:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(58:1),NA,Glycerolipid,Triacylglycerol,TG
-TG(58:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(58:3),NA,Glycerolipid,Triacylglycerol,TG
-TG(58:4),NA,Glycerolipid,Triacylglycerol,TG
-TG(58:5),NA,Glycerolipid,Triacylglycerol,TG
-TG(58:6),NA,Glycerolipid,Triacylglycerol,TG
-TG(59:4),NA,Glycerolipid,Triacylglycerol,TG
-TG(59:5),NA,Glycerolipid,Triacylglycerol,TG
-TG(60:2),NA,Glycerolipid,Triacylglycerol,TG
-TG(60:3),NA,Glycerolipid,Triacylglycerol,TG
-TG(60:4),NA,Glycerolipid,Triacylglycerol,TG
-TG(60:5),NA,Glycerolipid,Triacylglycerol,TG
-TG(60:6),NA,Glycerolipid,Triacylglycerol,TG
-TG(62:5),NA,Glycerolipid,Triacylglycerol,TG
-CL(72:8),NA,Glycerophospholipid,Cardiolipin,NA
-L-alpha-phosphatidyl choline,PC(36:0),Glycerophospholipid,Glycerophosphocholine,NA
-LPC(16:0),NA,Glycerophospholipid,Lysophosphatidylcholine,NA
-LPC(18:3),NA,Glycerophospholipid,Glycerophosphocholine,Lysophosphatidylcholine
-LPE(16:0),NA,Glycerophospholipid,Lysophosphatidylethanolamine,NA
-PA(34:2),NA,Glycerophospholipid,Phosphatidic acid,NA
-PC(17:0),NA,Glycerophospholipid,Phosphatidylcholine,NA
-PC(18:2),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(18:3),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(32:0),NA,Glycerophospholipid,Phosphatidylcholine,NA
-PC(32:1),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(32:2),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(32:3),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(33:2),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(33:3),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(34:0),NA,Glycerophospholipid,Phosphatidylcholine,NA
-PC(34:1),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(34:2),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(34:3),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(34:4),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(35:1),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(35:3),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(35:4),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(36:1),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(36:2),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(36:3),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(36:4),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(36:5),NA,Glycerophospholipid,Phosphatidylcholine,NA
-PC(36:6),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(38:2),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(38:3),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(38:5),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(38:6),NA,Glycerophospholipid,Phosphatidylcholine,NA
-PC(40:2),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(41:2),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(42:1),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PC(42:2),NA,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
-PE(16:0),NA,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
-PE(18:2),NA,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
-PE(24:0),NA,Glycerophospholipid,Phosphatidylethanolamine,NA
-PE(33:3),NA,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
-PE(34:0),NA,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
-PE(34:1),NA,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
-PE(34:2),NA,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
-PE(34:3),NA,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
-PE(36:2),NA,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
-PE(36:3),NA,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
-PE(36:4),NA,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
-PE(36:5),NA,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
-PE(36:6),NA,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
-PG(16:0),NA,Glycerophospholipid,Phosphatidylglycerol,NA
-PG(17:0),NA,Glycerophospholipid,Phosphatidylglycerol,NA
-PG(34:1),NA,Glycerophospholipid,Glycerophosphoglycerol,Phosphatidylglycerol
-PS(36:2),NA,Glycerophospholipid,Glycerophosphoserine,Phosphatidylserine
-PS(38:4),NA,Glycerophospholipid,Glycerophosphoserine,Phosphatidylserine
-GalCer(d22:3),NA,Sphingolipid,Glycosphingolipid,Cerebroside (GalCer)
-Palmitoyl ethanolamide,NAE(16:0),Fatty acid,N-acylethanolamine,NA
-Stearoyl ethanolamide,NAE(18:0),Fatty acid,N-acylethanolamine,NA
-alpha-Carotene,NA,Prenol,Carotenoid,Provitamin A
-alpha-Tocopherol,NA,Prenol,Tocopherol,Vitamin E
-Ubidecarenone,NA,Prenol,NA,NA
-Ubiquinone 9,NA,Prenol,Quinones,Coenzyme Q₉ (isoprenoid quinone)
-Vitamin K1,NA,Prenol,Quinones,Vitamin K1
-Cer(24:1),NA,Sphingolipid,Ceramide,NA
-Cer(d18:2/20:1),NA,Sphingolipid,Ceramides,Ceramides
-GalCer(d18:3),NA,Sphingolipid,Glycosphingolipid,Galactosylceramide (d18:2/18:1)
-GalCer(d20:3),NA,Sphingolipid,Glycosphingolipid,Galactosylceramide (d18:2/20:1)
-GalCer(d36:3),NA,Sphingolipid,Glycosphingolipid,Galactosylceramide
-GalCer(d38:3),NA,Sphingolipid,Glycosphingolipid,Galactosylceramide
-Phytosphingosine,NA,Sphingolipid,Sphingoid base,NA
-SM(d18:1/17:0),NA,Sphingolipid,Sphingomyelin,Sphingomyelins
-SM(d35:1),NA,Sphingolipid,Sphingomyelin,Sphingomyelins
-SPB 18:0;2OH,NA,Sphingolipid,NA,NA
-Sphinganine,NA,Sphingolipid,Sphingoid bases,Dihydrosphingosine
-.beta.-Sitosterol,NA,Sterol,Phytosterol,NA
-"4,4-Dimethylcholest-8(9),24-dien-3.beta.-ol",14-demethyllanosterol,Sterol,NA,NA
-"5.alpha.-Cholest-7-en-3.beta.-ol::Cholestan-3-one,(5.alpha.)-",Lathosterol,Sterol,Sterol derivatives,NA
-Fucosterol,NA,Sterol,Phytosterol,NA
-gamma-sitosterol,NA,Sterol,Phytosterol,NA
-.alpha.-Amyrin,NA,Terpenoid,Triterpenoid,NA
-.beta.-Cryptoxanthin,NA,Terpenoid,Tetraterpenoid,Carotenoid
-(-)-Caryophyllene oxide,NA,Terpenoid,Sesquiterpenoid,NA
-3-Hydroxyechinenone,NA,Terpenoid,Tetraterpenoid,Oxygenated carotenoid
-"8'-Apo-.beta.-carotenal, all-trans-",Apocarotenal,Terpenoid,Tetraterpenoid,Apolar carotenoid
-Antheraxanthin,NA,Terpenoid,Tetraterpenoid,Xanthophyll carotenoid
-beta-Carotene,NA,Terpenoid,Tetraterpenoid,Carotenoid
-beta-Zeacarotene,NA,Terpenoid,Tetraterpenoid,Carotenoid
-Cycloartenol acetate,NA,Terpenoid,Triterpenoid,Sterol precursor
-Diadinochrome,NA,Terpenoid,Tetraterpenoid,Xanthophyll carotenoid
-gibberellic acid,NA,Terpenoid,Diterpenoid,Plant hormone
-Ginsenoside F1,NA,Terpenoid,Triterpenoid,Triterpenoid saponin
-Lanosterol,NA,Terpenoid,Triterpenoid,Sterol precursor
-Lupeol,NA,Terpenoid,Triterpenoid,Pentacyclic triterpenoid
-Lutein,NA,Terpenoid,Tetraterpenoid,Xanthophyll carotenoid
-Lycopene,NA,Terpenoid,Tetraterpenoid,Acyclic carotenoid
-Nostoxanthin,NA,Terpenoid,Tetraterpenoid,Hydroxylated carotenoid
-Panaxatriol,NA,Terpenoid,Triterpenoid,Dammarane-type sapogenol
-Sumaresinolic acid,NA,Terpenoid,Triterpenoid,Pentacyclic triterpenoid
-Zeaxanthin,NA,Terpenoid,Tetraterpenoid,Xanthophyll carotenoid
-FA(18:4),NA,Fatty acid,NA,
-FA(22:0) amide,NA,Fatty acid,Fatty acid amide,
-FA(22:1),NA,Fatty acid,NA,
-FA(22:1) amide,NA,Fatty acid,Fatty acid amide,
-Oxo fatty acid (18:3),NA,Fatty acid,NA,
-Hydroperoxy fatty acid (18:3),NA,Fatty acid,NA,
-"(10E,15E)-9,12,13-trihydroxyoctadeca-10,15-dienoic acid","9,12,13,TriHODE",Fatty acid,Oxylipins,
+DGTS(34:5),DGTS(34:5),Betaine lipid,NA,NA
+.alpha.-Amyrin,.alpha.-Amyrin,Terpenoid,Triterpenoid,NA
+.alpha.-Ionone,.alpha.-Ionone,Terpenoid,Monoterpenoid,Cyclic monoterpenoid
+.beta.-Amyrin,.beta.-Amyrin,Terpenoid,Triterpenoid,Pentacyclic triterpenoid
+.beta.-Amyrin acetate,.beta.-Amyrin acetate,Terpenoid,Triterpenoid,Pentacyclic triterpenoid
+.beta.-Cryptoxanthin,.beta.-Cryptoxanthin,Terpenoid,Tetraterpenoid,Carotenoid
+.beta.-Sitosterol,.beta.-Sitosterol,Sterol,Sterol,Phytosterol
+.gamma.-Linolenoyl ethanolamide,.gamma.-Linolenoyl ethanolamide,Fatty acid,Fatty acid,N-acylethanolamine
+(-)-Caryophyllene oxide,(-)-Caryophyllene oxide,Terpenoid,Sesquiterpenoid,NA
+"(2E,4E,12Z)-N-(2-methylpropyl)octadeca-2,4,12-trienamide","(2E,4E,12Z)-N-(2-methylpropyl)octadeca-2,4,12-trienamide",Fatty acid,Fatty acid,NA
+"(2Z)-2-[(E)-6-(hydroxymethyl)-2,4,8,10-tetramethyldodec-2-enylidene]-4-methylpentanedioic acid","(2Z)-2-[(E)-6-(hydroxymethyl)-2,4,8,10-tetramethyldodec-2-enylidene]-4-methylpentanedioic acid",Prenol,Prenol,Diterpenoid
+"(6E,10E,14E,18E)-2,6,10,15,19,23-hexamethyltetracosa-6,10,14,18-tetraene-1,2,3,22,23-pentol","(6E,10E,14E,18E)-2,6,10,15,19,23-hexamethyltetracosa-6,10,14,18-tetraene-1,2,3,22,23-pentol",Terpenoid,Triterpenoid,NA
+1-heptadecanoyl-2-hydroxy-sn-glycero-3-phosphocholine,1-heptadecanoyl-2-hydroxy-sn-glycero-3-phosphocholine,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+"11,14,17-Eicosatrienoic acid,(Z,Z,Z)-","11,14,17-Eicosatrienoic acid,(Z,Z,Z)-",Fatty acid,Fatty acid,Oxylipin
+"13-Keto-9Z,11E-octadecadienoic acid","13-Keto-9Z,11E-octadecadienoic acid",Fatty acid,Fatty acid,Oxidized fatty acid
+13S-HOTrE,13S-HOTrE,Fatty acid,Fatty acid,Oxylipin
+14-demethyllanosterol,14-demethyllanosterol,Sterol,Sterol,NA
+"14(15)-Epoxy-5Z,8Z,11Z-eicosatrienoic acid, methyl ester","14(15)-Epoxy-5Z,8Z,11Z-eicosatrienoic acid, methyl ester",Fatty acid,Fatty acid,NA
+"17.alpha.-Methyl-5.beta.-androstan-3.alpha.,17.beta.-diol","17.alpha.-Methyl-5.beta.-androstan-3.alpha.,17.beta.-diol",Steroid,Androgen,NA
+"1H-Indole-3-carboxamide, 1-(5-fluoropentyl)-N-tricyclo[3.3.1.1(3,7)]dec-1-yl-","1H-Indole-3-carboxamide, 1-(5-fluoropentyl)-N-tricyclo[3.3.1.1(3,7)]dec-1-yl-",Terpenoid,Sesterterpenoid,Fungal metabolite
+22-Hydoxy-2-hopen-1-one,22-Hydoxy-2-hopen-1-one,Terpenoid,Sesquiterpenoid,NA
+24S-Hydroxycholesterol,24S-Hydroxycholesterol,Sterol,Sterol,Phytosterol
+3-Epilupeol,3-Epilupeol,Terpenoid,Triterpenoid,Pentacyclic triterpenoid
+3-Hydroxyechinenone,3-Hydroxyechinenone,Terpenoid,Tetraterpenoid,Oxygenated carotenoid
+3.10S-Hydroxypheophorbide a,3.10S-Hydroxypheophorbide a,Tetrapyrrole,Chlorophyll/derivative,NA
+"4-amino-5-(5-hydroxy-2',6-dimethyl-5'-prop-1-en-2-ylspiro[7-oxabicyclo[4.1.0]heptane-3,1'-cyclopentane]-2-yl)oxy-5-oxopentanoic acid","4-amino-5-(5-hydroxy-2',6-dimethyl-5'-prop-1-en-2-ylspiro[7-oxabicyclo[4.1.0]heptane-3,1'-cyclopentane]-2-yl)oxy-5-oxopentanoic acid",Tetrapyrrole,Chlorophyll/derivative,NA
+"5-Androstene-3.beta.,17.beta.-diol","5-Androstene-3.beta.,17.beta.-diol",Steroid,Androgen,NA
+7-Oxocholesterol,7-Oxocholesterol,Sterol,Sterol,Oxysterol
+"8(9)-Epoxy-5Z,11Z,14Z-eicosatrienoic acid, methyl ester","8(9)-Epoxy-5Z,11Z,14Z-eicosatrienoic acid, methyl ester",Fatty acid,Fatty acid,Oxidized fatty acid
+"9,12,13,TriHODE","9,12,13,TriHODE",Fatty acid,Fatty acid,Oxylipin
+AEG(o-15:2/15:0),AEG(o-15:2/15:0),Ether lipid,Acyl‑ether glycerol,AEG
+AEG(o-16:2/16:0),AEG(o-16:2/16:0),Ether lipid,Acyl‑ether glycerol,AEG
+AEG(o-16:2/18:2),AEG(o-16:2/18:2),Ether lipid,Acyl‑ether glycerol,AEG
+AEG(o-16:3/16:0),AEG(o-16:3/16:0),Ether lipid,Acyl‑ether glycerol,AEG
+AEG(o-18:3/16:1),AEG(o-18:3/16:1),Ether lipid,Acyl‑ether glycerol,AEG
+AEG(o-18:4/16:1),AEG(o-18:4/16:1),Ether lipid,Acyl‑ether glycerol,AEG
+AEG(o-18:4/18:2),AEG(o-18:4/18:2),Ether lipid,Acyl‑ether glycerol,AEG
+Alloxanthin,Alloxanthin,Terpenoid,Tetraterpenoid,Xanthophyll carotenoid
+Alpha-Carotene,Alpha-Carotene,Terpenoid,Tetraterpenoid,NA
+alpha-Tocopherol,alpha-Tocopherol,Prenol,Prenol,Vitamin
+Antheraxanthin,Antheraxanthin,Terpenoid,Tetraterpenoid,Xanthophyll carotenoid
+Apocarotenal,Apocarotenal,Terpenoid,Tetraterpenoid,Apolar carotenoid
+beta-Carotene,beta-Carotene,Terpenoid,Tetraterpenoid,Carotenoid
+beta-Zeacarotene,beta-Zeacarotene,Terpenoid,Tetraterpenoid,Carotenoid
+Betulin,Betulin,Terpenoid,Triterpenoid,NA
+Boldenone cypionate,Boldenone cypionate,Steroid,Androgen,NA
+Celaxanthin,Celaxanthin,Terpenoid,Tetraterpenoid,Xanthophyll carotenoid
+Cembrane_Diterpene_minus_Me,Cembrane_Diterpene_minus_Me,Terpenoid,Diterpenoid,NA
+Cer(24:1),Cer(24:1),Sphingolipid,Sphingolipid,Ceramide
+Cer(d18:2/20:1),Cer(d18:2/20:1),Sphingolipid,Sphingolipid,Ceramides
+Chamissonolide,Chamissonolide,Terpenoid,Sesquiterpenoid,Lactone-type sesquiterpenoid
+Chlorophyll a,Chlorophyll a,Tetrapyrrole,Chlorophyll/derivative,NA
+"Cholestan-3-one,(5.alpha.)-","Cholestan-3-one,(5.alpha.)-",Sterol,Sterol,Sterol derivatives
+CL(18:1),CL(18:1),Glycerophospholipid,Cardiolipin,NA
+Cycloartenol acetate,Cycloartenol acetate,Terpenoid,Triterpenoid,Sterol precursor
+DG(12:0/12:0),,Glycerolipid,Diacylglycerol,NA
+DG(16:0/16:0),,Glycerolipid,Diacylglycerol,
+DG(16:0/18:0),,Glycerolipid,Diacylglycerol,DG
+DG(16:0/18:1),,Glycerolipid,Diacylglycerol,NA
+DG(16:0/18:2),,Glycerolipid,Diacylglycerol,DG
+DG(16:0/18:3),,Glycerolipid,Diacylglycerol,DG
+DG(16:0/2:0),,Glycerolipid,Diacylglycerol,
+DG(16:1/18:2),,Glycerolipid,Diacylglycerol,DG
+DG(16:1/18:3),,Glycerolipid,Diacylglycerol,
+DG(18:0/18:0),,Glycerolipid,Diacylglycerol,NA
+DG(18:0/18:2),,Glycerolipid,Diacylglycerol,
+DG(18:0/18:2/0:0),,Glycerophospholipid,Phosphatidylserine,NA
+DG(18:0/20:3),,Glycerolipid,Diacylglycerol,DG
+DG(18:1/18:1),,Glycerolipid,Diacylglycerol,
+DG(18:1/18:2),,Glycerolipid,Diacylglycerol,DG
+DG(18:1/18:3),,Glycerolipid,Diacylglycerol,
+DG(18:1/2:0),,Glycerolipid,Diacylglycerol,NA
+DG(18:2/18:2),,Glycerolipid,Diacylglycerol,NA
+DG(18:2/18:3),,Glycerolipid,Diacylglycerol,
+DG(18:3/18:3),,Glycerolipid,Diacylglycerol,DG
+DG(8:0/8:0),,Glycerolipid,Diacylglycerol,
+DGDG(16:0/18:1),,Glycerolipid,Digalactosyldiacylglycerol,Digalactosyldiacylglycerol
+DGDG(16:0/18:2),,Glycerolipid,Digalactosyldiacylglycerol,
+DGDG(16:0/18:3),,Glycerolipid,Digalactosyldiacylglycerol,Digalactosyldiacylglycerol
+DGDG(18:0/18:2),,Glycerolipid,Digalactosyldiacylglycerol,
+DGDG(18:0/18:3),,Glycerolipid,Digalactosyldiacylglycerol,Digalactosyldiacylglycerol
+DGDG(18:2/18:3),,Glycerolipid,Digalactosyldiacylglycerol,
+DGDG(18:2/18:4),,Glycerolipid,Digalactosyldiacylglycerol,Digalactosyldiacylglycerol
+FA(22:1),FA(22:1),Fatty acid,Fatty acid,NA
+Fucosterol,Fucosterol,Sterol,Sterol,Oxysterol
+GalCer(d18:2/18:1),GalCer(d18:2/18:1),Sphingolipid,Sphingolipid,Glycosphingolipid
+GalCer(d18:2/20:1),GalCer(d18:2/20:1),Sphingolipid,Sphingolipid,Glycosphingolipid
+GalCer(d18:2/22:1),GalCer(d18:2/22:1),Sphingolipid,Sphingolipid,Glycosphingolipid
+gamma-sitosterol,gamma-sitosterol,Sterol,Sterol,Phytosterol
+gibberellic acid,gibberellic acid,Terpenoid,Diterpenoid,Plant hormone
+Ginsenoside F1,Ginsenoside F1,Terpenoid,Triterpenoid,Triterpenoid saponin
+Glycerol Tri-n-octanoate - 40.0 eV,Glycerol Tri-n-octanoate - 40.0 eV,Glycerolipid,Triacylglycerol,NA
+Hydroperoxy fatty acid (18:3),Hydroperoxy fatty acid (18:3),Fatty acid,Fatty acid,NA
+Iloprost,Iloprost,Terpenoid,Diterpenoid,Prostanoid analog
+Lanosterol,Lanosterol,Terpenoid,Triterpenoid,Sterol precursor
+LPC(16:0),,Glycerophospholipid,Lysophosphatidylcholine,
+LPC(16:0/0:0),,Glycerophospholipid,Lysophosphatidylcholine,NA
+LPC(18:3),LPC(18:3),Glycerophospholipid,Glycerophosphocholine,Lysophosphatidylcholine
+LPE(16:0),,Glycerophospholipid,Lysophosphatidylethanolamine,
+Lupenone,Lupenone,Terpenoid,Triterpenoid,Pentacyclic triterpenoid
+Lupeol,Lupeol,Terpenoid,Triterpenoid,Pentacyclic triterpenoid
+Lutein,Lutein,Terpenoid,Tetraterpenoid,Xanthophyll carotenoid
+Luteolin 7-glucoside,Luteolin 7-glucoside,Flavonoid,NA,NA
+Luteolin-4'-O-glucoside,Luteolin-4'-O-glucoside,Flavonoid,NA,NA
+Lycopene,Lycopene,Terpenoid,Tetraterpenoid,Acyclic carotenoid
+Medroxyprogesterone,Medroxyprogesterone,Steroid,Progestogen,NA
+MG(12:0),MG(12:0),Glycerolipid,Monoacylglycerol,NA
+MG(16:0),,Glycerolipid,Monoacylglycerol,
+MG(16:1),,Glycerolipid,Monoacylglycerol,NA
+MG(18:0),,Glycerolipid,Monoacylglycerol,
+MG(18:1),,Glycerolipid,Monoacylglycerol,NA
+MG(18:2),,Glycerolipid,Monoacylglycerol,
+MG(18:3),,Glycerolipid,Monoacylglycerol,NA
+MG(20:4),,Glycerolipid,Monoacylglycerol,
+MGDG(16:0/18:1),,Glycerolipid,Monogalactosyldiacylglycerol,Monogalactosyldiacylglycerol
+MGDG(16:0/18:3),,Glycerolipid,Monogalactosyldiacylglycerol,
+MGDG(18:2/18:2),,Glycerolipid,Monogalactosyldiacylglycerol,Monogalactosyldiacylglycerol
+MGDG(18:2/18:3),,Glycerolipid,Monogalactosyldiacylglycerol,
+MGDG(18:3/18:3),,Glycerolipid,Monogalactosyldiacylglycerol,Monogalactosyldiacylglycerol
+NAE(16:0),NAE(16:0),Fatty acid,Fatty acid,N-acylethanolamine
+NAE(18:0),NAE(18:0),Fatty acid,Fatty acid,N-acylethanolamine
+NCGC00164361-03!decanedioic acid,NCGC00164361-03!decanedioic acid,Terpenoid,Sesterterpenoid,Unclassified sesterterpenoid
+NCGC00380283-01!4-[5-[[4-[5-[acetyl(hydroxy)amino]pentylamino]-4-oxobutanoyl]-hydroxyamino]pentylamino]-4-oxobutanoic acid,NCGC00380283-01!4-[5-[[4-[5-[acetyl(hydroxy)amino]pentylamino]-4-oxobutanoyl]-hydroxyamino]pentylamino]-4-oxobutanoic acid,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
+"NCGC00385123-01_C22H30O6_7b,9-Dihydroxy-3-(hydroxymethyl)-1,1,6,8-tetramethyl-5-oxo-1,1a,1b,4,4a,5,7a,7b,8,9-decahydro-9aH-cyclopropa[3,4]benzo[1,2-e]azulen-9a-yl acetate","NCGC00385123-01_C22H30O6_7b,9-Dihydroxy-3-(hydroxymethyl)-1,1,6,8-tetramethyl-5-oxo-1,1a,1b,4,4a,5,7a,7b,8,9-decahydro-9aH-cyclopropa[3,4]benzo[1,2-e]azulen-9a-yl acetate",Terpenoid,Diterpenoid,NA
+Nostoxanthin,Nostoxanthin,Terpenoid,Tetraterpenoid,Hydroxylated carotenoid
+Ophiobolin A,Ophiobolin A,Terpenoid,Sesterterpenoid,Fungal metabolite
+Oxandrolone,Oxandrolone,Steroid,Androgen,NA
+Oxo fatty acid (18:3),Oxo fatty acid (18:3),Fatty acid,Fatty acid,NA
+PA(16:0/18:1),,Glycerophospholipid,Phosphatidic acid,NA
+PA(16:0/18:2),,Glycerophospholipid,Phosphatidic acid,
+PA(16:0/18:2)),,Glycerophospholipid,Phosphatidic acid,NA
+Panaxcerol B,,Glycerolipid,Monoacylglycerol,NA
+PC(14:0/14:0),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(14:0/18:0),,Glycerophospholipid,Phosphatidylcholine,
+PC(14:0/18:2),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(14:0/18:3),,Glycerophospholipid,Phosphatidylcholine,
+PC(14:0/20:4),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(14:0/22:5),,Glycerophospholipid,Phosphatidylcholine,
+PC(14:0/22:6),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(16:0/16:0),,Glycerophospholipid,Phosphatidylcholine,
+PC(16:0/18:0),,Glycerophospholipid,Phosphatidylcholine,NA
+PC(16:0/18:1),,Glycerophospholipid,Phosphatidylcholine,
+PC(16:0/18:2),,Glycerophospholipid,Phosphatidylcholine,NA
+PC(16:0/18:3),,Glycerophospholipid,Phosphatidylcholine,
+PC(16:0/20:1),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(16:0/20:3),,Glycerophospholipid,Phosphatidylcholine,
+PC(16:0/20:4),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(16:0/20:5),,Glycerophospholipid,Phosphatidylcholine,
+PC(16:0/22:5),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(16:0/22:6),,Glycerophospholipid,Phosphatidylcholine,
+PC(16:1/16:1),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(16:1/18:2),,Glycerophospholipid,Phosphatidylcholine,
+PC(16:1/20:4),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(16:1/20:5),,Glycerophospholipid,Phosphatidylcholine,
+PC(16:2/16:1),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(18:0/18:1),,Glycerophospholipid,Phosphatidylcholine,
+PC(18:0/18:2),,Glycerophospholipid,Phosphatidylcholine,NA
+PC(18:0/18:3),,Glycerophospholipid,Phosphatidylcholine,
+PC(18:0/20:2),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(18:0/20:3),,Glycerophospholipid,Phosphatidylcholine,
+PC(18:0/20:4),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(18:1/14:0),,Glycerophospholipid,Phosphatidylcholine,
+PC(18:1/16:0),,Glycerophospholipid,Phosphatidylcholine,NA
+PC(18:1/18:1),,Glycerophospholipid,Phosphatidylcholine,
+PC(18:1/18:2),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(18:1/20:1),,Glycerophospholipid,Phosphatidylcholine,
+PC(18:1/20:4),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(18:1/22:1),,Glycerophospholipid,Phosphatidylcholine,
+PC(18:1/24:0),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(18:1/24:1),,Glycerophospholipid,Phosphatidylcholine,
+PC(18:2),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(18:2/18:2),,Glycerophospholipid,Phosphatidylcholine,
+PC(18:2/20:0),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(18:2/20:4),,Glycerophospholipid,Phosphatidylcholine,
+PC(18:3),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(18:3/18:3),,Glycerophospholipid,Phosphatidylcholine,
+PC(22:0),,Glycerophospholipid,Glycerophosphocholine,Phosphatidylcholine
+PC(22:1/22:1),,Glycerophospholipid,Phosphatidylcholine,NA
+PE(12:0/12:0),,Glycerophospholipid,Phosphatidylethanolamine,
+PE(14:0/22:6),,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
+PE(16:0),,Glycerophospholipid,Phosphatidylethanolamine,
+PE(16:0/18:0),,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
+PE(16:0/18:1),,Glycerophospholipid,Phosphatidylethanolamine,
+PE(16:0/18:2),,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
+PE(16:0/18:3),,Glycerophospholipid,Phosphatidylethanolamine,
+PE(16:0/20:4),,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
+PE(16:0/20:5),,Glycerophospholipid,Phosphatidylethanolamine,
+PE(16:1/18:2),,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
+PE(18:0/18:1),,Glycerophospholipid,Phosphatidylethanolamine,
+PE(18:0/18:2),,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
+PE(18:0/18:3),,Glycerophospholipid,Phosphatidylethanolamine,
+PE(18:1/18:1),,Glycerophospholipid,Phosphatidylethanolamine,NA
+PE(18:1/18:2),,Glycerophospholipid,Phosphatidylethanolamine,
+PE(18:2/18:2),,Glycerophospholipid,Glycerophosphoethanolamine,Phosphatidylethanolamine
+PE(18:2/18:3),,Glycerophospholipid,Phosphatidylethanolamine,
+PE(18:3/18:3),,Glycerophospholipid,Phosphatidylethanolamine,NA
+PG(16:0/16:0),,Glycerophospholipid,Phosphatidylglycerol,
+PG(16:0/18:0),,Glycerophospholipid,Phosphatidylglycerol,NA
+PG(16:0/18:1),,Glycerophospholipid,Phosphatidylglycerol,
+PG(18:0/16:0),,Glycerophospholipid,Phosphatidylglycerol,
+Pheophorbide a,Pheophorbide a,Tetrapyrrole,Chlorophyll/derivative,NA
+Pheophytin a,Pheophytin a,Tetrapyrrole,Chlorophyll/derivative,NA
+Phytosphingosine,Phytosphingosine,Sphingolipid,Sphingolipid,NA
+Protopanaxadiol,Protopanaxadiol,Terpenoid,Triterpenoid,NA
+PS(18:0/18:2),,Glycerophospholipid,Phosphatidylserine,
+PS(18:0/20:4),,Glycerophospholipid,Phosphatidylserine,
+Schaftoside,Schaftoside,Flavonoid,NA,Phosphatidylserine
+Scutellarein tetramethyl ether,Scutellarein tetramethyl ether,Flavonoid,Flavonoid derivative,NA
+SM(d18:1/17:0),SM(d18:1/17:0),Sphingolipid,Sphingolipid,Sphingomyelin
+SPB 18:0;2OH,SPB 18:0;2OH,Sphingolipid,Sphingolipid,NA
+SPHINGANINE,SPHINGANINE,Sphingolipid,Sphingolipid,NA
+SQDG(16:0/14:0),,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
+SQDG(16:0/16:0),,Glycerolipid,Sulfoquinovosyldiacylglycerol,
+SQDG(16:0/18:0),,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
+SQDG(16:0/18:1),,Glycerolipid,Sulfoquinovosyldiacylglycerol,
+SQDG(16:0/18:2),,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
+SQDG(16:0/18:3),,Glycerolipid,Sulfoquinovosyldiacylglycerol,
+SQDG(16:1/18:3),,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
+SQDG(18:0/18:3),,Glycerolipid,Sulfoquinovosyldiacylglycerol,
+SQDG(18:1/18:3),,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
+SQDG(18:2/18:3),,Glycerolipid,Sulfoquinovosyldiacylglycerol,
+SQDG(18:3/18:3),,Glycerolipid,Sulfoquinovosyldiacylglycerol,SQDG
+Sumaresinolic acid,Sumaresinolic acid,Terpenoid,Triterpenoid,NA
+TG(10:0/10:0/10:0),,Glycerolipid,Triacylglycerol,NA
+TG(10:0/10:0/14:0),,Glycerolipid,Triacylglycerol,
+TG(10:0/12:0/14:0),,Glycerolipid,Triacylglycerol,NA
+TG(10:0/12:0/16:0),,Glycerolipid,Triacylglycerol,
+TG(10:0/14:0/16:0),,Glycerolipid,Triacylglycerol,TG
+TG(10:0/16:0/16:0),,Glycerolipid,Triacylglycerol,
+TG(10:0/16:1/18:1),,Glycerolipid,Triacylglycerol,TG
+TG(12:0/12:0/12:0),,Glycerolipid,Triacylglycerol,
+TG(12:0/12:0/14:0),,Glycerolipid,Triacylglycerol,TG
+TG(12:0/12:0/16:1),,Glycerolipid,Triacylglycerol,
+TG(12:0/12:0/18:1),,Glycerolipid,Triacylglycerol,TG
+TG(12:0/12:0/18:2),,Glycerolipid,Triacylglycerol,
+TG(12:0/14:0/16:0),,Glycerolipid,Triacylglycerol,TG
+TG(12:0/14:0/18:1),,Glycerolipid,Triacylglycerol,
+TG(12:0/14:0/18:3),,Glycerolipid,Triacylglycerol,NA
+TG(12:0/16:0/16:0),,Glycerolipid,Triacylglycerol,
+TG(12:0/16:0/18:1),,Glycerolipid,Triacylglycerol,TG
+TG(12:0/16:0/18:2),,Glycerolipid,Triacylglycerol,
+TG(12:0/16:0/18:3),,Glycerolipid,Triacylglycerol,TG
+TG(12:0/18:1/18:1),,Glycerolipid,Triacylglycerol,
+TG(12:0/18:1/18:2),,Glycerolipid,Triacylglycerol,TG
+TG(12:0/18:1/18:3),,Glycerolipid,Triacylglycerol,
+TG(12:0/18:2/18:3),,Glycerolipid,Triacylglycerol,TG
+TG(14:0/14:0/16:0),,Glycerolipid,Triacylglycerol,
+TG(14:0/14:0/16:1),,Glycerolipid,Triacylglycerol,TG
+TG(14:0/14:0/18:0),,Glycerolipid,Triacylglycerol,
+TG(14:0/14:1/18:1),,Glycerolipid,Triacylglycerol,TG
+TG(14:0/16:0/16:0),,Glycerolipid,Triacylglycerol,
+TG(14:0/16:0/18:1),,Glycerolipid,Triacylglycerol,TG
+TG(14:0/16:0/18:2),,Glycerolipid,Triacylglycerol,
+TG(14:0/16:1/18:2),,Glycerolipid,Triacylglycerol,TG
+TG(14:0/16:1/22:6),,Glycerolipid,Triacylglycerol,
+TG(14:0/18:1/18:1),,Glycerolipid,Triacylglycerol,TG
+TG(14:0/18:1/18:2),,Glycerolipid,Triacylglycerol,
+TG(14:0/18:1/18:3),,Glycerolipid,Triacylglycerol,TG
+TG(14:0/18:2/18:3),,Glycerolipid,Triacylglycerol,
+TG(14:0/18:3/18:3),,Glycerolipid,Triacylglycerol,TG
+TG(16:0/16:0/16:0),,Glycerolipid,Triacylglycerol,
+TG(16:0/16:0/18:1),,Glycerolipid,Triacylglycerol,TG
+TG(16:0/16:0/18:2),,Glycerolipid,Triacylglycerol,
+TG(16:0/16:0/20:1),,Glycerolipid,Triacylglycerol,TG
+TG(16:0/16:0/20:3),,Glycerolipid,Triacylglycerol,
+TG(16:0/18:0/18:2),,Glycerolipid,Triacylglycerol,TG
+TG(16:0/18:0/22:1),,Glycerolipid,Triacylglycerol,
+TG(16:0/18:1/18:1),,Glycerolipid,Triacylglycerol,TG
+TG(16:0/18:1/18:2),,Glycerolipid,Triacylglycerol,
+TG(16:0/18:1/18:3),,Glycerolipid,Triacylglycerol,TG
+TG(16:0/18:1/20:0),,Glycerolipid,Triacylglycerol,
+TG(16:0/18:1/20:1),,Glycerolipid,Triacylglycerol,TG
+TG(16:0/18:1/20:2),,Glycerolipid,Triacylglycerol,
+TG(16:0/18:1/22:0),,Glycerolipid,Triacylglycerol,TG
+TG(16:0/18:1/22:1),,Glycerolipid,Triacylglycerol,
+TG(16:0/18:2/18:3),,Glycerolipid,Triacylglycerol,TG
+TG(16:0/18:2/22:0),,Glycerolipid,Triacylglycerol,
+TG(16:0/18:3/18:3),,Glycerolipid,Triacylglycerol,TG
+TG(16:1/16:1/22:5),,Glycerolipid,Triacylglycerol,
+TG(16:1/18:1/18:1),,Glycerolipid,Triacylglycerol,TG
+TG(16:1/20:1/20:2),,Glycerolipid,Triacylglycerol,
+TG(16:1/20:1/22:1),,Glycerolipid,Triacylglycerol,TG
+TG(18:0/18:0/18:2),,Glycerolipid,Triacylglycerol,
+TG(18:0/18:0/20:1),,Glycerolipid,Triacylglycerol,TG
+TG(18:0/18:1/18:2),,Glycerolipid,Triacylglycerol,
+TG(18:0/18:1/22:0),,Glycerolipid,Triacylglycerol,TG
+TG(18:0/18:2/18:2),,Glycerolipid,Triacylglycerol,
+TG(18:0/18:2/18:3),,Glycerolipid,Triacylglycerol,TG
+TG(18:0/18:2/20:1),,Glycerolipid,Triacylglycerol,
+TG(18:0/18:2/22:0),,Glycerolipid,Triacylglycerol,TG
+TG(18:1/18:1/18:1),,Glycerolipid,Triacylglycerol,
+TG(18:1/18:1/18:2),,Glycerolipid,Triacylglycerol,TG
+TG(18:1/18:1/20:3),,Glycerolipid,Triacylglycerol,
+TG(18:1/18:2/18:2),,Glycerolipid,Triacylglycerol,TG
+TG(18:1/18:2/18:3),,Glycerolipid,Triacylglycerol,
+TG(18:1/18:2/22:0),,Glycerolipid,Triacylglycerol,TG
+TG(18:1/18:3/22:0),,Glycerolipid,Triacylglycerol,
+TG(18:1/20:0/22:1),,Glycerolipid,Triacylglycerol,NA
+TG(18:1/20:1/22:1),,Glycerolipid,Triacylglycerol,TG
+TG(18:1/20:3/22:0),,Glycerolipid,Triacylglycerol,
+TG(18:2/18:2/18:4),,Glycerolipid,Triacylglycerol,TG
+TG(18:2/18:2/20:2),,Glycerolipid,Triacylglycerol,
+TG(18:2/18:2/22:1),,Glycerolipid,Triacylglycerol,TG
+TG(18:2/18:3/20:1),,Glycerolipid,Triacylglycerol,
+TG(18:2/18:3/20:3),,Glycerolipid,Triacylglycerol,TG
+TG(18:2/18:3/22:1),,Glycerolipid,Triacylglycerol,
+TG(18:2/20:2/22:2),,Glycerolipid,Triacylglycerol,TG
+TG(18:2/20:3/21:0),,Glycerolipid,Triacylglycerol,
+TG(18:2/20:3/22:0),,Glycerolipid,Triacylglycerol,TG
+TG(18:2/22:0/22:3),,Glycerolipid,Triacylglycerol,
+TG(18:3/18:3/18:3),,Glycerolipid,Triacylglycerol,TG
+TG(18:3/18:3/20:3),,Glycerolipid,Triacylglycerol,
+TG(8:0/10:0/10:0),,Glycerolipid,Triacylglycerol,TG
+TG(8:0/16:1/18:1),,Glycerolipid,Triacylglycerol,
+trans-EKODE-(E)-Ib,trans-EKODE-(E)-Ib,Fatty acid,Fatty acid,Oxylipin
+Ubidecarenone,Ubidecarenone,Prenol,Prenol,NA
+Ubiquinone 9,Ubiquinone 9,Prenol,Prenol,NA
+Vitamin K1,Vitamin K1,Prenol,Prenol,Vitmain
+Zeaxanthin,Zeaxanthin,Terpenoid,Tetraterpenoid,Xanthophyll carotenoid

@@ -1,8 +1,11 @@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-################################################################################
-#### SOrghum Lipidomics Database (SOLD)
-################################################################################
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+###############################################################################
+###############################################################################
+## Figures
+##   Figure S1 – Glycerolipid and Glycerophosphlipid species table
+##   Table S2 – Lipid Class table
+###############################################################################
+###############################################################################
+
 
 ################################################################################
 ################################################################################
@@ -40,7 +43,7 @@ valid_classes <- c("TG","DG","MG",
                    "PC","PE","PI",
                    "DGDG","MGDG",
                    "SQDG","SM","AEG",
-                   "LPC","LPE","PG","PA","Cer","GalCer","FA")
+                   "LPC","LPE","PG","PA","Cer","GalCer","FA","PS")
 
 class_pat <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
 
@@ -84,23 +87,8 @@ classes_all <- sort(unique(pct_mean$Class))
 pal          <- viridis(length(classes_all), option = "D")
 names(pal)   <- classes_all
 
-nature_theme <- theme_minimal(base_size = 14) +
-  theme(
-    plot.title = element_text(size = 14, face = "bold", hjust = 0.5, 
-                              margin = margin(b = 10)),  # Title styling
-    axis.title = element_text(size = 12, face = "bold"),
-    axis.text = element_text(color = "black"),  # Ensure axis labels are visible
-    axis.text.y = element_text(face = "bold", hjust = 1),  # Bold class names
-    axis.line = element_line(color = "black"),  # Add axis lines
-    panel.grid = element_blank(),  # Remove all grid lines
-    legend.position = "top",
-    legend.title = element_blank(),  # Remove legend title
-    legend.text = element_text(size = 10),
-    plot.margin = margin(15, 15, 15, 15)  # Balanced white space
-  )
 
-
-nature_theme <- theme_minimal(base_size = 16) +
+plot_theme <- theme_minimal(base_size = 16) +
   theme(
     plot.title     = element_text(
       size   = 14,
@@ -109,19 +97,19 @@ nature_theme <- theme_minimal(base_size = 16) +
       margin = margin(b = 10)
     ),
     axis.title.x   = element_text(
-      size = 16,      # X‐axis title size
+      size = 18,      # X‐axis title size
       face = "bold"
     ),
     axis.title.y   = element_text(
-      size = 16,      # Y‐axis title size
+      size = 18,      # Y‐axis title size
       face = "bold"
     ),
     axis.text.x    = element_text(
-      size = 16,      # X‐axis tick label size
+      size = 18,      # X‐axis tick label size
       color = "black"
     ),
     axis.text.y    = element_text(
-      size = 16,      # Y‐axis tick label size
+      size = 18,      # Y‐axis tick label size
       color = "black"
     ),
     axis.line      = element_line(color = "black"),
@@ -162,7 +150,7 @@ p_bar <- ggplot(pct_mean,
         axis.text.y    = element_text(face = "bold", size = 16),  # enlarge y‐axis tick labels
         axis.title.x   = element_text(face = "bold", size = 16)   # enlarge x‐axis label
   ) + 
-  nature_theme
+  plot_theme
 
 ###############################################################################
 # 6.  NUMERIC TABLE  +  COLOUR SWATCH COLUMN FOR LEGENDS
@@ -199,9 +187,9 @@ tg <- tableGrob(
   tbl,
   rows = NULL,
   theme = ttheme_minimal(
-    base_size = 14,
-    core = list(fg_params = list(fontsize = 14, hjust = 0.5)),
-    colhead = list(fg_params = list(fontsize = 14, fontface = "bold"))
+    base_size = 16,
+    core = list(fg_params = list(fontsize = 16, hjust = 0.5)),
+    colhead = list(fg_params = list(fontsize = 16, fontface = "bold"))
   )
 )
 
@@ -237,7 +225,7 @@ grid::grid.draw(fig1a)
 # 8.  SAVE THE PLOT
 ###############################################################################
 
-ggsave("fig/main/Fig1a_lipid_species.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
+ggsave("fig/main/Fig1a_TIC_lipid_species.png",fig1a, width = 24, height = 8, units = "in", bg = "white")
 #ggsave("SuppFig_TIC_PC_PA_PE_PG_PS.png",fig1a, width = 21, height = 8, units = "in", bg = "white")
 
 
@@ -318,13 +306,13 @@ p_sc <- ggplot(pct_SC_mean,
                      breaks  = seq(0,100,25),
                      labels  = function(x) paste0(x, "%")) +
   labs(x = "% of TIC", y = NULL) +
-  theme_classic(base_size = 14) +
+  theme_classic(base_size = 16) +
   theme(axis.line.x = element_line(size = .4),
         axis.line.y = element_line(size = .4),
         axis.text.x    = element_text(face = "bold", size = 14),  # enlarge x‐axis tick labels
         axis.text.y    = element_text(face = "bold", size = 14),  # enlarge y‐axis tick labels
         axis.title.x   = element_text(face = "bold", size = 16)) +  # enlarge x‐axis label)
-  nature_theme
+  plot_theme
 
 
 ### Numeric table + color swatch for legends
@@ -355,8 +343,8 @@ tg_sc <- tableGrob(
   tbl_sc, rows = NULL,
   theme = ttheme_minimal(
     base_size = 14,
-    core    = list(fg_params = list(fontsize = 14, hjust = 0.5)),
-    colhead = list(fg_params = list(fontsize = 14, fontface = "bold"))
+    core    = list(fg_params = list(fontsize = 16, hjust = 0.5)),
+    colhead = list(fg_params = list(fontsize = 16, fontface = "bold"))
   )
 )
 
@@ -387,9 +375,9 @@ grid::grid.draw(fig1b)
 
 
 ### Save the plot
-ggplot2::ggsave("fig/supp/SuppFig4A_lipid_class.png",
+ggplot2::ggsave("fig/supp/SuppFig4A_TIC_lipid_class.png",
                 fig1b,
-                width = 21, height = 8, units = "in", bg = "white")
+                width = 24, height = 8, units = "in", bg = "white")
 
 
 
@@ -401,7 +389,7 @@ ggplot2::ggsave("fig/supp/SuppFig4A_lipid_class.png",
 ###############################################################################
 
 ### Load the class dictionary with Super- & SubClass info
-lipid_info <- vroom("data/lipid_class/final_lipid_classes.csv",
+lipid_info <- vroom("data/lipid_class/glycero_phospho_class.csv",
                     show_col_types = FALSE) %>%
   filter(!is.na(SubClass)) %>% 
   transmute(Lipid = Lipids,
@@ -487,11 +475,14 @@ make_class_panel <- function(df, cls, label_thresh = 3) {
       labels = function(x) paste0(x,"%")
     ) +
     labs(title = cls, x = NULL, y = NULL) +
-    theme_classic(base_size = 14) +
+    theme_classic(base_size = 18) +
     theme(
       plot.title   = element_text(face="bold", hjust=.5),
       axis.text    = element_text(size=12)
-    )
+    ) +
+    theme(legend.position = "none") +
+    plot_theme
+  
   
   # 4) numeric table with <0.1% formatting
   tbl <- dat %>%
@@ -545,19 +536,39 @@ make_class_panel <- function(df, cls, label_thresh = 3) {
   )
 }
 
+classes_all <- c("Glycerophospholipid")
 
 # ── 8. BUILD ALL PANELS ───────────────────────────────────────────────────────
 panel_list <- lapply(classes_all, make_class_panel, df = pct_mean)
 
-# ── 9. DISPLAY (e.g. 2 columns) ───────────────────────────────────────────────
-quartz()
-grid.arrange(grobs = panel_list, ncol = 2)
-
-quartz()
-
-#save
-ggsave("fig/supp/SuppFig5_lipid_class_subclass.png",
-       arrangeGrob(grobs = panel_list, ncol = 2),
-       width = 40, height = 16, units = "in", bg = "white")
+# 9. Capture the multi‐panel layout
+multi_panel <- arrangeGrob(grobs = panel_list, ncol = 1)
+quartz()   
+grid::grid.draw(multi_panel)
 
 
+# 10. Save to file
+ggsave("fig/supp/SuppFig4B_TIC_Glycerophospholipid_panels.png", 
+       multi_panel,
+       width = 24,    # adjust to your desired width
+       height = 8,    # and height
+       dpi = 300)
+
+
+classes_all <- c("Glycerolipid")
+
+# ── 8. BUILD ALL PANELS ───────────────────────────────────────────────────────
+panel_list <- lapply(classes_all, make_class_panel, df = pct_mean)
+
+# 9. Capture the multi‐panel layout
+multi_panel <- arrangeGrob(grobs = panel_list, ncol = 1)
+quartz()   
+grid::grid.draw(multi_panel)
+
+
+# 10. Save to file
+ggsave("fig/supp/SuppFig4C_TIC_Glycerolipid_panels.png", 
+       multi_panel,
+       width = 24,    # adjust to your desired width
+       height = 8,    # and height
+       dpi = 300)

@@ -18,11 +18,11 @@ library(ggh4x)
 # ╚══════════════════════════════════════════════════════════════════╝
 
 # Read the raw files 
-control  <- vroom("data/SPATS_fitted/non_normalized_intensities/control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
+control  <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_control_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
 colnames(control)[1] <- "Compound_Name"  
 
 
-lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
+lowinput  <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>% dplyr::select(-c(2,3,4))
 colnames(lowinput)[1] <- "Compound_Name"  
 
 
@@ -361,7 +361,7 @@ p_nested <- ggplot(ratio_long2, aes(Condition, Value, fill = Condition, colour =
 quartz(width = 12, height = 6)
 print(p_nested)
 
-ggsave("nested_lipid_remodeling_analysis.png", p_nested,
+ggsave("nested_lipid_remodeling_analysis2.png", p_nested,
        width = 16, height = 6, units = "in", dpi = 300, bg = "white")
 
 
@@ -446,7 +446,7 @@ p_nested2 <- ggplot(ratio_long3, aes(Condition, Value, fill = Condition, colour 
 
 quartz(width = 12, height = 6)
 print(p_nested2)
-ggsave("nested_lipid_turnover_analysis.png", p_nested2,
+ggsave("nested_lipid_turnover_analysis2.png", p_nested2,
        width = 12, height = 6, units = "in", dpi = 300, bg = "white")
 
 
@@ -522,13 +522,13 @@ p_nested3 <- ggplot(ratio_long4, aes(Condition, Value, fill = Condition, colour 
     panel.grid.major.y = element_line(colour   ="grey90"),
     panel.grid.major.x = element_blank(),
     legend.position    = "none",
-    plot.title         = element_text(hjßust   =0.5, face   ="plain", size   =14)
+    plot.title         = element_text(hjust   =0.5, face   ="plain", size   =14)
   ) +
   ggtitle("Carbon sink and allocation")
 
 quartz(width = 12, height = 6)
 print(p_nested3)
-ggsave("nested_lipid_carbon_analysis.png", p_nested3,
+ggsave("nested_lipid_carbon_analysis2.png", p_nested3,
        width = 10, height = 6, units = "in", dpi = 300, bg = "white")
 
 
