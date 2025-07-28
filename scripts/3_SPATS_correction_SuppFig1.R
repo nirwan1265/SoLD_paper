@@ -28,6 +28,11 @@ raw <- read.csv(
   stringsAsFactors = FALSE, check.names = FALSE
 ) %>% dplyr::select(-c(2:13))
 
+
+
+
+
+
 # transpose to get lines as rows, compounds as columns
 pheno_mat <- as.data.frame(t(raw), stringsAsFactors = FALSE)
 # first row of that (the original header) becomes column names

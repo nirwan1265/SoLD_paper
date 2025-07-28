@@ -36,18 +36,18 @@ lowinput <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_low
 
 
 # Valid classes
-# valid_classes <- c("DGDG","MGDG",
-#                    "TG","DG","MG",
-#                    "PC","PE",
-#                    "SQDG",
-#                    "LPC","LPE","PG","PA","PS"
-#                    )
+valid_classes <- c("DGDG","MGDG",
+                   "TG","DG","MG",
+                   "PC","PE",
+                   "SQDG",
+                   "LPC","LPE","PG"
+                   )
 
-valid_classes <- c("TG","DG","MG",
-                   "PC","PE","PI",
-                   "DGDG","MGDG",
-                   "SQDG","SM","AEG",
-                   "LPC","LPE","PG","PA","PS","Cer","Gal")
+# valid_classes <- c("TG","DG","MG",
+#                    "PC","PE","PI",
+#                    "DGDG","MGDG",
+#                    "SQDG","SM","AEG",
+#                    "LPC","LPE","PG","PA","PS","Cer","Gal")
 class_pat <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
 
 # ╔══════════════════════════════════════════════════════════════════╗

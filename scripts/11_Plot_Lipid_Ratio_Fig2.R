@@ -86,7 +86,7 @@ wide_log <- long_all %>%
   pivot_wider(names_from = Class, values_from = class_log,
               values_fill = NA_real_)
 
-wide_log <- wide_log[,-3]
+#wide_log <- wide_log[,-3]
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 4)  COMPUTE CLASS-PAIR                                           ║
 # ╚══════════════════════════════════════════════════════════════════╝
@@ -97,39 +97,66 @@ ratio_tbl <- wide_log %>%
     
     ### Membrane Lipid remodeling
     
-    ## 1. Sulfolipid Adjustments
-    #SQDG is the most vulnerable lipid:
-    SQDG_PC    = SQDG - PC,
-    SQDG_PG    = SQDG - PG,
-    SQDG_DGDG  = SQDG - DGDG, # Anionic lipid trade-offs
-    SQDG_MGDG  = SQDG - MGDG, 
-    SQDG_total = SQDG - ((DGDG + MGDG) / 2), # Sulfur allocation balance
+    # ## 1. Sulfolipid Adjustments
+    # #SQDG is the most vulnerable lipid:
+    # SQDG_PC    = SQDG - PC,
+    # SQDG_PG    = SQDG - PG,
+    # SQDG_DGDG  = SQDG - DGDG, # Anionic lipid trade-offs
+    # SQDG_MGDG  = SQDG - MGDG, 
+    # SQDG_total = SQDG - ((DGDG + MGDG) / 2), # Sulfur allocation balance
     
+    # VIP
     
-    ## 2. Galactolipid Dynamics
-    #MGDG is preferentially degraded:
-    MGDG_DGDG  = MGDG - DGDG, # Monogalactosyl vs. digalactosyl balance (bilayer vs. non-bilayer)
-    MGDG_PC    = MGDG - PC,
-    MGDG_total = MGDG - ((DGDG + SQDG) / 2), # Absolute monogalactolipid shift
-    
-    # DGDG is partially spared but outcompeted by phospholipids:
-    DGDG_total = DGDG - ((MGDG + SQDG) / 2), # Absolute digalactolipid shift
-    DGDG_PC    = DGDG - PC, #  Tests phospholipid replacement capacity under P stress
-    DGDG_PE    = DGDG - PE, #  Tests phospholipid replacement capacity under P stress
-    DGDG_PG    = DGDG - PG, #  Assess photosynthetic membrane integrity
+    MG_SQDG    = MG - SQDG, # Monogalactosyl vs. sulfolipid balance
+    PG_SQDG    = PG - SQDG, # Phosphatidylglycerol vs. sulfolipid balance
+    PE_SQDG    = PE - SQDG, # Phosphatidylethanolamine vs. sulfolipid balance
+    DGDG_SQDG  = DGDG - SQDG, # Digalactosyl vs. sulfolipid balance
+    PC_SQDG    = PC - SQDG, # Phosphatidylcholine vs. sulfolipid balance
+    SQDG_TG    = SQDG - TG, # Sulfolipid vs. storage lipid balance
     
     
     
-    ## 3. Phospholipid Homeostasis
-    PC_PE        = PC - PE, # Major bilayer asymmetry
-    PC_PG        = PC - PG,
-    PC_PS        = PC - PS, # Phosphatidylserine balance
-    PE_PS        = PE - PS, # Phosphatidylserine balance
+    # ## 2. Galactolipid Dynamics
+    # #MGDG is preferentially degraded:
+    # MGDG_DGDG  = MGDG - DGDG, # Monogalactosyl vs. digalactosyl balance (bilayer vs. non-bilayer)
+    # MGDG_PC    = MGDG - PC,
+    # MGDG_total = MGDG - ((DGDG + SQDG) / 2), # Absolute monogalactolipid shift
+    
+    # VIP
+    
+    MG_MGDG  = MGDG - MG, # Monogalactosyl vs. monogalactolipid balance
+    DGDG_MG  = DGDG - MGDG, # Digalactosyl vs. monogalactolipid balance
+    
+    
+    # # DGDG is partially spared but outcompeted by phospholipids:
+    # DGDG_total = DGDG - ((MGDG + SQDG) / 2), # Absolute digalactolipid shift
+    # DGDG_PC    = DGDG - PC, #  Tests phospholipid replacement capacity under P stress
+    # DGDG_PE    = DGDG - PE, #  Tests phospholipid replacement capacity under P stress
+    # DGDG_PG    = DGDG - PG, #  Assess photosynthetic membrane integrity
+    
+    
+    
+    # ## 3. Phospholipid Homeostasis
+    # PC_PE        = PC - PE, # Major bilayer asymmetry
+    # PC_PG        = PC - PG,
+    # PC_PS        = PC - PS, # Phosphatidylserine balance
+    # PE_PS        = PE - PS, # Phosphatidylserine balance
+    # PG_retention = PG - ((PC + PE) / 2), # Photosynthetic membrane priority
+    # NonP_Phospho = (MGDG + DGDG + SQDG) - ((PC + PE) / 2), # Non-phospholipid balance
+    # PC_total    = PC - ((PE + PG + PS) / 3), # Phospholipid balance
+    # PE_total    = PE - ((PC + PG + PS) / 3), # Phospholipid balance
+    # PS_total    = PS - ((PC + PE + PG) / 3), # Phospholipid balance
+    # 
+    
+    #VIP
+    
+    PG_PS        = PG - PS, # Phosphatidylglycerol vs. phosphatidylserine balance
+    PC_PS        = PC - PS, # Phosphatidylcholine vs. phosphatidylserine balance
+    PE_PS        = PE - PS, # Phosphatidylethanolamine vs. phosphatidylserine balance
+    PS_TG        = PS - TG, # Phosphatidylserine vs. storage lipid balance
+    PA_PS        = PA - PS, # Phosphatidic acid vs. phosphatidylserine balance
     PG_retention = PG - ((PC + PE) / 2), # Photosynthetic membrane priority
-    NonP_Phospho = (MGDG + DGDG + SQDG) - ((PC + PE) / 2), # Non-phospholipid balance
-    PC_total    = PC - ((PE + PG + PS) / 3), # Phospholipid balance
-    PE_total    = PE - ((PC + PG + PS) / 3), # Phospholipid balance
-    PS_total    = PS - ((PC + PE + PG) / 3), # Phospholipid balance
+    
     
     
     ### Lipid Turnover and Signaling
@@ -184,15 +211,25 @@ ratio_tbl <- wide_log %>%
 ratio_long <- ratio_tbl %>%
   dplyr::select(Sample,Condition,
                 
-                # Sulfolipid Adjustments
-                SQDG_PC, SQDG_PG, SQDG_DGDG, SQDG_MGDG, SQDG_total,
+                # # Sulfolipid Adjustments
+                # SQDG_PC, SQDG_PG, SQDG_DGDG, SQDG_MGDG, SQDG_total,
+                # 
+                # # Galactolipid Dynamics
+                # MGDG_DGDG,  MGDG_PC, MGDG_total, 
+                # DGDG_total,  DGDG_PC, DGDG_PE, DGDG_PG,
+                # 
+                # # Phospholipid Homeostasis
+                # PC_PE, PC_PG, PC_PS, PE_PS, PG_retention, NonP_Phospho, PC_total, PE_total, PS_total,
                 
+                #VIP
+                MG_SQDG, PG_SQDG, PE_SQDG, DGDG_SQDG, PC_SQDG, SQDG_TG,
                 # Galactolipid Dynamics
-                MGDG_DGDG,  MGDG_PC, MGDG_total, 
-                DGDG_total,  DGDG_PC, DGDG_PE, DGDG_PG,
-                
+                MG_MGDG, DGDG_MG,
+                # DGDG_total, DGDG_PC, DGDG_PE, DGDG_PG,
                 # Phospholipid Homeostasis
-                PC_PE, PC_PG, PC_PS, PE_PS, PG_retention, NonP_Phospho, PC_total, PE_total, PS_total,
+                PG_PS, PC_PS, PE_PS, PS_TG, PA_PS, PG_retention,
+                
+                
                 
                 # Diacylglycerol Flux Hub
                 DG_DGDG, DG_MGDG, 
@@ -237,21 +274,30 @@ stat_df <- ratio_long %>%
 # ╚══════════════════════════════════════════════════════════════════╝
 
 ### Membrane Lipid remodeling
-mem_sulfolipid     <- c("SQDG_PC","SQDG_PG","SQDG_DGDG","SQDG_MGDG","SQDG_total")
-mem_galactolipid   <- c("MGDG_DGDG",  "MGDG_PC", "MGDG_total","DGDG_total",  "DGDG_PC", "DGDG_PE", "DGDG_PG" )
-mem_phospholipid   <- c("PC_PE","PC_PG","PC_PS", "PE_PS","PG_retention","NonP_Phospho","PC_total", "PE_total", "PS_total")
+# mem_sulfolipid     <- c("SQDG_PC","SQDG_PG","SQDG_DGDG","SQDG_MGDG","SQDG_total")
+# mem_galactolipid   <- c("MGDG_DGDG",  "MGDG_PC", "MGDG_total","DGDG_total",  "DGDG_PC", "DGDG_PE", "DGDG_PG" )
+# mem_phospholipid   <- c("PC_PE","PC_PG","PC_PS", "PE_PS","PG_retention","NonP_Phospho","PC_total", "PE_total", "PS_total")
 
+# VIP lipid ratios
+mem_sulfolipid <- c("MG_SQDG","PG_SQDG","PE_SQDG","DGDG_SQDG","PC_SQDG","SQDG_TG")
+mem_galactolipid <- c("MG_MGDG","DGDG_MG")
+mem_phospholipid <- c("PG_PS","PC_PS","PE_PS","PS_TG","PA_PS")
 
 ### Lipid Turnover and Signaling
-turn_diacylglycerol<- c("DG_DGDG", "DG_MGDG","DG_PC","DG_PE","DG_Phospho","DG_SQDG")
-turn_lysophospho   <- c("LPC_PC","LPE_PE","Lyso_activity")
+# turn_diacylglycerol<- c("DG_DGDG", "DG_MGDG","DG_PC","DG_PE","DG_Phospho","DG_SQDG")
+# turn_lysophospho   <- c("LPC_PC","LPE_PE","Lyso_activity")
 
-
+# VIP lipid ratios
+turn_diacylglycerol <- c("DG_MG","DG_PG","DG_PE","DG_SQDG","DG_TG","LPC_TG")
+turn_lysophospho <- c("LPC_MG","LPE_SQDG","LPC_LPE","LPE_MGDG","DG_LPE","LPC_PE","LPC_PG","LPC_TG")
 
 ### Carbon sink and allocation
+# carbon_storage     <- c("TG_DG","TG_Galacto", "TG_Phospho","DG_to_Gala","")
+# carbon_photo       <- c( "Storage_vs_Photo","Storage_vs_Membrane")
+
+# VIP lipid ratios
 carbon_storage     <- c("TG_DG","TG_Galacto", "TG_Phospho","DG_to_Gala")
 carbon_photo       <- c( "Storage_vs_Photo","Storage_vs_Membrane")
-
 
 
 # ╔══════════════════════════════════════════════════════════════════╗

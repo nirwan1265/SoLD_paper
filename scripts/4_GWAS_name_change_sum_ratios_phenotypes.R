@@ -59,9 +59,14 @@ low_long  <- reshape_plate(lowinput, "LowInput")
 
 # Remove checks
 ctrl_long <- ctrl_long %>%
-  filter(!str_detect(Sample, "CHECK"))
+  filter(!str_detect(Sample, "^PICHECK"))
+# Change PIPI to just PI
+ctrl_long <- ctrl_long %>%
+  mutate(Sample = str_replace(Sample, "PIPI", "PI"))
+
+# For low_long, remove rows if string count less than 4
 low_long <- low_long %>%
-  filter(!str_detect(Sample, "Check"))
+  filter(str_count(Sample) >= 4)
 
 # Transfrom to wide format
 ctrl_wide <- ctrl_long %>%
@@ -90,19 +95,19 @@ ratio_df_ctrl <- map_dfc(pairs_ctrl, ~ {
   num <- .x[1]; den <- .x[2]
   ctrl_wide[[num]] / ctrl_wide[[den]]
 }) %>% 
-  set_names(map_chr(pairs_ctrl, ~ paste(.x, collapse = "/")))
+  set_names(map_chr(pairs_ctrl, ~ paste(.x, collapse = "_")))
 
 ratio_df_low <- map_dfc(pairs_low, ~ {
   num <- .x[1]; den <- .x[2]
   low_wide[[num]] / low_wide[[den]]
 }) %>% 
-  set_names(map_chr(pairs_low, ~ paste(.x, collapse = "/")))
+  set_names(map_chr(pairs_low, ~ paste(.x, collapse = "_")))
 
 
 # 4) bind the Sample column back on front
 ctrl_wide_ratios <- bind_cols(
   ctrl_wide %>% dplyr::select(Sample),
-  ratio_df
+  ratio_df_ctrl
 )
 low_wide_ratios <- bind_cols(
   low_wide %>% dplyr::select(Sample),
@@ -122,6 +127,6 @@ low_wide_ratios <- low_wide_ratios %>%
 
 
 # Save the results
-write.csv(ctrl_wide_ratios, "data/SPATS_fitted/BLUP_GWAS_phenotype//control_all_lipids_BLUPs_sum_ratios.csv", row.names = FALSE, quote = FALSE)
-write.csv(low_wide_ratios, "data/SPATS_fitted/BLUP_GWAS_phenotype/lowinput_all_lipids_BLUPs_sum_ratios.csv", row.names = FALSE, quote = FALSE)
+write.csv(ctrl_wide_ratios, "data/SPATS_fitted/BLUP_GWAS_phenotype/control_all_lipids_BLUPs_sum_ratios2.csv", row.names = FALSE, quote = FALSE)
+write.csv(low_wide_ratios, "data/SPATS_fitted/BLUP_GWAS_phenotype/lowinput_all_lipids_BLUPs_sum_ratios2.csv", row.names = FALSE, quote = FALSE)
 

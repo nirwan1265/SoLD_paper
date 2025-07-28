@@ -6,18 +6,16 @@ library(purrr)
 
 # List all .txt files in the directory
 
-# All
-# dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation/lowinput/all/"
-# file_list <- list.files(path = dir,pattern = "*.txt")
-
-# Traditional lipids
-dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation_100kb/Traditional_lipids/"
+# Lowinput
+dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/annotation/New Folder With Items/"
 file_list <- list.files(path = dir,pattern = "*.txt")
+file_list <- file_list[25]
+# Select only that start with TG in file_list vector
+file_list <- file_list[str_detect(file_list, "^SQ")]
 
-# Non-Traditional lipids
-dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/annotation/lowinput/Nontraditional_lipids/"
-file_list <- list.files(path = dir,pattern = "*.txt")
-file_list <- file_list[60]
+ 
+
+
 
 # Sums and Ratios
 dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/sum_ratio_BLUP/annotation_100kb/"
@@ -28,7 +26,7 @@ file_list <- list.files(path = dir,pattern = "*.txt")
 
 # Empty vectors
 results <- tibble()          
-p_value_threshold <- 1e-7
+p_value_threshold <- 1e-5
 -log10(p_value_threshold)
 
 # Loop through the files
@@ -61,10 +59,10 @@ for (fp in paste0(dir, file_list)) {
 combined_results <- results %>%
   group_by(Chromosome, gene = GeneID) %>%
   summarise(
-    phenotype        = paste(Phenotype,  collapse = ","),         # order = loop order
-    n_snps           = paste(n_snps,     collapse = ","),
-    best_snp         = paste(best_snp,   collapse = ","),
-    best_pvalue      = paste(best_pval,  collapse = ","),
+    phenotype        = paste(Phenotype,  collapse = ";"),         # order = loop order
+    n_snps           = paste(n_snps,     collapse = ";"),
+    best_snp         = paste(best_snp,   collapse = ";"),
+    best_pvalue      = paste(best_pval,  collapse = ";"),
     phenotype_number = n_distinct(Phenotype),
     .groups          = "drop"
   )
@@ -79,13 +77,13 @@ combined_results <- combined_results %>%
   mutate(
     phenotype = map_chr(phenotype, function(x) {
       # split at commas → clean each piece → paste back
-      str_split(x, ",")[[1]]                   |>
+      str_split(x, ";")[[1]]                   |>
         sub(dir_prefix, "", x = _)             |>  # remove dir prefix
         str_remove("_mod_sub_.*$")             |>  # trim suffix
         unique()                               |>  # de‑duplicate if needed
-        paste(collapse = ",")
+        paste(collapse = ";")
     }),
-    phenotype_number = str_count(phenotype, ",") + 1
+    phenotype_number = str_count(phenotype, ";") + 1
   )
 
 head(combined_results)
@@ -97,7 +95,7 @@ combined_results <- combined_results %>%
 head(combined_results)
 
 # Save the file
-write.table(combined_results, "table/GWAS_results/Sum_ratios_lipids_common_genes_lowinput_individual_logpvalue_7_100kb_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+write.table(combined_results, "table/GWAS_results/gibberellic_acid_Lowinput_common_genes_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 getwd()
 # write.table(combined_results, "table/GWAS_results/11_14_17_Eicosatrienoic_acid__Z_Z_Z___common_genes_lowinput_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 # write.table(combined_results, "table/GWAS_results/gibberellic_acid_common_genes_lowinput_individual_logpvalue_4_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
