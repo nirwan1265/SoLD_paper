@@ -72,11 +72,12 @@
 % % % % % % % % % % % % % % % % % % % % % % % %
 
 \documentclass[10pt,letterpaper]{article}
-\usepackage[top=0.85in,left=2.75in,footskip=0.75in]{geometry}
+\usepackage{textgreek}
 
 % amsmath and amssymb packages, useful for mathematical formulas and symbols
 \usepackage{amsmath,amssymb}
 \usepackage{newunicodechar}
+\newunicodechar{α}{\alpha}
 \newunicodechar{≥}{\geq{}}
 \newunicodechar{Δ}{\Delta}
 \DeclareUnicodeCharacter{03B2}{\textbeta}
@@ -171,8 +172,8 @@
 \usepackage[aboveskip=1pt,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=off]{caption}
 \renewcommand{\figurename}{Fig}
 
-% Use the PLoS provided BiBTeX style
-
+% Use bibliography
+\usepackage[numbers]{natbib}
 
 % Remove brackets from numbering in List of References
 \makeatletter
@@ -571,6 +572,25 @@ In order to reduce the risk of overfitting, a seven-fold cross-validation (CV) a
 For each lipid and genotype, we performed a hierarchical clustering using the \texttt{hclust} function in R.  Before clustering, the lipid intensities were scaled to zero mean and unit variance.  A Euclidean distance matrix was calculated, and the groups were merged according to Ward's minimum variance criterion (Ward.D2).  The dendrograms were rendered with the \texttt{dendextend} package, and two-dimensional clustergrams were generated using the \texttt{ clustergram.R} script.  
 
 
+\subsection*{Random Forest Regression and TreeSHAP–Based Feature Importance Analysis}
+For the purposes of this analysis, raw intensities were subjected to a log\textsubscript{10} transformation and subsequently median-centered. Flowering time (FT) measured in days and plant height (PT) measured in centimeters were assessed from the field of cultivation, with all instances of missing values duly excluded. Genetic principal components (PCs) were derived from SNP genotypes within the Sorghum Association Panel by employing standard principal component analysis (PCA) routines facilitated by the SNPRelate package in R. The principal five PCs, which encapsulate the population structure, were integrated with the lipid and phenotype datasets. Thereafter, both the phenotypic variables and each lipid feature were adjusted for ancestry effects through linear regression residualization based on these PCs.\[
+\begin{aligned}
+P_i &= \alpha + \sum_{m=1}^{M} \beta_m\,PC_{i m} + \varepsilon_i,
+\quad \widetilde{P}_i = \varepsilon_i,\\
+L_{k,i} &= \alpha_k + \sum_{m=1}^{M} \gamma_{k m}\,PC_{i m} + \eta_{k,i},
+\quad \widetilde{L}_{k,i} = \eta_{k,i}.
+\end{aligned}
+\]
+where \(P_i\) is the phenotype (e.g.\ flowering time, plant height) of line \(i\), 
+\(L_{k,i}\) is the abundance of lipid \(k\) in line \(i\), 
+\(PC_{i m}\) are the top \(M\) genetic principal components for line \(i\), 
+and \(\varepsilon_i\) and \(\eta_{k,i}\) are the residuals (structure‑corrected phenotype and lipid values, respectively).
+
+
+Residualized lipids were employed as predictors while residualized P functioned as the response variable within a Random Forest regression framework, facilitated by the \texttt{ranger} package. The dataset was partitioned into 80\% training data and 20\% testing data through stratification based on k-means clusters of the principal components, ensuring the preservation of genetic structure. Hyperparameter (\texttt{mtry}, \texttt{min.node.size}, \texttt{sample.fraction}) optimization was conducted through Bayesian optimization implemented in \texttt{tuneRanger}, utilizing the out-of-bag RMSE as the optimization criterion. The model's final performance was assessed on the reserved test data set using metrics including RMSE, MAE, Pearson’s $r$, $R^2$, bias, and normalized RMSE.
+
+In order to evaluate the contribution of each lipid to the predictions of P, the TreeSHAP algorithm was employed using the \texttt{treeshap} package. The trained \texttt{ranger} forest was amalgamated with the training dataset, and exact Shapley values $\phi_{i,k}$ were subsequently calculated for each sample $i$ and lipid $k$. The global importance was defined as the mean absolute Shapley value $\frac{1}{N}\sum_i|\phi_{i,k}|$, resulting in a prioritized list of candidate lipids. The most significant features were depicted using bar charts and beeswarm plots illustrating the per-sample Shapley value distributions.
+
 \subsection*{Pathway Enrichment Analysis}
 
 \subsection*{Data Availability}
@@ -658,14 +678,71 @@ Under LI conditions, the lipidome transitions from a photosynthetically driven p
 \end{figure}
 
 \subsection*{Genome-wide Association Studies of Lipids Associated with Control and Lowinput}
-We conducted GWAS encompassing three distinct layers of data: (1) individual lipid species, which comprise both conventional  as well as non-conventional signaling lipids (Supp Table 1), (2) aggregates of lipid class abundances, and (3) all conceivable pairwise ratios of these aggregated classes. Utilizing a significance threshold of $\log_{10}(p)\ge7$, we identified X SNPs associated with traditional lipid species (see Supplementary Table 2), Y SNPs associated with non-conventional species (refer to Supplementary Table 3), Z SNPs associated with all of the summed lipid classes, and Z SNPs associated with the ratios of summed classes (refer to Supplementary Table 4).
+We conducted GWAS with three distinct layers of data: (1) individual lipid species, which comprise both lipids  as well as other compounds (Supp Table 1), (2) aggregates of lipid class abundances, and (3) all conceivable pairwise ratios of these aggregated classes. Utilizing a significance threshold of $\log_{10}(p)\ge7$ for lipids and $\log_{10}(p)\ge5$ for other compounds , we identified W genes associated with lipid species (see Supplementary Table 2), X genes associated with other compounds (refer to Supplementary Table 3), Y genes associated with all of the summed lipid classes, and Z genes associated with the ratios of summed classes (refer to Supplementary Table 4) in a 25kb window. We conducted manual annotations for these candidate genes predicated on well-documented functions—such as lipid metabolism, N assimilation, P homeostasis, or response to cold stress. The full set of annotations is available in Supplementary Table 6. All the GWAS results can be obtained from the shiny app. Here, we explain some GWAS with important functions relating to the phenotype and the lowinput stresses. Fig \ref{fig:Fig3}
 
-Each significant SNP was annotated (refer to Supplementary Table 5) with the nearest gene within a 25 kb proximity. We conducted manual annotations for these candidate genes predicated on well-documented functions—such as lipid metabolism, N assimilation, P homeostasis, or response to cold stress. The full set of annotations is available in Supplementary Table 6.
+\subsection*{DGAT1 Controls Triacylglycerol Storage in Response to Nitrogen Limitation and Cold}
 
+We identified the gene \textit{SORBI\_3010G170000}, which encodes Acyl‐CoA:diacylglycerol acyltransferase 1 (DGAT1, analogous to Arabidopsis TG1), in five distinct GWASs: TG(58:3), TG(58:4), TG(58:5), TG(60:4), and TG(60:5). DGAT1 is responsible for the essential final conversion of DG into TG, which is a key lipid for carbon and energy storage in seeds and stress-affected vegetative tissues \cite{Zhang2009,Yang2011}. In Arabidopsis, low N levels result in the TG accumulation within leaves due to increased levels of DGAT1 and OLEOSIN1 \cite{Yang2011}. The ABA signaling pathway, involving the transcription factor ABI4, directly stimulates DGAT1 by interacting with CE1 elements (CACCG) in its promoter. In \emph{abi4} mutants, both DGAT1 stimulation and TG accumulation are reduced, emphasizing the significance of ABI4 during N deficiency \cite{Yang2011}. Additionally, DGAT1 is highly responsive to cold temperatures (4°C) and plays an essential role in freeze tolerance. Arabidopsis mutants deficient in \emph{dgat1} develop chlorosis and increased cell mortality under cold stress, with reduced TG but higher DG and PA levels \cite{Tan2018}. This elevated PA production induces RbohD-dependent ROS formation, causing oxidative stress. Increased DG kinase activity (DGK2/3/5) (GWAS results) further boosts PA, while the removal of \emph{dgk} genes restores cold tolerance, suggesting a balance between DGAT1 and DGK is essential for managing ROS and adapting to cold stress \cite{Tan2018}. In seeds, both DGAT1 and phospholipid:diacylglycerol acyltransferase 1 (PDAT1) are vital for optimal oil body development. \emph{dgat1} mutants have a 20–40\% decline in seed oil content (see Lipid annotation Section 5), whereas double mutants (\emph{dgat1/pdat1}) or RNAi lines demonstrate an 80\% decrease in TG, resulting in fertility and embryonic issues \cite{Zhang2009}. Overexpression of DGAT1 enhances seed weight and oil production, highlighting its crucial role in regulating TG levels throughout plant development \cite{Zhang2009,Yang2011}.
+
+
+\subsection*{SQDG Metabolism and Its Role in Phosphate‐Starvation Responses}
+
+In our GWAS of SQDG(32:0) levels, the top locus was \textit{SORBI\_3002G000600}, which encodes the plant ortholog of sulfoquinovosyltransferase (SQD2). SQDG is a negatively charged glycolipid (sulfoquinovose = 6‑deoxy‑6‑sulfonato‑glucose) that constitutes up to 10–20\% of chloroplast thylakoid lipids and is critical for stabilizing photosystem II, photosystem I, and cytochrome \emph{b}\(_6\)\emph{f} complexes \citep{Yu2002,Qin2015,Umena2011}.
+
+Biosynthesis proceeds in two enzymatic steps \citep{Yu2002,Sun2021}:
+\begin{enumerate}[label=(\arabic*)]
+  \item \textit{SQD1} (UDP‑sulfoquinovose synthase): 
+        \[
+           \mathrm{UDP\!-\!Glc} + \mathrm{SO_3^{2-}} \;\longrightarrow\; \mathrm{UDP\!-\!sulfoquinovose}
+        \]
+  \item \textit{SQD2} (sulfoquinovosyltransferase): 
+        \[
+           \mathrm{UDP\!-\!sulfoquinovose} + \mathrm{diacylglycerol} \;\longrightarrow\; \mathrm{SQDG}
+        \]
+\end{enumerate}
+
+Under phosphate (Pi) starvation, plants degrade phospholipids (e.g.\ PG) to recycle Pi, while \textit{SQD1} and \textit{SQD2} are transcriptionally upregulated, leading to increased SQDG accumulation and preservation of thylakoid membrane functions \citep{Essigmann1998,Nakamura2013,Sun2021}. In rice, \textit{OsPHR2} directly activates \textit{OsSQD1} under Pi deficiency, and loss of \textit{OsPHR2} impairs SQDG levels, alters fatty‐acid composition, and reduces photosynthetic efficiency \citep{Sun2021}. Similarly, \emph{sqd2} mutants in \emph{Arabidopsis thaliana} are unable to synthesize SQDG and exhibit growth defects under low‐Pi conditions, underscoring the essential role of SQDG in replacing anionic phospholipids in the chloroplast \citep{Yu2002}.
+
+
+\subsection*{Alternative Oxidase Roles in Photoprotection and Nitrate Assimilation}
+
+Through our GWAS focused on alpha-carotene, we  identified an alternative oxidase (AOX) gene. Alpha-carotene (\(\alpha\)-carotene), a secondary chloroplast carotenoid, is primarily located within the reaction centers of photosystem I (PSI) and photosystem II (PSII), with only minor quantities found in the peripheral light-harvesting complexes \citep{Young1989}. It bears structural similarity to \(\beta\)-carotene, absorbs blue-green light, and facilitates energy transfer to chlorophyll while concurrently quenching triplet chlorophyll and reactive oxygen species (ROS) to safeguard the photosynthetic apparatus from photooxidative damage under intense light stress. Its co-localization with \(\beta\)-carotene in pigment–protein complexes indicates a contributory role in stabilizing the core structures of PSII and PSI \citep{Young1989}. The mitochondrial AOX pathway offers a non-phosphorylating alternative to cytochrome oxidase, directly oxidizing ubiquinol to water, thereby preventing over-reduction of the photosynthetic electron transport chain \citep{Vishwakarma2015}. AOX1A, the dominant isoform in green tissues, plays a role in dissipating excess reducing equivalents produced by photosynthesis, supports non-photochemical quenching (NPQ), and collaborates with the chloroplast malate–oxaloacetate shuttle to sustain cellular redox homeostasis. Under conditions of stress, such as high light or drought, that inhibit the cytochrome pathway, AOX activity curbs ROS formation and maintains photosynthetic efficiency \citep{Vishwakarma2015}. In addition to its photoprotective function, AOX is vital for nitrate assimilation in plants. During NO\(_3^-\) reduction, the accumulation of reducing equivalents may lead to chloroplast over-reduction; AOX counters this by channeling excess reductants into mitochondrial respiration, thereby preventing oxidative stress and sustaining photosynthesis \citep{Gandin2014}. Studies involving \emph{aox1a} T-DNA insertion mutants in \emph{Arabidopsis thaliana} corroborate that AOX engages with nitrate assimilation pathways to uphold redox balance and optimize C-N metabolism under varying N conditions \citep{Gandin2014,Vishwakarma2015}.
+
+
+\subsection*{Beta‑Sitosterol GWAS Links Cellulose Synthase to Membrane Stability}
+
+In our GWAS of beta-sitosterol (BS), we detected a significant association peak at the cellulose synthase locus SORBI\_3003G049600, indicating that variations in this CesA gene may affect BS accumulation or its function in stabilizing membranes in sorghum. BS is a common phytosterol in plants that integrates into lipid bilayers to regulate membrane fluidity and stability. Although its exact role in cell wall structure is not fully understood, BS is suggested to protect cells from abiotic and biotic stress by enhancing plasma membrane integrity and potentially interacting with cytoplasmic and chloroplast membranes \citep{Sayeed2016}. Studies from Arabidopsis implies that BS plays a role in defense responses, yet a conclusive characterization of its role in cell wall mechanics remains necessary \citep{Sayeed2016}. The cellulose synthase (CesA) complexes are responsible for synthesizing the β-1,4-glucan chains of cellulose, the primary load-bearing polysaccharide in plant cell walls. In Arabidopsis, specific CesA isoforms form plasma-membrane rosettes to produce primary-wall (e.g., AtCesA1, 3, 6) and secondary-wall cellulose (e.g., AtCesA4, 7, 8), which support cell expansion, mechanical strength, and biomass accumulation \citep{Mueller1980,Somerville2006,Hu2018}. Mutations in CesA genes (e.g., \emph{rsw1}, \emph{prc1‑1}) result in decreased cellulose content, weakened cell walls, altered cell morphology, and reduced stress resistance \citep{Hu2018,Arioli1998,Persson2007,CanoDelgado2003,HernandezBlanco2007}. Although CesA primarily directs carbon towards cellulose production, downregulation or mutation of certain CesA genes can redirect carbon flux towards storage compounds. In Arabidopsis seeds, suppression of CesA leads to a slight reduction in cellulose content and prompts compensatory increases in non-cellulosic polysaccharides or proteins \citep{Hu2020}. It has been proposed that redirecting carbon from cell wall polysaccharides to seed storage proteins and oils may enhance nutritional quality, addressing the inverse relationship between seed oil and protein content \citep{Tomlinson2004,Ekman2008,Iyer2008,Shi2012,Tan2011,YoshieStark2008,Knowles1983}. 
+
+
+\subsection*{Gibberellic Acid Response GWAS Identifies a MADS‑Box Regulator of Flowering Time}
+
+In the gibberellic acid (GA) genome-wide association study (GWAS), we detected the \textit{SORBI\_3007G090421}. GA\(_3\) enhances floral initiation in short-day sorghum genotypes, predominantly when in conjunction with far-red light (FR). Williams and Morgan (1979) demonstrated that the combination of GA\(_3\) and FR results in an advancement of flowering by 30 to 80 days in early to intermediate maturity lines, and independently facilitates stem elongation \citep{Williams1979}. Lee \emph{et al.} (1998) further elucidated that photoperiod and phytochrome B are instrumental in regulating endogenous GA\(_1\)/GA\(_{20}\) rhythms, with altered GA peaks in \emph{phyB}-deficient genotypes being associated with early flowering under non-inductive day lengths \citep{Lee1998}. In our GA\(_3\) GWAS, the MADS-box transcription factor gene SORBI\_3007G090421 was identified. MADS-box proteins, particularly Type II C-function genes, are key regulators of floral organ identity and flowering time, whereas Type I MADS (e.g., \emph{AGL62}) affects endosperm development with consequential indirect effects on reproductive timing \citep{Paul2020}. Environmental temperature influences the effects of GA3 on development; Jabir and Mahmoud (2021) reported that elevated temperatures at planting dates, coupled with GA\(_3\) (100 ppm), expedited sorghum flowering, improved germination, and enhanced enzymatic activities for nutrient mobilization \citep{Jabir2021}. Williams and Morgan also observed genotype-specific temperature responses under controlled versus field conditions, casting light on temperature as a crucial element in GA3-mediated flowering regulation.
+
+
+\subsection*{GWAS of Zeaxanthin Reveals CP29 as a Key Photoprotective Regulator}
+
+Our GWAS investigation into zeaxanthin identified the CP29-encoding gene SORBI\_3001G357200, suggesting that natural variation in the sequence or expression of CP29 is a key factor in zeaxanthin-mediated photoprotection in sorghum. Zeaxanthin is a carotenoid involved in the xanthophyll cycle, accumulating in thylakoid membranes under excessive light conditions and playing a crucial role in photoprotection. During lumen acidification induced by high light, violaxanthin is converted to zeaxanthin by violaxanthin de-epoxidase, which subsequently associates with specific light-harvesting complex (Lhc) subunits and quenches chlorophyll triplet states, thereby hindering singlet oxygen (\(^{1}\mathrm{O}_{2}\)) formation \citep{DallOsto2012}. Zeaxanthin causes a red shift in carotenoid triplet absorption and facilitates triplet energy transfer from chlorophyll to carotenoid, enhancing non-photochemical quenching (NPQ) and mitigating photoinhibition \citep{DallOsto2012,DemmigAdams2020}. CP29 is a monomeric photosystem II antenna protein that binds three xanthophylls (lutein at L1, violaxanthin/zeaxanthin at L2) and several chlorophylls. The exchange of zeaxanthin at the L2 site induces a charge-transfer quenching state in CP29, which comprises both the fast (qE) and slow components of NPQ \citep{Guardini2020}. Contrary to PsbS, the protonatable residues exposed in the lumen of CP29 are not necessary for the activation of qE; instead, PsbS detects pH changes and interacts with CP29 to promote the conformational change required for energy dissipation \citep{Guardini2020}.
+
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{fig/main/Fig3.png}
+  \caption{\textbf{Low‐input lipid GWAS Manhattan plots for traditional and non‐traditional lipids.}
+    \textbf{(A)} Manhattan plots for five TG species (TG\_58\_3, TG\_58\_4, TG\_58\_5, TG\_60\_4, TG\_60\_5), all peaking at an acyl‐CoA:diacylglycerol acyltransferase locus (\textit{SORBI\_3010G170000}) in chromosome 10; the vertical green dashed line marks the SNP position for this gene.  
+    \textbf{(B)} SQDG(32:0) Manhattan plot, highlighting a sulfolipid synthase gene (\textit{SORBI\_3002G000600}).  
+    \textbf{(C)} \(\alpha\)‐Carotene Manhattan plot, identifying an alternative oxidase (\textit{SORBI\_3006G202500}).  
+    \textbf{(D)} \(\beta\)‐Sitosterol Manhattan plot, pinpointing a cellulose synthase (\textit{SORBI\_3003G049600}).  
+    \textbf{(E)} Gibberellic acid Manhattan plot, at a MADS‐box transcription factor locus (\textit{SORBI\_3007G090421}).  
+    \textbf{(F)} Zeaxanthin Manhattan plot, marking a chloroplast RNA‐binding protein (\textit{SORBI\_3001G357200}).  
+    Green dots indicate SNPs within or near the highlighted genes in panels B–F. Panels A and B show traditional lipids (–log\textsubscript{10} $p$\(\geq\)7), and panels C–F show non‐traditional lipids (–log\textsubscript{10} $p$\(\geq\)5).}
+  \label{fig:Fig3}
+\end{figure}
 
 
 \subsection*{Lipid Changes under LowInput (LI)}
-The multi-year, multi-field experimental design introduced considerable environmental variability into the lipidomic profiles. Although spatial corrections (SpATS) and batch-effect normalization (SERRF) were employed, residual confounding factors necessitated a ratio-based analytical approach to compare the C and the LI conditions. Lipid class ratios, which demonstrate greater resilience to technical and environmental noise than absolute abundances, were prioritized to identify biologically conserved patterns of membrane adaptation. To mitigate these confounding effects, we concentrated on within-plant lipid class ratios, expected to be fairly consistent under a variety of cultivation environments, rather than absolute abundances. We aggregated individual molecular species into their respective lipid classes, computed all possible pairwise ratios on a linear scale, and subsequently applied OPLS-DA to identify the most discriminative ratios. The resulting scores plot (Fig. \ref{fig:Fig2:OPLS}) demonstrated a robust separation of C versus LI samples, and the model exhibited exemplary performance metrics (R²Y = 0.99; Q²Y = 0.82) alongside a highly significant CV-ANOVA (p < 0.001) (Supp Figure, supp table). Hotelling’s T² analysis confirmed the absence of extreme outliers, and a 1,000-permutation test dismissed overfitting, indicating that our observations are unlikely attributable to chance. From the complete ratio set, 21 features surpassed a conservative VIP threshold of 1. Each of these high VIP ratios was then subjected to univariate testing (adjusted p < 0.05) and cross-verified against established pathways of membrane remodeling under cold and nutrient stress. The two-tier selection approach prioritizing statistical power and biological relevance yielded a defined set of lipid-class ratios (supp table) which may differentiate between C and LI.
+The multi-year, multi-field experimental design introduced considerable environmental variability into the lipidomic profiles. Although spatial corrections (SpATS) and batch-effect normalization (SERRF) were employed, residual confounding factors necessitated a ratio-based analytical approach to compare the C and the LI conditions. Lipid class ratios, which demonstrate greater resilience to technical and environmental noise than absolute abundances, were prioritized to identify biologically conserved patterns of membrane adaptation. To mitigate these confounding effects, we concentrated on within-plant lipid class ratios, expected to be fairly consistent under a variety of cultivation environments, rather than absolute abundances. We aggregated individual molecular species into their respective lipid classes, computed all possible pairwise ratios on a linear scale, and subsequently applied OPLS-DA to identify the most discriminative ratios. The resulting scores plot (Fig. \ref{fig:Fig2:OPLS}) demonstrated a robust separation of C versus LI samples, and the model exhibited exemplary performance metrics (R²Y = 0.99; Q²Y = 0.82) alongside a highly significant CV-ANOVA (p < 0.001) (Supp Figure, supp table). Hotelling’s T² analysis confirmed the absence of extreme outliers, and a 1,000-permutation test dismissed overfitting, indicating that our observations are unlikely attributable to chance. From the complete ratio set, 21 features surpassed a conservative VIP threshold of 1. Each of these high VIP ratios was then subjected to univariate testing (adjusted p < 0.05) and cross-verified against established pathways of membrane remodeling under cold and nutrient stress. The two-tier selection approach prioritizing statistical power and biological relevance yielded a defined set of lipid-class ratios (supp table) which may differentiate between C and LI. These lipid ratios are used for the further studying the effects of C and LI. 
+
 
 
 
@@ -680,52 +757,108 @@ The multi-year, multi-field experimental design introduced considerable environm
 
 
 
-
 \begin{table}[!h]
 \centering
 \caption{\bf Most important lipid ratios based on OLSA-DA}
   \label{table:olsa}
 \begin{tabular}{>{}l>{\raggedleft\arraybackslash}p{3cm}}
 \toprule
-\textbf{Lipid Ratio} & \textbf{VIP score}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{Lipid}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{VIP}}}\\
 \midrule
-\textbf{\cellcolor{gray!10}{PE/SQDG}} & \cellcolor{gray!10}{1.62}\\
-\textbf{MGDG/PC} & 1.61\\
-\textbf{\cellcolor{gray!10}{PC/SQDG}} & \cellcolor{gray!10}{1.60}\\
-\textbf{MGDG/PE} & 1.57\\
-\textbf{\cellcolor{gray!10}{SQDG/TG}} & \cellcolor{gray!10}{1.50}\\
-\addlinespace
-\textbf{MG/SQDG} & 1.50\\
-\textbf{\cellcolor{gray!10}{MGDG/TG}} & \cellcolor{gray!10}{1.49}\\
-\textbf{DGDG/MGDG} & 1.49\\
-\textbf{\cellcolor{gray!10}{DGDG/PC}} & \cellcolor{gray!10}{1.47}\\
-\textbf{PC/PS} & 1.46\\
-\addlinespace
-\textbf{\cellcolor{gray!10}{MG/MGDG}} & \cellcolor{gray!10}{1.43}\\
-\textbf{DGDG/PE} & 1.39\\
-\textbf{\cellcolor{gray!10}{DGDG/SQDG}} & \cellcolor{gray!10}{1.32}\\
-\textbf{DGDG/TG} & 1.24\\
-\textbf{\cellcolor{gray!10}{LPE/PC}} & \cellcolor{gray!10}{1.23}\\
-\addlinespace
-\textbf{PE/PS} & 1.21\\
-\textbf{\cellcolor{gray!10}{PS/TG}} & \cellcolor{gray!10}{1.15}\\
-\textbf{MG/PC} & 1.15\\
-\textbf{\cellcolor{gray!10}{LPC/MGDG}} & \cellcolor{gray!10}{1.13}\\
-\textbf{LPC/SQDG} & 1.07\\
-\addlinespace
-\textbf{\cellcolor{gray!10}{LPE/TG}} & \cellcolor{gray!10}{1.07}\\
-\textbf{LPE/PE} & 1.06\\
-\textbf{\cellcolor{gray!10}{PC/PE}} & \cellcolor{gray!10}{1.05}\\
-\textbf{LPC/PC} & 1.03\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{MG/SQDG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.3477152}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{PS/SQDG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.3269934}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{MG/MGDG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.3129383}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{PG/SQDG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.3095189}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DG/MG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.3045241}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{MGDG/PS}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.3002383}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DGDG/MG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.2991999}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{LPC/MG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.2990496}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{LPC/PS}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.2949707}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{PE/SQDG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.2927374}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DG/PS}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.2910234}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{LPE/SQDG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.2791521}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DGDG/PS}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.2791280}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{PC/PS}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.2669194}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DGDG/SQDG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.2415975}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{LPC/LPE}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.2374166}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{PE/PS}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.2345047}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{PG/PS}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.2329187}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{SQDG/TG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.2274170}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{MGDG/PG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.2203243}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{MG/PG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.2173704}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{PA/PS}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.2144649}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{MG/PC}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.2001533}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{MGDG/PE}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.1977784}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{PC/SQDG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.1753937}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{LPE/MGDG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.1693838}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DGDG/MGDG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.1692894}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{MG/PA}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.1640779}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{LPE/PS}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.1464950}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{PS/TG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.1454233}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{MG/PE}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.1353841}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{MGDG/TG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.1270486}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DG/LPE}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.1153512}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{LPC/PE}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.0867704}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{LPE/PA}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.0847130}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{DG/TG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.0692637}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{PA/TG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.0634569}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{LPC/PG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.0585614}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DG/SQDG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.0457521}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{MGDG/PC}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.0409298}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DG/PG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.0377364}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{LPC/TG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{1.0159688}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DG/PE}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{1.0019530}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{DGDG/PE}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{0.9931831}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{MG/PS}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{0.9898455}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{PA/PG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{0.9793070}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DGDG/LPE}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{0.9788471}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{PA/PE}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{0.9566347}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{LPE/MG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{0.9462309}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{DGDG/PG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{0.9419712}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{PC/PE}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{0.9297606}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{MG/TG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{0.9046252}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DGDG/TG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{0.8586145}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{LPC/PC}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{0.8417395}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{LPE/PC}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{0.8327617}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{PA/PC}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{0.8302258}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{LPC/SQDG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{0.7412971}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{DGDG/PA}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{0.7168053}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DG/MGDG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{0.7083824}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{DG/PC}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{0.6514012}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{PC/TG}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{0.6337247}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{PC/PG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{0.6218584}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DG/PA}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{0.6024455}}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{LPE/PG}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{0.5879689}}\\
+\cellcolor[HTML]{f7f7f7}{\textcolor{black}{\textbf{\cellcolor{gray!10}{DGDG/LPC}}}} & \cellcolor[HTML]{f7f7f7}{\textcolor{black}{\cellcolor{gray!10}{0.5773318}}}\\
+\textcolor{black}{\cellcolor[HTML]{f7f7f7}{\textbf{\textbf{DG/DGDG}}}} & \textcolor{black}{\cellcolor[HTML]{f7f7f7}{\textbf{0.5023645}}}\\
 \bottomrule
 \end{tabular}
 \end{table}
+
+
+
+Important ratios 
+
+
+SORBI_3006G214500 - Lecithin cholesterol acyltransferase like 4
+SORBI_3001G448800 - Lecithin cholesterol acyltransferase like 1
+SORBI_3001G041900 - PNLPA
+SORBI_3001G042901 - Adenylate isopentanyltransferases
+
 
 \subsection*{1. Membrane Lipid Remodeling under LowInput (LI)}
 
 \subsubsection*{1.1 Sulfolipid (SQDG) Collapse Under LI Stress Adaptation}
 
-Under LI stress, SQDG is the lipid most susceptible to degradation, breaking down quickly prior to the remodeling of other membrane lipids (Fig.~\ref{fig:lipid_remodeling}\,“Sulfolipid Adjustments”).
+In plants, N uptake commonly occurs mainly in the form of nitrate (NO₃⁻), which is subsequently reduced by the enzyme nitrate reductase.
+Simultaneously, we have developed the BZea population as a broadly useful teosinte–introgression resource. Teosinte, the wild ancestor of maize, possesses advantageous traits for nitrogen dynamics that were may have been reduced during the domestication process. Our collection consists of approximately 2,100 BC₂S₃ lines derived from 81 georeferenced teosinte accessions encompassing Zea mays ssp. parviglumis, ssp. huehuetenangensis, ssp. mexicana, Z. diploperennis, and Z. luxurians. Through backcrossing with B73, each line conserves approximately 12.5\% of the teosinte genetic material while remaining agronomically viable under temperate conditions, thereby overcoming photoperiod and growth discrepancies. We have conducted whole-genome sequencing on 1,400 lines at approximately 0.8× coverage and generated 3′ RNA-seq profiles for population characterization. Current efforts are focused on examining nitrogen dynamics in lines bearing Z. diploperennis alleles, which are hypothesized to be enhanced for nutrient recycling. More broadly, we are evaluating loci nominated by environmental genome-wide association studies by selecting BZea introgression lines that contain the pertinent teosinte haplotypes. The integration of these strategies seeks to elucidate the functional contributions of wild alleles to the nitrogen biology of maize.
+
+
+Teosinte, the wild ancestor progenitor of maize, contains an array of advantageous traits, notably Nitrogen Use Efficiency (NUE), which have been substantially reduced through considerably diminished during the domestication of maize. Here we provide both the This report provides a comprehensive genotypic and phenotypic characterization of a newly developed teosinte introgression population, along with preliminary observations pertinent to the study of NUE in this population. The donor lines of the population consist of 81 georeferenced teosinte accessions, including multiple species within the Zea genus, such as Zea mays ssp. parviglumis, ssp. huehuetenangensis, ssp. mexicana, Zea diploperennis, and Zea luxurians, resulting in approximately 2100 derived lines. The photoperiod and growth requisites of teosinte present challenges for the examination of NUE. The BZea panel addresses this challenge by utilizing BC₂S₃ lines that have undergone backcrossing to B73, thus containing approximately 12.5% teosinte DNA in each line. Whole-genome sequencing was conducted on 1,400 BZea BC₂S₃ lines at an approximate coverage of 0.8×, alongside 3’ RNA-sequencing for population characterization. To investigate NUE in maize, an environmental genome-wide analysis was performed on a georeferenced panel of landraces, which exhibit adaptation across the Americas, in relation to total soil nitrogen. This led to the identification of several candidates for nitrogen-related phenotypes, including a TATC Sec-independent transporter and genes involved in the aspartate metabolism pathway. A CRISPR-knockout of the TATC Sec-independent gene has been produced and is presently undergoing phenotypic analysis to assess its impact on NUE. Concurrently, a comprehensive evaluation of nitrogen dynamics is being conducted in lines incorporating alleles from Zea diploperennis, a perennial teosinte potentially enriched with nutrient-recycling capabilities. Furthermore, functional testing of these candidates is underway within the BZea panel by selecting introgression lines that harbor teosinte haplotypes at the relevant loci. These initiatives aim to elucidate the functional significance of teosinte alleles and their potential to improve agronomic traits in maize.
+
+Teosinte, the wild ancestor of maize, harbors an abundance of valuable traits that have been substantially reduced through the domestication process of maize. Recognizing the potential of these unexploited alleles, we provide both the genotypic and phenotypic characterization of a newly developed teosinte introgression population, along with preliminary insights into the experimental applicability of this genetic material. The donor lines of the population include 81 georeferenced teosinte accessions encompassing multiple species within the Zea genus, such as Zea mays ssp. parviglumis, ssp. huehuetenangensis, ssp. mexicana, Zea diploperennis, and Zea luxurians, culminating in approximately 2100 derived lines. Evaluating the impact of teosinte alleles on agronomic traits presents a challenge due to the photoperiod and growth environment differences between maize and teosinte. The 'BZea' population addresses this complexity by employing BC2S3s with B73, resulting in derived lines that retain 12.5\% of the original teosinte genetic composition. This introgression into B73 enables the assessment of teosinte alleles within a maize framework under temperate conditions. To elucidate the characteristics of this population, we performed whole genome sequencing on 1400 of these derived lines with an average sequencing depth of 0.8x. Additionally, we executed 3’ RNA-sequencing on a subset of the population. Through this population, we are exploring various experimental avenues. Currently, we are examining nitrogen dynamics employing lines from Z. diploperennis, a perennial teosinte presumed to possess alleles relevant to nutrient recycling. Furthermore, we utilize this population to construct allelic series for numerous candidate genes, including those related to nitrogen and other environmental factors. These efforts aim to uncover the functional roles of teosinte alleles and their potential to enhance maize agronomic traits.
+
+Nitrogen Use Efficiency (NUE) is a critical factor in augmenting crop productivity, as it quantifies the efficacy with which plants utilize applied nitrogen (N) fertilizers. It is typically defined as the grain yield produced per unit of nitrogen supplied. Enhancing NUE is essential for attaining sustainable agriculture due to its potential to diminish reliance on N fertilizers and mitigate environmental damage. Aspartate serves as a fundamental metabolite in nitrogen metabolism, acting as a precursor for the biosynthesis of key amino acids such as lysine, threonine, and methionine, and is crucial for N assimilation. Modifications in aspartate metabolism can have a direct impact on NUE by improving nitrogen remobilization under low-N conditions. Natural genetic variability exists within crop populations, offering opportunities to enhance N metabolism and NUE. Natural allelic diversity in genes vital for N uptake and assimilation has been shown to advance NUE across various species. In sorghum, genetic variation in traits related to NUE has been documented, with specific alleles resulting in enhanced nitrogen uptake and metabolic efficiency. In our study, we employed Genome-Wide Association Studies (GWAS) and Fst analysis to identify key genetic loci associated with NUE in maize. Our findings highlighted the significance of the aspartate metabolism pathway in nitrogen assimilation and redistribution. Through GWAS, we identified a candidate gene with a strong association with N-related traits, suggesting its potential role in regulating nitrogen metabolism. Furthermore, Fst analysis of the Indian Chief and Jarvis maize populations, which have undergone extensive selection (14 cycles) for increased yield and N accumulation in seeds, revealed distinct selection signals at various stages in the aspartate pathway. These results imply that modifying aspartate metabolism could enhance NUE under selective pressure. Future endeavors will concentrate on the functional validation of these candidate genes or entire pathways through CRISPR-based gene knockouts and overexpression studies. Additionally, several other metabolic pathways under selection were identified, although they are not examined here in detail. These pathways might collaborate in supportive roles related to nitrogen uptake, transport, assimilation, and remobilization. It is crucial to consider these pathways when developing new high-NUE maize varieties.
 
 
 % ------------------------------------------------------------------
@@ -1214,7 +1347,7 @@ Additionally, the LION lipid-ontology enrichment analysis (Figure \ref{fig:Fig6}
 Furthermore, five independent GWAS results for TGs (Figure \ref{fig:Fig6}C) consistently identify a single locus on chromosome 1 annotated as the triacylglycerol lipase gene SORBI\_3001G041900 (SbPNPLA1) above the pvalue cutoffe Sum\_TG, TG\_54\_6, TG\_54\_7, TG\_56\_4, and TG\_56\_6 plots. The recurrent emergence of this peak across both aggregate and individual species traits highlights the crucial role of PNPLA1 in triacylglycerol homeostasis. Collectively, these findings support a model wherein genetic variation at the PNPLA1 locus directs the variability in lipid storage and mobilization, especially under cold and nutrient-deficient conditions.
 
 
-\begin{figure}[ht]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{fig/main/Fig6.png}
   \caption{\textbf{Integrated lipid‐metabolism network, ontology enrichment, and GWAS of triacylglycerol traits.}
@@ -1289,23 +1422,189 @@ Me, myself and I
 % 
 \begin{thebibliography}{10}
 
-\bibitem{bib1}
-Conant GC, Wolfe KH.
-\newblock {{T}urning a hobby into a job: how duplicated genes find new
-  functions}.
-\newblock Nat Rev Genet. 2008 Dec;9(12):938--950.
 
-\bibitem{bib2}
-Ohno S.
-\newblock Evolution by gene duplication.
-\newblock London: George Alien \& Unwin Ltd. Berlin, Heidelberg and New York:
-  Springer-Verlag.; 1970.
+\bibitem[Dall’Osto \emph{et~al.}(2012)]{DallOsto2012}
+Dall’Osto, L., Cazzaniga, S., Bressan, M., Paleček, D., Židek, K., Jennings, R.~C., \& Bassi, R. (2012).  
+Zeaxanthin protects plant photosynthesis by modulating chlorophyll triplet yield in specific light‐harvesting antenna subunits.  
+\emph{Journal of Biological Chemistry}, 287(10), 6180–6190.
 
-\bibitem{bib3}
-Magwire MM, Bayer F, Webster CL, Cao C, Jiggins FM.
-\newblock {{S}uccessive increases in the resistance of {D}rosophila to viral
-  infection through a transposon insertion followed by a {D}uplication}.
-\newblock PLoS Genet. 2011 Oct;7(10):e1002337.
+\bibitem[Demmig‐Adams \emph{et~al.}(2020)]{DemmigAdams2020}
+Demmig‐Adams, B., Adams, W.~W., III, \& Holzwarth, A.~R. (2020).  
+Zeaxanthin, a molecule for photoprotection in many different environments.  
+\emph{Molecules}, 25(1), 100.
+
+\bibitem[Guardini \emph{et~al.}(2020)]{Guardini2020}
+Guardini, Z., Bressan, M., Caferri, R., Bassi, R., \& Dall’Osto, L. (2020).  
+Identification of a pigment cluster catalysing fast photoprotective quenching response in CP29.  
+\emph{Nature Plants}, 6, 1261–1273.
+
+
+\bibitem[Williams and Morgan(1979)]{Williams1979}
+Williams, E.~A., \& Morgan, P.~W. (1979).  
+Floral initiation in sorghum hastened by gibberellic acid and far‐red light.  
+\emph{Planta}, 145, 269–272.
+
+\bibitem[Lee \emph{et~al.}(1998)]{Lee1998}
+Lee, I.~J., Foster, K.~R., \& Morgan, P.~W. (1998).  
+Photoperiod control of gibberellin levels and flowering in sorghum.  
+\emph{Plant Physiology}, 116, 1003–1011.
+
+\bibitem[Paul \emph{et~al.}(2020)]{Paul2020}
+Paul, P., Dhatt, B.~K., Miller, M., \emph{et~al.} (2020).  
+MADS78 and MADS79 are essential regulators of early seed development in rice.  
+\emph{Plant Physiology}, 182, 933–948.
+
+\bibitem[Jabir and Mahmoud(2021)]{Jabir2021}
+Jabir, D.~A.~A., \& Mahmoud, M.~R. (2021).  
+The effect of temperature stress associated with different planting dates and levels of gibberellic acid on the growth of sorghum spring.  
+\emph{IOP Conference Series: Earth and Environmental Science}, 923, 012090.
+
+\bibitem[Young and Britton(1989)]{Young1989}
+Young, A.~J., \& Britton, G. (1989).
+\newblock The distribution of alpha-carotene in the photosynthetic pigment-protein complexes of higher plants.
+\newblock \emph{Plant Science}, 64, 179–183.
+
+\bibitem[Vishwakarma \emph{et~al.}(2015)]{Vishwakarma2015}
+Vishwakarma, A., Tetali, S.~D., Selinski, J., Scheibe, R., \& Padmasree, K. (2015).
+\newblock Importance of the alternative oxidase (AOX) pathway in regulating cellular redox and ROS homeostasis to optimize photosynthesis during restriction of the cytochrome oxidase pathway in \emph{Arabidopsis thaliana}.
+\newblock \emph{Annals of Botany}, 116(4), 553–566.
+\newblock \doi{10.1093/aob/mcv066}
+
+\bibitem[Gandin \emph{et~al.}(2014)]{Gandin2014}
+Gandin, A., Dinakar, C., McDonald, A.~E., \& Vanlerberghe, G.~C. (2014).
+\newblock Cooperation between the AOX pathway and nitrate assimilation to maintain optimal photosynthesis by regulating the accumulation of reducing equivalents.
+\newblock \emph{Plant Physiology}.
+  
+\bibitem[Sayeed \emph{et~al.}(2016)]{Sayeed2016}
+Sayeed, M.~S.~B., \emph{et~al.} (2016).  
+Critical analysis on characterization, systemic effect, and therapeutic potential of beta‑sitosterol.  
+\emph{Medicines}.
+
+\bibitem[Mueller and Brown(1980)]{Mueller1980}
+Mueller, S.~C., \& Brown, R.~M., Jr. (1980).  
+Evidence for an intramembrane component associated with a cellulose microfibril synthesizing complex in higher plants.  
+\emph{Journal of Cell Biology}, 84(3), 315–326.
+
+\bibitem[Somerville(2006)]{Somerville2006}
+Somerville, C. (2006).  
+Cellulose synthesis in higher plants.  
+\emph{Annual Review of Cell and Developmental Biology}, 22, 53–78.
+
+\bibitem[Hu \emph{et~al.}(2018)]{Hu2018}
+Hu, H., \emph{et~al.} (2018).  
+Cellulose synthase mutants distinctively affect cell growth and cell wall integrity for plant biomass production in Arabidopsis.  
+\emph{Plant Cell Physiology}, 59(6), 1142–1154.
+
+\bibitem[Arioli \emph{et~al.}(1998)]{Arioli1998}
+Arioli, T., \emph{et~al.} (1998).  
+Molecular analysis of cellulose biosynthesis in Arabidopsis.  
+\emph{Science}, 279, 717–720.
+
+\bibitem[Persson \emph{et~al.}(2007)]{Persson2007}
+Persson, S., \emph{et~al.} (2007).  
+Genetic evidence for three unique components in primary cell‐wall cellulose synthase complexes.  
+\emph{Proceedings of the National Academy of Sciences USA}, 104(39), 15566–15571.
+
+\bibitem[Cano‐Delgado \emph{et~al.}(2003)]{CanoDelgado2003}
+Cano‐Delgado, A.~I., \emph{et~al.} (2003).  
+Reduced cellulose synthesis invokes lignification and defense responses in Arabidopsis thaliana.  
+\emph{Plant Journal}, 34(4), 351–362.
+
+\bibitem[Hernández‐Blanco \emph{et~al.}(2007)]{HernandezBlanco2007}
+Hernández‐Blanco, C., \emph{et~al.} (2007).  
+Impaired cellulose synthesis enhances disease resistance in Arabidopsis.  
+\emph{Plant Cell}, 19(3), 890–903.
+
+\bibitem[Tomlinson \emph{et~al.}(2004)]{Tomlinson2004}
+Tomlinson, K., \emph{et~al.} (2004).  
+Effects of inhibiting cellulose biosynthesis on nitrogen, phosphorus, and sulfur metabolism in Brassica napus.  
+\emph{Plant Physiology}, 134(2), 568–577.
+
+\bibitem[Ekman \emph{et~al.}(2008)]{Ekman2008}
+Ekman, D., \emph{et~al.} (2008).  
+Carbon partitioning during secondary wall biosynthesis in Arabidopsis stems.  
+\emph{Plant Journal}, 53(3), 425–436.
+
+\bibitem[Iyer \emph{et~al.}(2008)]{Iyer2008}
+Iyer, P.~V.~V., \emph{et~al.} (2008).  
+Alteration of cellulose and lignin in Arabidopsis via RNAi of cellulose synthase genes.  
+\emph{Molecular Plant}, 1(2), 212–220.
+
+\bibitem[Shi \emph{et~al.}(2012)]{Shi2012}
+Shi, D., \emph{et~al.} (2012).  
+Genetic analysis of Arabidopsis cellulose mutants reveals secondary cell wall defects.  
+\emph{Plant Physiology}, 158(4), 1587–1595.
+
+\bibitem[Tan \emph{et~al.}(2011)]{Tan2011}
+Tan, J., \emph{et~al.} (2011).  
+Enhancing seed protein content by down‐regulating cellulose synthesis in rice.  
+\emph{Plant Biotechnology Journal}, 9(7), 834–842.
+
+\bibitem[Yoshie‐Stark \emph{et~al.}(2008)]{YoshieStark2008}
+Yoshie‐Stark, Y., \emph{et~al.} (2008).  
+Manipulation of cell wall composition to increase seed protein content in maize.  
+\emph{Journal of Agricultural Food Chemistry}, 56(11), 3981–3988.
+
+\bibitem[Knowles(1983)]{Knowles1983}
+Knowles, N.~R. (1983).  
+Carbohydrate and protein accumulation during seed development in peas.  
+\emph{Plant Physiology}, 72(1), 45–50.
+
+\bibitem[Hu \emph{et~al.}(2020)]{Hu2020}
+Hu, H., \emph{et~al.} (2020).  
+Manipulating cellulose synthase for seed storage protein improvement.  
+\emph{Plant Cell Reports}, 39(5), 607–619.
+
+
+\bibitem{Yu2002}
+Yu, B., Xu, C., \& Benning, C. (2002).  
+\emph{Arabidopsis disrupted in SQD2 encoding sulfolipid synthase is impaired in phosphate-limited growth.}  
+\textit{Proceedings of the National Academy of Sciences USA}, 99, 5732–5737.
+
+\bibitem{Sun2021}
+Sun, Y., Song, K., Liu, L., \emph{et al.} (2021).  
+\emph{Sulfoquinovosyl diacylglycerol synthase 1 impairs glycolipid accumulation and photosynthesis in phosphate-deprived rice.}  
+\textit{Journal of Experimental Botany}, 72(18), 6510–6523.
+
+\bibitem{Qin2015}
+Qin, X., Suga, M., Kuang, T., \& Shen, J. R. (2015).  
+\emph{Structural basis for energy transfer pathways in the plant PSI-LHCI supercomplex.}  
+\textit{Science}, 348, 989–995.
+
+\bibitem{Umena2011}
+Umena, Y., Kawakami, K., Shen, J. R., \& Kamiya, N. (2011).  
+\emph{Crystal structure of oxygen-evolving photosystem II at 1.9 Å resolution.}  
+\textit{Nature}, 473, 55–60.
+
+\bibitem{YuBenning2003}
+Yu, B., \& Benning, C. (2003).  
+\emph{Anionic lipids are required for chloroplast structure and function in Arabidopsis.}  
+\textit{The Plant Journal}, 36, 762–770.
+
+\bibitem{Essigmann1998}
+Essigmann, B., Güler, S., Narang, R. A., Linke, D., \& Benning, C. (1998).  
+\emph{Phosphate availability affects thylakoid lipid composition and the expression of SQD1, a gene required for sulfolipid biosynthesis in Arabidopsis thaliana.}  
+\textit{Proceedings of the National Academy of Sciences USA}, 95, 1950–1955.
+
+\bibitem{Nakamura2013}
+Nakamura, Y. (2013).  
+\emph{Phosphate starvation and membrane lipid remodeling in seed plants.}  
+\textit{Progress in Lipid Research}, 52, 43–50.
+
+\bibitem{Yang2011}
+Yang, Y., Yu, X., Song, L., \& An, C. (2011).  
+\emph{ABI4 Activates DGAT1 Expression in Arabidopsis Seedlings during Nitrogen Deficiency.}  
+\textit{Plant Physiology}, 156(2), 874–883.
+
+\bibitem{Tan2018}
+Tan, W.-J., Yang, Y.-C., Zhou, Y., Huang, L.-P., Xu, L., Chen, Q.-F., Yu, L.-J., \& Xiao, S. (2018).  
+\emph{DIACYLGLYCEROL ACYLTRANSFERASE and DIACYLGLYCEROL KINASE Modulate Triacylglycerol and Phosphatidic Acid Production in the Plant Response to Freezing Stress.}  
+\textit{Plant Physiology}, 177(4), 1304–1316.
+
+\bibitem{Zhang2009}
+Zhang, M., Fan, J., Taylor, D. C., \& Ohlrogge, J. B. (2009).  
+\emph{DGAT1 and PDAT1 Acyltransferases Have Overlapping Functions in Arabidopsis Triacylglycerol Biosynthesis and Are Essential for Normal Pollen and Seed Development.}  
+\textit{The Plant Cell}, 21(12), 3885–3901.
 
 \end{thebibliography}
 
