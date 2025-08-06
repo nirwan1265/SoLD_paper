@@ -604,6 +604,9 @@ Instrument performance was measured using total ion current (TIC) traces through
 
 After normalization of the SERRF for instrumental artifacts, in sets C and LI, the relative standard deviation (RSD) of the sample  for all lipid characteristics decreased from 3. 86 \% and 1. 18 \% (raw data)  to 0. 94 \% and 0. 51 \%, respectively,  (Supplementary Figs. \ref{fig:S2A} and \ref{fig:S2}, top panel). This reduction in technical variability demonstrates that SERRF effectively removes batch-related effects, producing more consistent peak areas across injections. Similarly, PCA of the signal pre- and post-SERRF shows that the points cluster tightly, indicating that most of the remaining variance is biological rather than instrumental (Supplementary Figs. \ref{fig:S1A} and \ref{fig:S1B}, bottom panel).
 
+
+
+
 \subsection*{Overview of lipid species count}
 The total number of different lipid species and their classes identified under C and LI conditions is shown in the Supplementary Figure \ref{fig:S3A}, Supplementary Figure \ref{fig:S3B} and  \href{https://docs.google.com/spreadsheets/d/1SB90-QLYheKEzmHCUIh1UfgkrtbL064s8Oo5BfwFaV0/edit?gid=1876149577#gid=1876149577}{Supplementary Table S1A}. In particular, triacylglycerols (TG) exhibit the highest species diversity with both LI and C having 60 species each. Phosphatidylcholines (PC) decrease from 25 species in C to 24 species in LI. Monoacylglycerols (MG) also decline from 8 species in C to 6 species in LI. Phosphatidylethanolamines (PE) increase slightly (12 species in C versus 13 in LI) (Supplementary Figure \ref{fig:S3B}, \href{https://docs.google.com/spreadsheets/d/1SB90-QLYheKEzmHCUIh1UfgkrtbL064s8Oo5BfwFaV0/edit?gid=1876149577#gid=1876149577}{Supplementary Table 1B}). When aggregated by lipid class (Supplementary Figure \ref{fig:S3C}), glycerolipids increase from 86 classes in Control to 96 in LI, while glycerophospholipids fall from 39 classes in C to 35 in LI, driven primarily by the loss of PC subspecies. The glycoglycerolipids remain essentially unchanged (25 in C, 24 in LI), and the small molecule classes such as sphingolipids (SM), lysophospholipids (LPC, LPE), free fatty acids (FA), phosphoglycerols (PG) and ceramides (Cer) each remain at one or two detected species under both conditions, possibly due to the inability of the mass spectrometer to identify those small signals (Supplementary Figures \ref{fig:S3A} and \ref{fig:S3B}). A total of 183 (162 in C, 159 in LI) traditional lipid species were detected across both workflows, 24 (13.1\%) are unique to C, 21 (11.5\%) are unique to LI and 138 (75.4.5\%) are shared (Supplementary Figure \ref{fig:S3C}). Similarly, a total of 49 non-traditional lipids were also identified across both the conditions with 10 (20.4\%) unique to C, 11 (22.4\%) unique to LI, and 28 (57.1 \%) shared among the groups. Thus, in the LI condition, (1) TG represents the highest lipid species, (2) the diversity of PC, PE, MG, SQDG, and DG slightly decreases, and (3) approximately 75\% of the traditional lipid species are common to both datasets, with around 24\% unique to C and 21\% unique to LI.
 
@@ -1621,24 +1624,12 @@ Zhang, M., Fan, J., Taylor, D. C., \& Ohlrogge, J. B. (2009).
 %========================================================
 \begin{figure}[htp]
   \centering
-
-  % ---------- panel A: Control TIC ----------
-  \begin{subfigure}[t]{\textwidth}
-    \includegraphics[width=\linewidth]{fig/supp/SuppFig_1A_TIC_Control}
-    \caption{Total ion current vs.\ injection order for Control samples.}
-    \label{fig:S1A}
-  \end{subfigure}
-
-  \vspace{1em}
-
-  % ---------- panel B: Low-Input TIC ----------
-  \begin{subfigure}[t]{\textwidth}
-    \includegraphics[width=\linewidth]{fig/supp/SuppFig_1B_TIC_LowInput.png}
-    \caption{Total ion current vs.\ injection order for Low-Input samples.}
-    \label{fig:S1B}
-  \end{subfigure}
-
-  \caption{TIC traces for all injections.  (A) Control, (B) Low-Input.}
+  \includegraphics[width=\textwidth]{fig/supp/SuppFig1.png}
+  \caption{
+    Total ion current (TIC) traces for all injections in the lipidomics run. 
+    {\bf(A)} Control samples (top panel). 
+    {\bf(B)} Lowinput samples (bottom panel).
+  }
   \label{fig:S1}
 \end{figure}
 
@@ -1649,24 +1640,13 @@ Zhang, M., Fan, J., Taylor, D. C., \& Ohlrogge, J. B. (2009).
 %========================================================
 \begin{figure}[htp]
   \centering
-
-  % ---------- row 1 ----------
-  \begin{subfigure}[t]{0.48\textwidth}
-    \includegraphics[width=\linewidth]{fig/supp/SuppFig_2A_RSD_PCA_Control.png}
-    \caption{Control.}
-    \label{fig:S2A}
-  \end{subfigure}\hfill
-  \begin{subfigure}[t]{0.48\textwidth}
-    \includegraphics[width=\linewidth]{fig/supp/SuppFig_2B_RSD_PCA_Lowinput.png}
-    \caption{Low‐Input.}
-    \label{fig:S2B}
-  \end{subfigure}
-
+  % Combined panel A (left) and B (right) in one image file
+  \includegraphics[width=\textwidth]{fig/supp/SuppFig2.png}
   \caption{
-    SERRF-normalized quality metrics across injections.  
-    (\textbf{A}) Control samples: per‐feature RSD distributions (boxplot) and PCA of QC vs.\ samples.  
-    (\textbf{B}) Low‐Input samples: same metrics after SERRF correction.  
-    Both panels demonstrate tight RSDs (most features<15 %) and clear separation of QC from biological samples in PC1/PC2.
+    SERRF-normalized quality metrics across injections. 
+    {\bf(A)} Control samples: per-feature RSD distributions (boxplot) and PCA of QC vs.\ biological samples. 
+    {\bf(B)} Low-Input samples: same metrics after SERRF correction. 
+    Red and green dots represents blank and QC respectively. Both panels demonstrate tight RSDs and clear separation of QC from biological samples in PC1/PC2.
   }
   \label{fig:S2}
 \end{figure}
@@ -1677,19 +1657,23 @@ Zhang, M., Fan, J., Taylor, D. C., \& Ohlrogge, J. B. (2009).
 
 
 
+
 %========================================================
-%  Supplementary Figure S3 - Lipid species/class count   (panels A, B, C, and D)
+%  Supplementary Figure 3: Spatial Analysis 
 %========================================================
-\begin{figure}[htbp]
+\begin{figure}[htp]
   \centering
-  \includegraphics[width=\textwidth]{fig/supp/SuppFig_3.png}
-  \caption{Lipid detection across classes and overlap between Control and LowInput.  
-    \textbf{(A)} Number of detected lipid species by class, showing non‐polar glycerolipids (TG, DG, MG), glycerophospholipids (PC, PE, PG, etc.), sphingolipids (Cer, GalCer), and others in Control (purple) vs LowInput (yellow).  
-    \textbf{(B)} Subdivision into “non‐traditional” small lipids (top: N‐acylethanolamines, fatty acid amides, tetrapyrroles, prenols, steroids, terpenoids) and “traditional” classes (bottom: sterols, sphingolipids, glycerophospholipids, glycerolipids), with counts for each group and condition.  
-    \textbf{(C)} Venn diagram of non‐traditional lipid species detected uniquely or jointly in Control vs LowInput (numbers and percentage of total non‐traditional species).  
-    \textbf{(D)} Venn diagram of traditional lipid species detected uniquely or jointly in Control vs LowInput (numbers and percentage of total traditional species).}
+  \includegraphics[width=\textwidth]{fig/supp/SuppFig3.png}
+  \caption{
+    Spatial‐analysis diagnostics for the lipid TG(10:0/10:0/10:0) from the SpATS model. 
+    {\bf(A)} Control: 3D spatial‐trend surface (row vs.\ column displacement). 
+    {\bf(B)} Control diagnostics: (i) raw data, (ii) fitted values, (iii) residuals, (iv) fitted spatial trend, (v) genotypic BLUPs, (vi) histogram of BLUPs. 
+    {\bf(C)} Low‐Input: 3D spatial‐trend surface. 
+    {\bf(D)} Low‐Input diagnostics, as in (B).
+  }
   \label{fig:S3}
 \end{figure}
+
 
 
 
@@ -1726,13 +1710,34 @@ Zhang, M., Fan, J., Taylor, D. C., \& Ohlrogge, J. B. (2009).
 
 
 %========================================================
-%  Supplementary Figure S4 - Lipid ratio contrasts under low-P
+% Supplementary Figure S4 - Lipid species/class count   (panels A, B, C, and D)
 %========================================================
 \begin{figure}[htp]
   \centering
-  \includegraphics[width=0.65\textwidth]{fig/supp/SuppFig_4_TIC_nontraditional_lipid_class.png}
-  \caption{Relative contribution of non-traditional lipid classes to total ion current (TIC) under Control and Low-Input conditions. Classes contributing less than 3\% in both conditions were omitted for clarity.}
-  \label{fig:S4_TIC_nontraditional}
+  \includegraphics[width=\textwidth]{fig/supp/SuppFig4.png}
+  \caption{
+    Summary of lipid coverage in Control vs.\ Lowinput runs. 
+    {\bf(A)} Number of detected lipid species per major class.
+    {\bf(B)} Breakdown of species counts within the two largest classes: Glycerolipid and Glyverophospholipid.
+    {\bf(C)} Venn diagram of all lipid species: 184 species (∼58.2\%) are shared, while Control only (65, 20.6\%) and Lowiput only (67, 21.2\%) show a small number of unique detections in each run.
+  }
+  \label{fig:S4}
+\end{figure}
+
+
+%========================================================
+% Supplementary Figure S5 - TIC - Class, Glycerolipid, Glycerophospholipid
+%========================================================
+\begin{figure}[htp]
+  \centering
+  \includegraphics[width=\textwidth]{fig/supp/SuppFig5.png}
+  \caption{
+    Distribution of total ion current (TIC) by lipid category in Control vs.\ Low-Input samples. 
+    {\bf(A)} Major lipid classes as % of TIC: glycerolipids dominate (~64 % Control, ~52 % Low-Input), followed by glycerophospholipids (~30 % vs 25 %), with sphingolipids, fatty acids, terpenoids and others making up the balance. 
+    {\bf(B)} Breakdown of the glycerolipid pool: mono- and di-galactosyldiacylglycerols, diacylglycerols and triacylglycerols together account for most of the glycerolipid TIC, with nearly identical subclass proportions in both runs. 
+    {\bf(C)} Breakdown of the glycerophospholipid pool: phosphatidylcholines (>79 %), phosphatidylethanolamines (~18 %), and minor head-groups (LPC, PS, etc.) together explain the glycerophospholipid TIC, again very consistent between Control and Low-Input.
+  }
+  \label{fig:S5}
 \end{figure}
 
 
