@@ -1,21 +1,25 @@
+library(ggplot2)
+library(dplyr)
+library(forcats)
 library(tidyverse)
+
+
 # your data frame
 df <- read.csv("table/Linex2/LION-enrichment.csv")
-colnames(df) <- c("TermID", "Description", "Annotated", "p.value", "q.value")
 
-
-
+# Filter p.value for <0.05
 df <- df %>%
-  # sort by ascending q‐value (smallest = most significant)
-  arrange(q.value) %>%
-  # turn Description into a factor in that order, then reverse so the top row is most significant
+  filter(p.value < 0.05)
+
+
+# add the –log10 metrics:
+df2 <- df %>%
   mutate(
-    Description = fct_rev(fct_inorder(Description)),
-    logQ = -log10(q.value),
-    logP = -log10(p.value)
+    logP = -log10(p.value),
+    logQ = -log10(FDR.q.value),
+    Description = fct_reorder(Discription, logP)     # so bigger dots are lower on the axis
   )
 
-# plot
 nature_theme <- theme_minimal(base_size = 16) +
   theme(
     plot.title     = element_text(
@@ -51,23 +55,29 @@ nature_theme <- theme_minimal(base_size = 16) +
     
     plot.margin    = margin(15, 15, 15, 15)
   )
-quartz()
-enrichment <- ggplot(df2, aes(x = logQ, y = Description)) +
-  # vertical line at FDR q = 0.05
-  geom_vline(xintercept = -log10(0.05), color = "red", linetype = "dashed") +
-  geom_point(aes(size = Annotated, color = logP)) +
-  scale_color_viridis_c(name = expression(-log[10](p~value)), option = "C") +
+
+lion_lipid <- ggplot(df2, aes(x=logQ, y=Description)) +
+  # dashed line at FDR = 0.05 → –log10(0.05)
+  geom_vline(xintercept = -log10(0.05), color="red", linetype="dashed") +
+  # split into two facets by up/down
+  facet_grid(Regulated ~ ., scales="free_y", space="free_y") +
+  # dots sized by number of annotated lipids, colored by –log10(p)
+  geom_point(aes(size=Annotated, color=logP)) +
+  scale_color_viridis_c(
+    name = expression(-log[10](p~value)),
+    option = "C"
+  ) +
   scale_size_continuous(name = "Annotated hits") +
   labs(
     x = expression(-log[10](FDR~q~value)),
     y = NULL,
-    title = "LION Enrichment"
+    title = "LION enrichment analysis (ranking mode)\nlowinput vs. control"
   ) +
-  theme_minimal(base_size = 16) +
+  nature_theme +
   theme(
-    panel.grid.major.y = element_blank(),
-    legend.key.width    = unit(1.2, "cm")
-  ) + nature_theme
+    panel.grid.major.y = element_line(color = "grey90"),
+    panel.grid.minor   = element_blank()
+  )
 
 # Save the plot
-ggsave("fig/main/Fig7_LION_enrichment.png", enrichment, width = 8, height = 12, dpi = 300, bg = "white")
+ggsave("fig/main/Fig7_LION_enrichment.png",plot=last_plot(), width = 12, height = 14, dpi = 300, bg = "white")

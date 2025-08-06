@@ -177,7 +177,7 @@ quartz()
 print(fig1a)
 
 # Save the plot
-ggsave("fig/main/SuppFig_4A_Lipid_Counts.png",
+ggsave("fig/supp/SuppFig_4A_Lipid_Counts.png",
        plot = fig1a,
        width = 6, height = 6, dpi = 300,
        units = "in", bg = "white")  # white background for publication quality
@@ -273,7 +273,7 @@ print(fig1b)
 # Save the plot
 ggsave("fig/supp/SuppFig_4B_Lipid_Class_Counts.png",
        plot = fig1b,
-       width = 6, height = 6, dpi = 300,
+       width = 8, height = 5, dpi = 300,
        units = "in", bg = "white")  # white background for publication quality
 
 

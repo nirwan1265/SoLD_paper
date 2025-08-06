@@ -7,12 +7,6 @@
 ###############################################################################
 
 
-################################################################################
-################################################################################
-#### FIGURE 1A
-################################################################################
-################################################################################
-
 ###############################################################################
 # 1.  LIBRARIES
 ###############################################################################
@@ -21,6 +15,14 @@ suppressPackageStartupMessages({
   library(vroom);   library(dplyr);   library(tidyr);  library(stringr)
   library(ggplot2); library(viridis); library(gridExtra); library(grid)
 })
+
+
+################################################################################
+################################################################################
+#### FIGURE 1A
+################################################################################
+################################################################################
+
 
 ################################################################################
 # 1.  LOAD DATA  (Control & LowInput)
@@ -39,23 +41,41 @@ lowinput <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_low
 # 2.  SELECT THE CLASSES 
 ################################################################################
 
-valid_classes <- c("TG","DG","MG",
-                   "PC","PE","PI",
-                   "DGDG","MGDG",
-                   "SQDG","SM","AEG",
-                   "LPC","LPE","PG","PA","Cer","GalCer","FA","PS")
+valid_classes <- c(
+  "TG",
+  
+  "DGDG","MGDG","SQDG",
+  
+  "PC","PE","PI","PG","PA","PS","LPC","LPE",
+  
+  "DG","MG"
+)
+#class_pat <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
+class_pat <- paste0("^(", paste(valid_classes, collapse = "|"), ")")
 
-class_pat <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
-
-reshape_plate <- function(df, label){
+reshape_plate <- function(df, label) {
   df %>%
     pivot_longer(-Compound_Name, names_to = "Lipid", values_to = "Intensity") %>%
+    # now using our reordered, “longest‐first” regex
     mutate(Class = str_extract(Lipid, class_pat)) %>%
     filter(!is.na(Class)) %>%
     group_by(Sample = Compound_Name, Class) %>%
-    summarise(sum_int = sum(Intensity, na.rm = TRUE), .groups = "drop") %>%
+    summarise(sum_int = sum(Intensity, na.rm = TRUE), .groups="drop") %>%
     mutate(Condition = label)
 }
+
+ctrl_long <- reshape_plate(control,  "Control")
+low_long  <- reshape_plate(lowinput, "LowInput")
+
+pct_mean <- bind_rows(ctrl_long, low_long) %>%
+  group_by(Sample, Condition) %>%
+  mutate(pct = 100 * sum_int / sum(sum_int)) %>%
+  ungroup() %>%
+  group_by(Condition, Class) %>%
+  summarise(pct_mean = mean(pct), .groups="drop")
+
+# …then rebuild your bar‐plot exactly as before…
+
 
 ctrl_long <- reshape_plate(control,  "Control")
 low_long  <- reshape_plate(lowinput, "LowInput")
@@ -139,7 +159,7 @@ p_bar <- ggplot(pct_mean,
             colour   = "white", size = 3) +
   scale_fill_manual(values = pal, guide = "none") +
   scale_x_continuous(expand = c(0,0),
-                     limits = c(0,100),
+                     #limits = c(0,100),
                      breaks = seq(0,100,25),
                      labels = function(x) paste0(x, "%")) +
   labs(x = "% of TIC", y = NULL) +
@@ -149,7 +169,7 @@ p_bar <- ggplot(pct_mean,
         axis.text.x    = element_text(face = "bold", size = 16),  # enlarge x‐axis tick labels
         axis.text.y    = element_text(face = "bold", size = 16),  # enlarge y‐axis tick labels
         axis.title.x   = element_text(face = "bold", size = 16)   # enlarge x‐axis label
-  ) + 
+  ) +
   plot_theme
 
 ###############################################################################
@@ -230,14 +250,9 @@ ggsave("fig/main/Fig1a_TIC_lipid_species.png",fig1a, width = 24, height = 8, uni
 
 
 
-
-
-
-
-
 ################################################################################
 ################################################################################
-#### Supplementary Figure 4
+#### Supplementary Figure 5A
 ################################################################################
 ################################################################################
 
@@ -302,17 +317,17 @@ p_sc <- ggplot(pct_SC_mean,
             colour = "white", size = 3.2) +
   scale_fill_manual(values = pal, guide = "none") +   # ← remove legend
   scale_x_continuous(expand = c(0,0),
-                     limits  = c(0,100),
+                     #limits  = c(0,100),
                      breaks  = seq(0,100,25),
                      labels  = function(x) paste0(x, "%")) +
   labs(x = "% of TIC", y = NULL) +
   theme_classic(base_size = 16) +
   theme(axis.line.x = element_line(size = .4),
         axis.line.y = element_line(size = .4),
-        axis.text.x    = element_text(face = "bold", size = 14),  # enlarge x‐axis tick labels
-        axis.text.y    = element_text(face = "bold", size = 14),  # enlarge y‐axis tick labels
-        axis.title.x   = element_text(face = "bold", size = 16)) +  # enlarge x‐axis label)
-  plot_theme
+        axis.text.x    = element_text(face = "bold", size = 16),  # enlarge x‐axis tick labels
+        axis.text.y    = element_text(face = "bold", size = 16),  # enlarge y‐axis tick labels
+        axis.title.x   = element_text(face = "bold", size = 16))   # enlarge x‐axis label)
+  
 
 
 ### Numeric table + color swatch for legends
@@ -375,17 +390,14 @@ grid::grid.draw(fig1b)
 
 
 ### Save the plot
-ggplot2::ggsave("fig/supp/SuppFig4A_TIC_lipid_class.png",
+ggplot2::ggsave("fig/supp/SuppFig5A_TIC_lipid_class.png",
                 fig1b,
                 width = 24, height = 8, units = "in", bg = "white")
 
 
 
-
-
-
 ###############################################################################
-### Supplementary Figure 5
+### Supplementary Figure 5B
 ###############################################################################
 
 ### Load the class dictionary with Super- & SubClass info
@@ -548,7 +560,7 @@ grid::grid.draw(multi_panel)
 
 
 # 10. Save to file
-ggsave("fig/supp/SuppFig4B_TIC_Glycerophospholipid_panels.png", 
+ggsave("fig/supp/SuppFig5B_TIC_Glycerophospholipid_panels.png", 
        multi_panel,
        width = 24,    # adjust to your desired width
        height = 8,    # and height
@@ -567,7 +579,7 @@ grid::grid.draw(multi_panel)
 
 
 # 10. Save to file
-ggsave("fig/supp/SuppFig4C_TIC_Glycerolipid_panels.png", 
+ggsave("fig/supp/SuppFig5C_TIC_Glycerolipid_panels.png", 
        multi_panel,
        width = 24,    # adjust to your desired width
        height = 8,    # and height

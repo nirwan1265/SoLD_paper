@@ -50,11 +50,11 @@ colnames(control)
 ###############################################################################
 
 # Valid classes
-# valid_classes <- c("TG","DG","MG",
-#                    "PC","PE","PI",
-#                    "DGDG","MGDG",
-#                    "SQDG","SM","AEG",
-#                    "LPC","LPE","PG","PA","PS","AEG","Cer","FA","GalCer")
+valid_classes <- c("TG","DG","MG",
+                   "PC","PE","PI",
+                   "DGDG","MGDG",
+                   "SQDG","SM","AEG",
+                   "LPC","LPE","PG","PA","PS","AEG","Cer","FA","GalCer")
 
 valid_classes <- c("TG","DG","MG",
                    "PC","PE",
@@ -93,7 +93,9 @@ lowinput_sub <- lowinput_sub %>%
 ###############################################################################
 
 # 1. Use the intersected lipid list (shared lipids)
-shared_lipids <- intersect(lipid_cols_ctrl, lipid_cols_low)
+#shared_lipids <- intersect(lipid_cols_ctrl, lipid_cols_low)
+shared_lipids <- intersect(colnames(control), colnames(lowinput))
+shared_lipids <- shared_lipids[!shared_lipids %in% c("Compound_Name", "Condition")]
 
 # 2. Subset and bind together
 combined_df <- bind_rows(
@@ -284,6 +286,7 @@ individual_PCA <- ggplot() +
               ylim = c(min(scores_df$PC2)*1.05, max(scores_df$PC2)*1.05)) +
   
   theme_bw(base_size = 16) +  # base theme with box and grid
+  nature_theme +
   theme(
     panel.grid.major = element_line(color = "grey85", size = 0.4),
     panel.grid.minor = element_blank(),
@@ -301,7 +304,14 @@ individual_PCA <- ggplot() +
     ),
     legend.direction     = "vertical",
     legend.spacing.y     = unit(0.2, "cm")
+  )  +
+  theme(
+    panel.grid.major.y = element_line(color = "grey90"),
+    panel.grid.minor   = element_blank(),
+    panel.grid.major.x = element_line(color = "grey90"),
+   
   )
+
 
 
 
@@ -309,7 +319,7 @@ quartz()
 individual_PCA
 
 # Save the plot
-ggsave("fig/main/Fig1b_individual_indv_lipid_PCA_plot.png", individual_PCA, width = 8, height = 5, dpi = 300, bg = "white")
+ggsave("fig/main/Fig1b_individual_indv_lipid_PCA_plot.png", individual_PCA, width = 6, height = 6, dpi = 300, bg = "white")
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -500,13 +510,13 @@ summed_pca <- ggplot() +
     ),
     legend.direction     = "vertical",
     legend.spacing.y     = unit(0.2, "cm")
-  )
+  ) 
 
 
 summed_pca
 
 # Save
-ggsave("fig/main/Fig1c_summed_lipid_PCA_biplot.png", summed_pca,width = 8, height = 6, dpi = 300, bg = "white")
+ggsave("fig/main/Fig1c_summed_lipid_PCA_biplot.png", summed_pca,width = 8, height = 8, dpi = 300, bg = "white")
 
 
 
@@ -524,6 +534,8 @@ ggsave("fig/main/Fig1c_summed_lipid_PCA_biplot.png", summed_pca,width = 8, heigh
 # 
 # quartz()
 # combined
+
+
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ###############################################################################
 ## RATIOS OF THE LIPIDS

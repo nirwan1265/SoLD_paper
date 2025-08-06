@@ -16,6 +16,8 @@ library(ggbreak)
 library(ggplot2)
 library(dplyr)
 library(grid)
+library(knitr) 
+library(kableExtra)
 
 
 # ╔══════════════════════════════════════════════════════════════════╗
@@ -26,13 +28,10 @@ library(grid)
 control <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_control_all_lipids_fitted_phenotype_non_normalized.csv") %>%
   select(-c(2,3,4)) %>%
   rename(Compound_Name = 1)
-
+dim(control)
 lowinput <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>%
   select(-c(2,3,4)) %>%
-  rename(Compound_Name = 1) 
-
-
-
+  rename(Compound_Name = 1)
 
 
 # Valid classes
@@ -40,7 +39,7 @@ valid_classes <- c("DGDG","MGDG",
                    "TG","DG","MG",
                    "PC","PE",
                    "SQDG",
-                   "LPC","LPE","PG"
+                   "LPC","LPE","PG","PA","PS"
                    )
 
 # valid_classes <- c("TG","DG","MG",
@@ -92,6 +91,11 @@ long_prep_global <- function(df) {
 combined  <- bind_rows(control  %>% mutate(Condition = "Control"),
                        lowinput %>% mutate(Condition = "LowInput"))
 long_all  <- long_prep_global(combined)
+
+# Remove na:
+long_all <- long_all %>%
+  filter(!is.na(class_log))
+table(is.na(long_all))
 
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 3)  PIVOT WIDE                                                   ║
@@ -167,7 +171,7 @@ meta <- wide_ratios %>% dplyr::select(Sample, Condition)
 lipid_mat <- wide_ratios %>% 
   dplyr::select(-Sample, -Condition) %>% 
   as.matrix()
-
+dim(lipid_mat)
 # 2) build your class vector: a factor of your two Conditions
 class_vec <- factor(meta$Condition)
 
@@ -384,7 +388,7 @@ perm_plot_broken_nature <- ggplot(plot_df, aes(x = value)) +
   
   labs(x = "Metric value", y = "Frequency") +
   
-  scale_x_break(c(0.05, 0.85), scales = 0.5) +
+  scale_x_break(c(0.05, 0.90), scales = 0.5) +
   
   guides(
     fill = guide_legend(
@@ -418,8 +422,6 @@ ggsave("fig/main/Fig2b_OPLS_permutation_plot.png", plot = perm_plot_broken_natur
 
 
 
-
-
 # Extract VIP scores
 vip_vec <- slot(opls_mod, "vipVn")     # numeric vector with names = lipid IDs
 
@@ -430,7 +432,7 @@ vip_df <- tibble(
 
 # 2.  Keep VIP > 1.3  (and sort descending)
 vip_hits <- vip_df %>%
-  filter(VIP > 1) %>%
+  filter(VIP > 0.5) %>%
   arrange(desc(VIP))
 
 # How many?
@@ -438,8 +440,6 @@ cat("Number of discriminatory lipids (VIP > 1):", nrow(vip_hits), "\n")
 print(vip_hits, n = Inf)
 
 # Convert to latex format:
-library(knitr)
-library(kableExtra)
 kable(vip_hits, format = "latex", booktabs = TRUE, linesep = "", escape = FALSE) %>%
   kable_styling(latex_options = c("striped", "hold_position")) %>%
   column_spec(1, bold = TRUE) %>%
@@ -471,7 +471,7 @@ kable(vip_hits, format = "latex", booktabs = TRUE, linesep = "", escape = FALSE)
 #   group_by(SampleGroup) %>%   # QC or pooled injections
 #   summarise(CV = sd(Intensity) / mean(Intensity)) 
 
-quartz()
+quartz() 
 ggplot(vip_hits, aes(x = reorder(Lipid, VIP), y = VIP)) +
   geom_col(
     width    = 0.7,
@@ -481,7 +481,7 @@ ggplot(vip_hits, aes(x = reorder(Lipid, VIP), y = VIP)) +
   ) +
   coord_flip() +
   geom_hline(
-    yintercept = 1.3,
+    yintercept = 1,
     linetype   = "dashed",
     colour     = "red"
   ) +
@@ -758,3 +758,120 @@ ggplot(vip_hits, aes(x = reorder(Lipid, VIP), y = VIP)) +
 
 
 
+
+
+
+### VOLCANO
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(tibble)
+
+# — 1) bring in your ratio matrix and VIP vector —  
+# assume `lipid_mat` is an R matrix or data.frame with 710 rows (samples) × 78 columns (ratios),
+# with rownames(lipid_mat) = sample IDs, and
+# vip_vec is a named numeric vector length 78, names(vip_vec) = the same ratios.
+
+# turn the matrix into a tibble, preserving rownames
+ratios_df <- as_tibble(lipid_mat, rownames = "SampleID")
+
+# add a Condition column (first 394 control, then 316 lowinput)
+ratios_df <- ratios_df %>%
+  mutate(Condition = rep(c("Control","LowInput"), times = c(394,316)))
+
+# — 2) pivot longer so each row is one measurement —  
+long_df <- ratios_df %>%
+  pivot_longer(
+    -c(SampleID, Condition),
+    names_to  = "Ratio",
+    values_to = "Value"
+  )
+
+# — 3) keep only those Ratios that have VIP scores —  
+vip_df <- enframe(vip_vec, name="Ratio", value="VIP")
+long_df <- long_df %>%
+  inner_join(vip_df, by="Ratio")
+
+# — 4) compute statistics for each Ratio —  
+stats_df <- long_df %>%
+  group_by(Ratio, VIP) %>%
+  summarise(
+    # mean per condition
+    mean_ctrl = mean(Value[Condition=="Control"], na.rm=TRUE),
+    mean_low  = mean(Value[Condition=="LowInput"], na.rm=TRUE),
+    # log2 fold‐change
+    log2FC    = log2(mean_low / mean_ctrl),
+    # p‐value from two‐sample t‐test
+    pval      = t.test(
+      Value[Condition=="LowInput"],
+      Value[Condition=="Control"]
+    )$p.value,
+    .groups = "drop"
+  ) %>%
+  mutate(
+    negLog10P = -log10(pval),
+    highVIP   = VIP > 1
+  )
+
+# — 5) volcano plot —  
+quartz()
+ggplot(stats_df, aes(x = log2FC, y = negLog10P)) +
+  geom_point(aes(color = highVIP), alpha = 0.7, size=2) +
+  scale_color_manual(
+    values = c("FALSE"="gray70", "TRUE"="firebrick"),
+    labels = c("VIP ≤ 1","VIP > 1"),
+    name   = "High VIP"
+  ) +
+  geom_vline(xintercept = c(-0.05,0.05), linetype="dashed") +
+  geom_hline(yintercept = -log10(0.05), linetype="dashed") +
+  labs(
+    x = "log₂ fold‐change (LowInput / Control)",
+    y = "-log₁₀(p-value)",
+    title = "Volcano of lipid‐ratio changes"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = c(0.8, 0.8),
+    legend.background = element_rect(fill="white", color="black")
+  )
+
+
+
+library(ggrepel)
+
+# define your thresholds
+fc_cut   <- 0.05
+p_cut    <- 0.05
+vip_cut  <- 1.0
+
+stats_df <- stats_df %>%
+  mutate(
+    sig = (abs(log2FC) >= fc_cut & pval < p_cut),
+    vip_hi = VIP >= vip_cut
+  )
+quartz()
+ggplot(stats_df, aes(x=log2FC, y=negLog10P)) +
+  geom_point(aes(color = vip_hi), alpha=0.7, size=2) +
+  scale_color_manual(
+    values = c("FALSE"="gray70","TRUE"="firebrick"),
+    labels = c(paste0("VIP < ",vip_cut), paste0("VIP ≥ ",vip_cut)),
+    name   = "High VIP"
+  ) +
+  geom_vline(xintercept = c(-fc_cut, fc_cut), linetype="dashed", color="black") +
+  geom_hline(yintercept = -log10(p_cut),    linetype="dashed", color="black") +
+  geom_text_repel(
+    data = filter(stats_df, sig & vip_hi),
+    aes(label = Ratio),
+    size = 3,
+    max.overlaps = 20
+  ) +
+  labs(
+    x = "log₂ fold-change (LowInput / Control)",
+    y = "-log₁₀(p-value)",
+    title = "Volcano of lipid-ratio changes"
+  ) +
+  theme_minimal(base_size=14) +
+  theme(
+    legend.position = c(0.8,0.8),
+    legend.background = element_rect(fill="white", color="black")
+  )
