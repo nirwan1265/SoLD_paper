@@ -177,10 +177,10 @@ quartz()
 print(fig1a)
 
 # Save the plot
-ggsave("fig/supp/SuppFig_4A_Lipid_Counts.png",
-       plot = fig1a,
-       width = 6, height = 6, dpi = 300,
-       units = "in", bg = "white")  # white background for publication quality
+# ggsave("fig/supp/SuppFig_4A_Lipid_Counts.png",
+#        plot = fig1a,
+#        width = 6, height = 6, dpi = 300,
+#        units = "in", bg = "white")  # white background for publication quality
 
 
 
@@ -271,11 +271,11 @@ quartz()
 print(fig1b)
 
 # Save the plot
-ggsave("fig/supp/SuppFig_4B_Lipid_Class_Counts.png",
-       plot = fig1b,
-       width = 8, height = 5, dpi = 300,
-       units = "in", bg = "white")  # white background for publication quality
-
+# ggsave("fig/supp/SuppFig_4B_Lipid_Class_Counts.png",
+#        plot = fig1b,
+#        width = 8, height = 5, dpi = 300,
+#        units = "in", bg = "white")  # white background for publication quality
+# 
 
 
 ###############################################################################
@@ -330,3 +330,47 @@ ggsave("fig/supp/SuppFig_4C_Lipid_Overlap_Venn.png",
        plot = p_lipid,
        width = 6, height = 6, dpi = 300,
        units = "in", bg = "white")  
+
+
+
+###############################################################################
+### Supplementary Table 1
+###############################################################################
+
+unique_control <- setdiff(names(control),names(lowinput))
+unique_lowinput <- setdiff(names(lowinput),names(control))
+common_lipids <- intersect(names(control),names(lowinput))
+
+# Remove Compound_Name
+common_lipids <- common_lipids[common_lipids != "Compound_Name"]
+
+
+# figure out the maximum length
+max_len <- max(length(common_lipids),
+               length(unique_control),
+               length(unique_lowinput))
+
+# a helper to pad with NAs
+pad_na <- function(x, len) {
+  c(x, rep(NA, len - length(x)))
+}
+
+# build a tibble with equal‐length columns
+supp_table1 <- tibble(
+  Common_Lipids    = pad_na(common_lipids,    max_len),
+  Unique_Control   = pad_na(unique_control,   max_len),
+  Unique_LowInput  = pad_na(unique_lowinput,  max_len)
+)
+
+# inspect
+supp_table1
+# Save
+write.csv(supp_table1,"table/supp/SuppTable_1_Common_lipids.csv",row.names = F)
+
+
+
+###############################################################################
+### Supplementary Table 2
+###############################################################################
+
+

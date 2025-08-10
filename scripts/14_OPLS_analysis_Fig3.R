@@ -18,7 +18,13 @@ library(dplyr)
 library(grid)
 library(knitr) 
 library(kableExtra)
-
+library(dplyr)
+library(tidyr)
+library(forcats)
+library(ggplot2)
+library(patchwork)
+library(ggplot2)
+library(ggbreak)
 
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 1) READ RAW INTENSITY TABLES AND CLASS                           ║
@@ -200,6 +206,46 @@ scores_df <- data.frame(
   stringsAsFactors = FALSE
 )
 
+
+# Theme
+plot_theme <- theme_minimal(base_size = 24) +
+  theme(
+    plot.title     = element_text(
+      size   = 14,
+      face   = "bold",
+      hjust  = 0.5,
+      margin = margin(b = 10)
+    ),
+    axis.title.x   = element_text(
+      size = 16,      # X‐axis title size
+      face = "bold"
+    ),
+    axis.title.y   = element_text(
+      size = 16,      # Y‐axis title size
+      face = "bold"
+    ),
+    axis.text.x    = element_text(
+      size = 16,      # X‐axis tick label size
+      color = "black"
+    ),
+    axis.text.y    = element_text(
+      size = 16,      # Y‐axis tick label size
+      color = "black"
+    ),
+    axis.line      = element_line(color = "black"),
+    panel.grid     = element_blank(),
+    
+    legend.position      = c(0.95, 0.95),
+    legend.justification = c("right","top"),
+    legend.background    = element_rect(fill="white", color="grey70", size=0.4),
+    legend.direction     = "vertical",
+    legend.spacing.y     = unit(0.2,"cm"),
+    legend.title         = element_blank(),
+    legend.text          = element_text(size=16),
+    
+    plot.margin    = margin(15, 15, 15, 15)
+  )
+
 # 2) Make the OPLS-DA score plot
 opls_plot <- ggplot(scores_df, aes(x = t1, y = to1, color = Condition)) +
   
@@ -257,18 +303,19 @@ opls_plot <- ggplot(scores_df, aes(x = t1, y = to1, color = Condition)) +
     ),
     legend.direction     = "vertical",
     legend.spacing.y     = unit(0.2, "cm")
-  )
+  ) +
+  plot_theme
 quartz()
 print(opls_plot)
 
 # Save the plot
-ggsave("fig/main/Fig2a_OPLS_scores_plot.png", plot = opls_plot, width = 10, height = 6, dpi = 300, bg = "white")
+#ggsave("fig/main/Fig2c_OPLS_scores_plot.png", plot = opls_plot, width = 10, height = 6, dpi = 300, bg = "white")
 
 # 2) Run the permutation test (200 label-swaps)
 perm_res <- opls(
   lipid_mat, class_vec,
   predI = 1,
-  permI = 200,
+  permI = 500,
   scaleC = "standard"
 )
 
@@ -304,121 +351,127 @@ obs_df <- tibble(
 )
 
 # 8) Plot!
-# 1) Define a Nature‐style theme
-nature_theme <- theme_minimal(base_size = 16) +
-  theme(
-    plot.title     = element_text(
-      size   = 14,
-      face   = "bold",
-      hjust  = 0.5,
-      margin = margin(b = 10)
-    ),
-    axis.title.x   = element_text(
-      size = 16,      # X‐axis title size
-      face = "bold"
-    ),
-    axis.title.y   = element_text(
-      size = 16,      # Y‐axis title size
-      face = "bold"
-    ),
-    axis.text.x    = element_text(
-      size = 16,      # X‐axis tick label size
-      color = "black"
-    ),
-    axis.text.y    = element_text(
-      size = 16,      # Y‐axis tick label size
-      color = "black"
-    ),
-    axis.line      = element_line(color = "black"),
-    panel.grid     = element_blank(),
-    
-    legend.position = "top",
-    legend.title    = element_blank(),
-    legend.text     = element_text(
-      size = 16        # legend label size
-    ),
-    
-    plot.margin    = margin(15, 15, 15, 15)
+# # 2) Build the plot with the break
+# perm_plot_broken_nature <- ggplot(plot_df, aes(x = value)) + 
+#   
+#   # Histograms (fill mapped here!)
+#   geom_histogram(aes(fill = metric),
+#                  position = "identity",
+#                  alpha    = 0.6,
+#                  bins     = 30,
+#                  color    = "white") + 
+#   
+#   # Dashed lines (manually colored)
+#   geom_vline(data = obs_df,
+#              aes(xintercept = obs),
+#              linetype = "dashed",
+#              size     = 0.8,
+#              color    = c("#440154FF", "#FDE725FF")) + 
+#   
+#   # Labels (also manually colored)
+#   geom_text(data = obs_df,
+#             aes(x = obs, y = Inf,
+#                 label = sprintf("%s = %.3f\np = %.3f", metric, obs, p_ex)),
+#             hjust = -0.1,
+#             vjust = c(1.2, 3.5),
+#             size  = 3,
+#             color = c("#440154FF", "#FDE725FF")) +
+#   
+#   # R²X arrow and label
+#   geom_segment(aes(x = obsR2X, xend = obsR2X, y = 0, yend = -5),
+#                arrow = arrow(length = unit(0.2, "cm")),
+#                color = "darkgreen") +
+#   annotate("text",
+#            x     = obsR2X,
+#            y     = -8,
+#            label = sprintf("R²X = %.3f", obsR2X),
+#            color = "darkgreen",
+#            size  = 3,
+#            hjust = 0.5) +
+#   
+#   # Manual fill legend
+#   scale_fill_manual(
+#     values = c("R²Y" = "#440154FF", "Q²" = "#FDE725FF"),
+#     labels = c("Perm R²Y", "Perm Q²")
+#   ) +
+#   
+#   labs(x = "Metric value", y = "Frequency") +
+#   
+#   scale_x_break(c(0.05, 0.90), scales = 0.5) +
+#   
+#   guides(
+#     fill = guide_legend(
+#       override.aes = list(alpha = 0.6),
+#       title = NULL
+#     )
+#   ) +
+#   theme(
+#     legend.position      = "top",
+#     legend.justification = "center",
+#     legend.background    = element_rect(
+#       fill     = "white",
+#       color    = "grey70",
+#       size     = 0.4,
+#       linetype = "solid"
+#     ),
+#     legend.direction     = "vertical",
+#     legend.spacing.y     = unit(0.2, "cm")
+#   ) +
+#   plot_theme
+# 
+# 
+# 
+# # 3) Draw it
+# quartz()
+# print(perm_plot_broken_nature)
+
+# Summarize permuted distributions
+perm_summary <- plot_df %>%
+  group_by(metric) %>%
+  summarise(
+    mean_perm = mean(value, na.rm = TRUE),
+    sd_perm   = sd(value, na.rm = TRUE),
+    .groups = "drop"
   )
 
+# Merge with observed
+bar_df <- perm_summary %>%
+  left_join(obs_df, by = "metric")
 
-# 2) Build the plot with the break
-perm_plot_broken_nature <- ggplot(plot_df, aes(x = value)) + 
-  
-  # Histograms (fill mapped here!)
-  geom_histogram(aes(fill = metric),
-                 position = "identity",
-                 alpha    = 0.6,
-                 bins     = 30,
-                 color    = "white") + 
-  
-  # Dashed lines (manually colored)
-  geom_vline(data = obs_df,
-             aes(xintercept = obs),
-             linetype = "dashed",
-             size     = 0.8,
-             color    = c("#440154FF", "#FDE725FF")) + 
-  
-  # Labels (also manually colored)
-  geom_text(data = obs_df,
-            aes(x = obs, y = Inf,
-                label = sprintf("%s = %.3f\np = %.3f", metric, obs, p_ex)),
-            hjust = -0.1,
-            vjust = c(1.2, 3.5),
-            size  = 3,
-            color = c("#440154FF", "#FDE725FF")) +
-  
-  # R²X arrow and label
-  geom_segment(aes(x = obsR2X, xend = obsR2X, y = 0, yend = -5),
-               arrow = arrow(length = unit(0.2, "cm")),
-               color = "darkgreen") +
-  annotate("text",
-           x     = obsR2X,
-           y     = -8,
-           label = sprintf("R²X = %.3f", obsR2X),
-           color = "darkgreen",
-           size  = 3,
-           hjust = 0.5) +
-  
-  # Manual fill legend
-  scale_fill_manual(
-    values = c("R²Y" = "#440154FF", "Q²" = "#FDE725FF"),
-    labels = c("Perm R²Y", "Perm Q²")
-  ) +
-  
-  labs(x = "Metric value", y = "Frequency") +
-  
-  scale_x_break(c(0.05, 0.90), scales = 0.5) +
-  
-  guides(
-    fill = guide_legend(
-      override.aes = list(alpha = 0.6),
-      title = NULL
-    )
-  ) +
-  
-  nature_theme +
-  theme(
-    legend.position      = "top",
-    legend.justification = "center",
-    legend.background    = element_rect(
-      fill     = "white",
-      color    = "grey70",
-      size     = 0.4,
-      linetype = "solid"
-    ),
-    legend.direction     = "vertical",
-    legend.spacing.y     = unit(0.2, "cm")
-  )
+pal <- c("R²Y"="#440154FF","Q²"="#FDE725FF")
 
+make_hist_zoom <- function(metric_name, bw = 0.002, col = "#440154FF") {
+  df  <- dplyr::filter(plot_df, metric == metric_name)
+  obs <- dplyr::filter(obs_df,  metric == metric_name)$obs
+  xl  <- min(df$value, na.rm = TRUE)
+  xh  <- max(df$value, na.rm = TRUE)
+  pad <- 0.01
+  
+  ggplot(df, aes(value)) +
+    geom_histogram(binwidth = bw, fill = scales::alpha(col, 0.85), colour = "white") +
+    coord_cartesian(xlim = c(xl - pad, xh + pad)) +
+    # arrow + label pointing to the (off-panel) observed value near 1
+    annotate("segment", x = xh + pad*0.9, xend = xh + pad*0.4,
+             y = Inf, yend = Inf, colour = col,
+             arrow = arrow(length = unit(0.18,"cm")), lineend = "round") +
+    annotate("text", x = xh + pad*0.4, y = Inf,
+             label = sprintf("obs = %.3f\np = %.3f", obs,
+                             dplyr::filter(obs_df, metric == metric_name)$p_ex),
+             colour = col, hjust = 1, vjust = 1.2, size = 4) +
+    labs(x = paste0(metric_name, " (permutation)"), y = "Count") +
+    theme_bw(24) +
+    plot_theme
+}
 
+p_r2y_zoom <- make_hist_zoom("R²Y", bw = 0.002, col = "#440154FF")
+p_q2_zoom  <- make_hist_zoom("Q²",  bw = 0.002, col = "#FDE725FF")
 
-# 3) Draw it
 quartz()
-print(perm_plot_broken_nature)
+perm_plot <- (p_r2y_zoom | p_q2_zoom)
+
 
 # Save the plot
-ggsave("fig/main/Fig2b_OPLS_permutation_plot.png", plot = perm_plot_broken_nature, width = 12, height = 6, dpi = 300, bg = "white")
+ggsave("fig/supp/SuppFig6_OPLS_permutation_plot.png", plot = perm_plot, width = 12, height = 8, dpi = 300, bg = "white")
 
 
 
@@ -432,12 +485,244 @@ vip_df <- tibble(
 
 # 2.  Keep VIP > 1.3  (and sort descending)
 vip_hits <- vip_df %>%
-  filter(VIP > 0.5) %>%
+  filter(VIP > 1) %>%
   arrange(desc(VIP))
 
 # How many?
 cat("Number of discriminatory lipids (VIP > 1):", nrow(vip_hits), "\n")
 print(vip_hits, n = Inf)
+
+
+
+
+library(dplyr)
+library(forcats)
+library(ggplot2)
+
+# --- your buckets ---
+mem_sulfolipid   <- c("PG_SQDG","PC_SQDG","PE_SQDG","PS_SQDG","SQDG_TG","DGDG_SQDG")
+mem_galactolipid <- c("DGDG_MGDG","MGDG_PG","MG_MGDG","DGDG_MG","MGDG_PE","MGDG_PC", "MGDG_PS")
+mem_phospholipid <- c("PC_PS","PE_PS","PA_PS","PG_PS")
+
+turn_diacylglycerol <- c("DG_TG","DG_MG","DG_PE","DG_PC","DG_PG","PA_TG")
+turn_lysophospho    <- c("LPC_PS","LPE_PS","LPC_PE","LPC_PG","LPC_LPE","LPE_MGDG","LPC_MG")
+
+group_map <- c(
+  setNames(rep("Sulfolipid adjustments",   length(mem_sulfolipid)),   mem_sulfolipid),
+  setNames(rep("Galactolipid dynamics",    length(mem_galactolipid)), mem_galactolipid),
+  setNames(rep("Phospholipid homeostasis", length(mem_phospholipid)), mem_phospholipid),
+  setNames(rep("DG turnover / signaling",  length(turn_diacylglycerol)), turn_diacylglycerol),
+  setNames(rep("Lyso-phospho turnover",    length(turn_lysophospho)), turn_lysophospho)
+)
+
+vip_df <- vip_hits %>%
+  mutate(Key   = gsub("/", "_", Lipid),
+         Group = unname(group_map[Key]),
+         Group = ifelse(is.na(Group), "Other", Group)) %>%
+  mutate(Group = factor(
+    Group,
+    levels = c("Sulfolipid adjustments","Galactolipid dynamics",
+               "Phospholipid homeostasis","DG turnover / signaling",
+               "Lyso-phospho turnover","Other")
+  ))
+
+# reorder within each facet without extra deps
+vip_df <- vip_df %>%
+  group_by(Group) %>%
+  mutate(Lipid_f = fct_reorder(Lipid, VIP, .desc = FALSE)) %>%
+  ungroup()
+
+p_vip_facets <- ggplot(vip_df, aes(x = Lipid_f, y = VIP, fill = Group)) +
+  geom_col(width = 0.7, colour = "black", linewidth = 0.2, show.legend = FALSE) +
+  coord_flip() +
+  facet_grid(Group ~ ., scales = "free_y", space = "free_y", switch = "y") +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = "grey50") +
+  scale_fill_viridis_d(end = 0.92) +
+  labs(x = NULL, y = "VIP score", title = "OPLS-DA VIP by pathway group") +
+  theme_bw(base_size = 11) +
+  theme(
+    strip.placement    = "outside",
+    strip.text.y.left  = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank()
+  )
+quartz()
+p_vip_facets
+
+
+
+
+
+
+
+
+
+# --- your buckets ---
+mem_sulfolipid   <- c("PG_SQDG","PC_SQDG","PE_SQDG","PS_SQDG","SQDG_TG","DGDG_SQDG")
+mem_galactolipid <- c("DGDG_MGDG","MGDG_PG","MG_MGDG","DGDG_MG","MGDG_PE","MGDG_PC","MGDG_PS")
+mem_phospholipid <- c("PC_PS","PE_PS","PA_PS","PG_PS")
+
+turn_diacylglycerol <- c("DG_TG","DG_MG","DG_PE","DG_PC","DG_PG","PA_TG")
+turn_lysophospho    <- c("LPC_PS","LPE_PS","LPC_PE","LPC_PG","LPC_LPE","LPE_MGDG","LPC_MG")
+
+group_map <- c(
+  setNames(rep("Sulfolipid",   length(mem_sulfolipid)),   mem_sulfolipid),
+  setNames(rep("Galactolipid",    length(mem_galactolipid)), mem_galactolipid),
+  setNames(rep("Phospholipid", length(mem_phospholipid)), mem_phospholipid),
+  setNames(rep("Diacylglycerol",  length(turn_diacylglycerol)), turn_diacylglycerol),
+  setNames(rep("Lyso-phospho",    length(turn_lysophospho)), turn_lysophospho)
+)
+
+# ---------------------------
+# 1) VIP table with groups + per-group order
+# ---------------------------
+vip_df <- vip_hits %>%
+  mutate(Key   = gsub("/", "_", Lipid),
+         Group = unname(group_map[Key]),
+         Group = ifelse(is.na(Group), "Other", Group)) %>%
+  mutate(Group = factor(
+    Group,
+    levels = c("Sulfolipid","Galactolipid",
+               "Phospholipid","Diacylglycerol",
+               "Lyso-phospho","Other")
+  )) %>%
+  group_by(Group) %>%
+  mutate(Lipid_f = fct_reorder(Lipid, VIP, .desc = FALSE)) %>%
+  ungroup()
+
+# LOOKUP (single source of truth for the box side)
+lookup <- vip_df %>% select(Lipid, Group, Lipid_f)
+
+# ---------------------------
+# 2) Build ratio_tbl from wide_log ONLY for VIP ratios
+#    (wide_log is log-space, so log-ratio = num - den)
+# ---------------------------
+build_ratio_tbl <- function(wide_log, vip_df) {
+  ratios <- unique(vip_df$Lipid)
+  parts  <- tibble(ratio = ratios) %>%
+    separate(ratio, into = c("num","den"), sep = "/", remove = FALSE) %>%
+    mutate(col = gsub("/", "_", ratio))
+  
+  # optional sanity check
+  need <- unique(c(parts$num, parts$den))
+  miss <- setdiff(need, names(wide_log))
+  if (length(miss)) warning("Missing in wide_log: ", paste(miss, collapse = ", "))
+  
+  out <- wide_log %>% select(Sample, Condition)
+  for (i in seq_len(nrow(parts))) {
+    n  <- parts$num[i]; d <- parts$den[i]; cn <- parts$col[i]
+    out[[cn]] <- wide_log[[n]] - wide_log[[d]]
+  }
+  out %>% select(Sample, Condition, all_of(parts$col))
+}
+
+ratio_tbl <- build_ratio_tbl(wide_log, vip_df)
+
+# ---------------------------
+# 3) Long data for distributions, stamped with VIP order/group
+# ---------------------------
+keep_keys  <- gsub("/", "_", vip_df$Lipid)
+
+ratio_long <- ratio_tbl %>%
+  pivot_longer(cols = all_of(keep_keys), names_to = "Key", values_to = "Value") %>%
+  mutate(Lipid = gsub("_", "/", Key)) %>%
+  left_join(lookup, by = "Lipid") %>%     # <- DO NOT recompute groups; trust VIP
+  mutate(Condition = factor(Condition, levels = c("Control","LowInput"))) %>%
+  filter(!is.na(Group))                   # should be none, but just in case
+
+# ---------------------------
+# 4) Plots
+# ---------------------------
+
+# Left: VIP bars (horizontal)
+p_vip <- ggplot(vip_df, aes(x = VIP, y = Lipid_f, fill = Group)) +
+  geom_col(width = 0.7, colour = "black", linewidth = 0.2, show.legend = FALSE) +
+  geom_vline(xintercept = 1, linetype = "dashed", colour = "grey60") +
+  scale_fill_viridis_d(end = 0.92) +
+  facet_grid(Group ~ ., scales = "free_y", space = "free_y", switch = "y") +
+  labs(x = "VIP score", y = NULL, title = "OPLS-DA VIP by pathway group") +
+  theme_bw(base_size = 24) +
+  theme(
+    strip.placement    = "outside",
+    strip.text.y.left  = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank()
+  )
+
+# Right: LEFT-ALIGNED distributions (ratios on y; dodge by Condition)
+p_boxes <- ggplot(ratio_long, aes(x = Lipid_f, y = Value, fill = Condition)) +
+  geom_violin(position = position_dodge(width = 0.72),
+              width = 0.9, alpha = 0.25, colour = NA, trim = TRUE) +
+  geom_boxplot(position = position_dodge(width = 0.72),
+               width = 0.55, outlier.shape = NA, colour = "black", alpha = 0.95) +
+  coord_flip() +
+  facet_grid(Group ~ ., scales = "free_y", space = "free_y", switch = "y") +
+  scale_fill_manual(values = c(Control = "#440154FF", LowInput = "#FDE725FF")) +
+  labs(x = NULL, y = "Z-score") +
+  theme_bw(base_size = 24) +
+  theme(
+    # keep horizontal separators between ratios (after flip these are major.y)
+    #panel.grid.major.y = element_line(colour = "grey90"),
+    #panel.grid.minor.y = element_blank(),
+    # optional faint vertical grid
+    #panel.grid.major.x = element_line(colour = "grey95"),
+    
+    # nuke y-axis text/ticks (the ratio names)
+    axis.text.y  = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_blank(),
+    
+    # remove row facet strips on the right panel
+    strip.text.y.left  = element_blank(),
+    strip.background.y = element_blank(),
+    
+    legend.position = "bottom",
+    #strip.placement = "outside",
+    # Remove all grid lines
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) 
+
+
+# Stitch side-by-side
+quartz()
+p_out <- (p_vip | p_boxes) + plot_layout(widths = c(1, 2), guides = "collect")
+
+# theme the *combined* plot
+p_out <- p_out & theme(
+  legend.position       = c(0.5, 1),   # top-center
+  legend.justification  = c(0.5, 1),
+  legend.direction      = "horizontal",
+  legend.box.background = element_rect(color = "grey70", fill = "white", size = 0.6),
+  legend.background     = element_blank(),
+  legend.key            = element_rect(fill = NA, colour = NA),
+  legend.margin         = margin(4, 6, 4, 6)
+)
+
+
+# High-res PNG (journal friendly)
+ggsave("VIP_by_group_boxes.png", plot = p_out,
+       width = 12, height = 24, units = "in", dpi = 300, bg = "white")
+
+
+
+
+# ---------------------------
+# 5) Optional sanity checks
+# ---------------------------
+# Any VIP ratio missing from ratio_tbl?
+setdiff(gsub("/", "_", vip_df$Lipid), names(ratio_tbl))         # expect character(0)
+
+# Any VIP ratio lost before plotting?
+setdiff(vip_df$Lipid, unique(ratio_long$Lipid))                 # expect character(0)
+
+
+
+
+
+
+
+
 
 # Convert to latex format:
 kable(vip_hits, format = "latex", booktabs = TRUE, linesep = "", escape = FALSE) %>%

@@ -98,35 +98,30 @@ ratio_tbl <- wide_log %>%
     ### Membrane Lipid remodeling
     
     # ## 1. Sulfolipid Adjustments
-    # #SQDG is the most vulnerable lipid:
-    # SQDG_PC    = SQDG - PC,
-    # SQDG_PG    = SQDG - PG,
-    # SQDG_DGDG  = SQDG - DGDG, # Anionic lipid trade-offs
-    # SQDG_MGDG  = SQDG - MGDG, 
-    # SQDG_total = SQDG - ((DGDG + MGDG) / 2), # Sulfur allocation balance
+    #SQDG is the most vulnerable lipid:
+    # SQDG replaces phospholipids in chloroplast membranes under low-P
+    PG_SQDG  = PG - SQDG,    # Thylakoid membrane remodeling (PG is major chloroplast phospholipid)
+    PC_SQDG  = PC - SQDG,   # Extra-plastidic membrane adaptation
+    PE_SQDG  = PE - SQDG,    # Non-plastidic phospholipid replacement
+    SQDG_TG  = SQDG - TG,    # SQDG accumulation vs. storage lipids
+    DGDG_SQDG  = SQDG - DGDG, # Anionic lipid trade-offs
+    SQDG_total = SQDG - ((DGDG + MGDG) / 2), # Sulfur allocation balance
     
-    # VIP
-    
-    MG_SQDG    = MG - SQDG, # Monogalactosyl vs. sulfolipid balance
-    PG_SQDG    = PG - SQDG, # Phosphatidylglycerol vs. sulfolipid balance
-    PE_SQDG    = PE - SQDG, # Phosphatidylethanolamine vs. sulfolipid balance
-    DGDG_SQDG  = DGDG - SQDG, # Digalactosyl vs. sulfolipid balance
-    PC_SQDG    = PC - SQDG, # Phosphatidylcholine vs. sulfolipid balance
-    SQDG_TG    = SQDG - TG, # Sulfolipid vs. storage lipid balance
-    
+    #SQDG_MGDG  = SQDG - MGDG,
+  
+
+
     
     
     # ## 2. Galactolipid Dynamics
-    # #MGDG is preferentially degraded:
-    # MGDG_DGDG  = MGDG - DGDG, # Monogalactosyl vs. digalactosyl balance (bilayer vs. non-bilayer)
-    # MGDG_PC    = MGDG - PC,
-    # MGDG_total = MGDG - ((DGDG + SQDG) / 2), # Absolute monogalactolipid shift
-    
-    # VIP
-    
-    MG_MGDG  = MGDG - MG, # Monogalactosyl vs. monogalactolipid balance
-    DGDG_MG  = DGDG - MGDG, # Digalactosyl vs. monogalactolipid balance
-    
+    #MGDG is preferentially degraded:
+    DGDG_MGDG  = DGDG - MGDG, # Monogalactosyl vs. digalactosyl balance (bilayer vs. non-bilayer)
+    MGDG_PG    = MGDG - PG,
+    MG_MGDG  = MG - MGDG, # Monoglyceride flux to monogalactolipids
+    #MGDG_total = MGDG - ((DGDG + SQDG) / 2), # Absolute monogalactolipid shift
+    #DGDG_total = DGDG - ((MGDG + SQDG) / 2), # Absolute digalactolipid shift
+
+  
     
     # # DGDG is partially spared but outcompeted by phospholipids:
     # DGDG_total = DGDG - ((MGDG + SQDG) / 2), # Absolute digalactolipid shift
@@ -137,6 +132,16 @@ ratio_tbl <- wide_log %>%
     
     
     # ## 3. Phospholipid Homeostasis
+    PC_PS = PC - PS,   # PS is a stress-signaling lipid (membrane asymmetry)
+    PE_PS = PE - PS,   # PE/PS balance affects membrane curvature
+    PA_PS = PA - PS,   # PA is a stress-signaling precursor (e.g., phospholipase D activity)
+    PG_PS = PG - PS,   # PS is a stress-signaling lipid (membrane asymmetry)
+    PG_ret = PG - ((PC + PE) / 2), # Photosynthetic membrane priority
+    NonP_P = (MGDG + DGDG + SQDG) - ((PC + PE) / 2), # Non-phospholipid balance
+    #PC_total    = PC - ((PE + PG + PS) / 3), # Phospholipid balance
+    #PE_total    = PE - ((PC + PG + PS) / 3), # Phospholipid balance
+    #PS_total    = PS - ((PC + PE + PG) / 3), # Phospholipid balance
+    
     # PC_PE        = PC - PE, # Major bilayer asymmetry
     # PC_PG        = PC - PG,
     # PC_PS        = PC - PS, # Phosphatidylserine balance
@@ -148,14 +153,6 @@ ratio_tbl <- wide_log %>%
     # PS_total    = PS - ((PC + PE + PG) / 3), # Phospholipid balance
     # 
     
-    #VIP
-    
-    PG_PS        = PG - PS, # Phosphatidylglycerol vs. phosphatidylserine balance
-    PC_PS        = PC - PS, # Phosphatidylcholine vs. phosphatidylserine balance
-    PE_PS        = PE - PS, # Phosphatidylethanolamine vs. phosphatidylserine balance
-    PS_TG        = PS - TG, # Phosphatidylserine vs. storage lipid balance
-    PA_PS        = PA - PS, # Phosphatidic acid vs. phosphatidylserine balance
-    PG_retention = PG - ((PC + PE) / 2), # Photosynthetic membrane priority
     
     
     
@@ -163,21 +160,36 @@ ratio_tbl <- wide_log %>%
     
     ## 1. Diacylglycerol Flux Hub
     # DG Accumulates from Degraded Lipids but is Excluded from Membranes
-    DG_DGDG    = DG   - DGDG,
-    DG_MGDG    = DG   - MGDG, # Precursor flux to galactolipids
-    
-    DG_PC        = DG  - PC,
-    DG_PE        = DG  - PE,
+    DG_TG = DG - TG,   # Diacylglycerol vs. triacylglycerol (TAG synthesis/breakdown)
+    DG_MG = DG - MG,   # Diacylglycerol vs. monoacylglycerol (lipolysis marker)
     DG_Phospho   = DG  - ((PC + PE) / 2), # Phospholipid-derived precursor pool
-    DG_SQDG    = DG   - SQDG,
+    
+    
+    
+    
+    # DG_DGDG    = DG   - DGDG,
+    # DG_MGDG    = DG   - MGDG, # Precursor flux to galactolipids
+    # 
+    # DG_PC        = DG  - PC,
+    # DG_PE        = DG  - PE,
+    # DG_Phospho   = DG  - ((PC + PE) / 2), # Phospholipid-derived precursor pool
+    # DG_SQDG    = DG   - SQDG,
    
     
     
     ## 2. Lysophospholipids Remodeling
-    LPC_PC       = LPC - PC,
-    LPE_PE       = LPE - PE,
-    Lyso_activity = (LPC + LPE) - (PC + PE), # Global phospholipase activity
+    LPC_PS  = LPC - PS,  # Lyso-PC accumulation (phospholipase A2 activity)
+    LPE_PS  = LPE - PS,  # Lyso-PE accumulation (phospholipase A2 activity)
+    LPC_PE = LPC - PE,  # Lyso-PC vs. PE (phospholipase A1 activity)
+    LPC_PG = LPC - PG,  # Lyso-PC vs. PG (phospholipase A1 activity)
+    LPC_LPE = LPC - LPE, # Phospholipase specificity (e.g., PLA1 vs. PLA2)
+
     
+    
+        # LPC_PC       = LPC - PC,
+    # LPE_PE       = LPE - PE,
+    # Lyso_activity = (LPC + LPE) - (PC + PE), # Global phospholipase activity
+    # 
     
     
     ### Carbon sink and allocation
@@ -185,11 +197,7 @@ ratio_tbl <- wide_log %>%
     ## 1. Storage Lipid Reallocation
     
     # Triacylglycerol (TG) Synthesis Dominates Under Stress
-    TG_DG        = TG  - DG, # DAG→TAG conversion efficiency
     TG_Galacto   = TG - (MGDG + DGDG)/2,  # Storage vs. chloroplast lipids
-    
-    
-    
     TG_Phospho   = TG  - ((PC + PE) / 2), # Storage vs. membrane lipids
     DG_to_Gala   = DG - ((MGDG + DGDG)/2), # Precursor flux to galactolipids
     
@@ -211,42 +219,30 @@ ratio_tbl <- wide_log %>%
 ratio_long <- ratio_tbl %>%
   dplyr::select(Sample,Condition,
                 
-                # # Sulfolipid Adjustments
-                # SQDG_PC, SQDG_PG, SQDG_DGDG, SQDG_MGDG, SQDG_total,
-                # 
-                # # Galactolipid Dynamics
-                # MGDG_DGDG,  MGDG_PC, MGDG_total, 
-                # DGDG_total,  DGDG_PC, DGDG_PE, DGDG_PG,
-                # 
-                # # Phospholipid Homeostasis
-                # PC_PE, PC_PG, PC_PS, PE_PS, PG_retention, NonP_Phospho, PC_total, PE_total, PS_total,
-                
-                #VIP
-                MG_SQDG, PG_SQDG, PE_SQDG, DGDG_SQDG, PC_SQDG, SQDG_TG,
+                # Sulfolipid Adjustments
+                PG_SQDG,PC_SQDG,PE_SQDG,SQDG_TG,DGDG_SQDG,#SQDG_total,
+            
                 # Galactolipid Dynamics
-                MG_MGDG, DGDG_MG,
-                # DGDG_total, DGDG_PC, DGDG_PE, DGDG_PG,
+                DGDG_MGDG, MGDG_PG, MG_MGDG,# MGDG_total, DGDG_total,
+                
                 # Phospholipid Homeostasis
-                PG_PS, PC_PS, PE_PS, PS_TG, PA_PS, PG_retention,
-                
-                
+                PC_PS, PE_PS, PA_PS, PG_PS, PG_ret, NonP_P,# PC_total, PE_total, PS_total,
+        
                 
                 # Diacylglycerol Flux Hub
-                DG_DGDG, DG_MGDG, 
-                DG_PC, DG_PE,  DG_Phospho, DG_SQDG,
+                DG_TG, DG_MG, DG_Phospho,
+                
                 
                 # Lysophospholipids Remodeling 
-                LPC_PC, LPE_PE, Lyso_activity,
+                LPC_PS, LPE_PS, LPC_PE, LPC_PG, LPC_LPE,
+                
                 
                 # Storage Lipid Reallocation
-                TG_DG, TG_Galacto, 
-                TG_Phospho,DG_to_Gala,
+                TG_Galacto, TG_Phospho, DG_to_Gala,
                 
                 # Metabolic Trade-offs
                 Storage_vs_Photo, Storage_vs_Membrane
                
-
-                
                                 
   ) %>%
   pivot_longer(-c(Sample, Condition),
@@ -278,27 +274,21 @@ stat_df <- ratio_long %>%
 # mem_galactolipid   <- c("MGDG_DGDG",  "MGDG_PC", "MGDG_total","DGDG_total",  "DGDG_PC", "DGDG_PE", "DGDG_PG" )
 # mem_phospholipid   <- c("PC_PE","PC_PG","PC_PS", "PE_PS","PG_retention","NonP_Phospho","PC_total", "PE_total", "PS_total")
 
-# VIP lipid ratios
-mem_sulfolipid <- c("MG_SQDG","PG_SQDG","PE_SQDG","DGDG_SQDG","PC_SQDG","SQDG_TG")
-mem_galactolipid <- c("MG_MGDG","DGDG_MG")
-mem_phospholipid <- c("PG_PS","PC_PS","PE_PS","PS_TG","PA_PS")
+mem_sulfolipid <- c("PG_SQDG","PC_SQDG","PE_SQDG","SQDG_TG","DGDG_SQDG")
+mem_galactolipid <- c("DGDG_MGDG", "MGDG_PG", "MG_MGDG")
+mem_phospholipid <- c("PC_PS", "PE_PS", "PA_PS", "PG_PS", "PG_ret", "NonP_P")
 
 ### Lipid Turnover and Signaling
 # turn_diacylglycerol<- c("DG_DGDG", "DG_MGDG","DG_PC","DG_PE","DG_Phospho","DG_SQDG")
 # turn_lysophospho   <- c("LPC_PC","LPE_PE","Lyso_activity")
-
-# VIP lipid ratios
-turn_diacylglycerol <- c("DG_MG","DG_PG","DG_PE","DG_SQDG","DG_TG","LPC_TG")
-turn_lysophospho <- c("LPC_MG","LPE_SQDG","LPC_LPE","LPE_MGDG","DG_LPE","LPC_PE","LPC_PG","LPC_TG")
+turn_diacylglycerol <- c("DG_TG", "DG_MG", "DG_Phospho")
+turn_lysophospho <- c("LPC_PS", "LPE_PS", "LPC_PE", "LPC_PG", "LPC_LPE")
 
 ### Carbon sink and allocation
 # carbon_storage     <- c("TG_DG","TG_Galacto", "TG_Phospho","DG_to_Gala","")
 # carbon_photo       <- c( "Storage_vs_Photo","Storage_vs_Membrane")
-
-# VIP lipid ratios
-carbon_storage     <- c("TG_DG","TG_Galacto", "TG_Phospho","DG_to_Gala")
-carbon_photo       <- c( "Storage_vs_Photo","Storage_vs_Membrane")
-
+carbon_storage  <- c("TG_Galacto", "TG_Phospho", "DG_to_Gala")
+carbon_photo    <- c("Storage_vs_Photo", "Storage_vs_Membrane")
 
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 7)  PLOTTING FUNCTION                                            ║
@@ -308,12 +298,50 @@ carbon_photo       <- c( "Storage_vs_Photo","Storage_vs_Membrane")
 condition_cols <- c(Control = "#440154FF", LowInput = "#FDE725FF")
 
 # Pre-used theme
-nature_theme <- theme_minimal(12) +
-  theme(axis.line        = element_line(colour = "black"),
-        axis.text        = element_text(colour = "black"),
-        panel.grid.major = element_line(colour = "grey92"),
-        panel.grid.minor = element_line(colour = "grey95"),
-        legend.position  = "none")
+# nature_theme <- theme_minimal(12) +
+#   theme(axis.line        = element_line(colour = "black"),
+#         axis.text        = element_text(colour = "black"),
+#         panel.grid.major = element_line(colour = "grey92"),
+#         panel.grid.minor = element_line(colour = "grey95"),
+#         legend.position  = "none")
+
+plot_theme <- theme_minimal(base_size = 24) +
+  theme(
+    plot.title     = element_text(
+      size   = 14,
+      face   = "bold",
+      hjust  = 0.5,
+      margin = margin(b = 10)
+    ),
+    axis.title.x   = element_text(
+      size = 16,      # X‐axis title size
+      face = "bold"
+    ),
+    axis.title.y   = element_text(
+      size = 16,      # Y‐axis title size
+      face = "bold"
+    ),
+    axis.text.x    = element_text(
+      size = 16,      # X‐axis tick label size
+      color = "black"
+    ),
+    axis.text.y    = element_text(
+      size = 16,      # Y‐axis tick label size
+      color = "black"
+    ),
+    axis.line      = element_line(color = "black"),
+    panel.grid     = element_blank(),
+    
+    legend.position      = c(0.95, 0.95),
+    legend.justification = c("right","top"),
+    legend.background    = element_rect(fill="white", color="grey70", size=0.4),
+    legend.direction     = "vertical",
+    legend.spacing.y     = unit(0.2,"cm"),
+    legend.title         = element_blank(),
+    legend.text          = element_text(size=16),
+    
+    plot.margin    = margin(15, 15, 15, 15)
+  )
 
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 8)  PLOTTING                                                     ║
@@ -327,9 +355,23 @@ ratio_to_group <- function(r) {
   } else if (r %in% mem_galactolipid) {
     "Galactolipid Dynamics"
     
-  } else if (r %in% mem_phospholipid) {
+  # } else if (r %in% mem_phospholipid) {
+  #   "Phospholipid Homeostasis"
+  # } else {
+    NA_character_
+  }
+}
+
+ratio_to_group <- function(r) {
+  if (r %in% mem_phospholipid) {
     "Phospholipid Homeostasis"
-  } else {
+    
+  # } else if (r %in% mem_galactolipid) {
+  #   "Galactolipid Dynamics"
+  #   
+  #   # } else if (r %in% mem_phospholipid) {
+  #   #   "Phospholipid Homeostasis"
+     } else {
     NA_character_
   }
 }
@@ -346,8 +388,8 @@ ratio_long2 <- ratio_long %>%
   mutate(
     Ratio = factor(Ratio, levels = desired_order),
     Group = factor(Group, levels = c(
-    "Sulfolipid Adjustments",
-    "Galactolipid Dynamics",
+    #"Sulfolipid Adjustments",
+    #"Galactolipid Dynamics"
     "Phospholipid Homeostasis"
   )))
 
@@ -358,8 +400,8 @@ stat_df2 <- stat_df %>%
   mutate(
     Ratio = factor(Ratio, levels = desired_order),
     Group = factor(Group, levels = c(
-    "Sulfolipid Adjustments",
-    "Galactolipid Dynamics",
+    #"Sulfolipid Adjustments",
+    #"Galactolipid Dynamics"
     "Phospholipid Homeostasis"
   )))
 
@@ -378,7 +420,7 @@ p_nested <- ggplot(ratio_long2, aes(Condition, Value, fill = Condition, colour =
   scale_fill_manual(values = condition_cols) +
   scale_colour_manual(values = condition_cols) +
   labs(x = NULL, y = "Z-scores") +
-  nature_theme +
+  plot_theme +
   facet_grid2(
     rows = NULL,
     cols = vars(Group, Ratio),
@@ -389,8 +431,9 @@ p_nested <- ggplot(ratio_long2, aes(Condition, Value, fill = Condition, colour =
       background_x = elem_list_rect(fill = c("white", "white")),
       # Both Group-level and Ratio-level text use plain face and same size:
       text_x = list(
-        element_text(face = "plain", size = 10),  # Group-level
-        element_text(face = "plain", size = 10)   # Ratio-level
+        element_text(face = "bold", size = 24),  # Group-level
+        element_text(face = "bold", size = 24)
+        
       )
     )
   ) +
@@ -400,15 +443,15 @@ p_nested <- ggplot(ratio_long2, aes(Condition, Value, fill = Condition, colour =
     panel.grid.major.y = element_line(colour = "grey90"),
     panel.grid.major.x = element_blank(),
     legend.position    = "none",
-    plot.title         = element_text(hjust = 0.5, face = "plain", size = 14)
+    plot.title         = element_text(hjust = 0.5, face = "plain", size = 24)
   ) +
   ggtitle("Membrane Lipid Remodeling")
 
 quartz(width = 12, height = 6)
 print(p_nested)
 
-ggsave("nested_lipid_remodeling_analysis2.png", p_nested,
-       width = 16, height = 6, units = "in", dpi = 300, bg = "white")
+ggsave("fig/main/Fig3_lipid_remodeling_analysis2.png", p_nested,
+       width = 28, height = 8, units = "in", dpi = 300, bg = "white")
 
 
 
@@ -465,7 +508,7 @@ p_nested2 <- ggplot(ratio_long3, aes(Condition, Value, fill = Condition, colour 
   scale_fill_manual(values = condition_cols) +
   scale_colour_manual(values = condition_cols) +
   labs(x = NULL, y = "Z-scores") +
-  nature_theme +
+  plot_theme +
   facet_grid2(
     rows = NULL,
     cols   = vars(Group, Ratio),
@@ -474,8 +517,8 @@ p_nested2 <- ggplot(ratio_long3, aes(Condition, Value, fill = Condition, colour 
     strip  = strip_nested(
       background_x   = elem_list_rect(fill   = c("white", "white")),
       text_x         = list(
-        element_text(face   = "plain", size   = 10), # Group-level
-        element_text(face   = "plain", size   = 10) # Ratio-level
+        element_text(face   = "bold", size   = 24), # Group-level
+        element_text(face   = "bold", size   = 24) # Ratio-level
       )
     )
   ) +
@@ -485,15 +528,15 @@ p_nested2 <- ggplot(ratio_long3, aes(Condition, Value, fill = Condition, colour 
     panel.grid.major.y = element_line(colour   = "grey90"),
     panel.grid.major.x = element_blank(),
     legend.position    = "none",
-    plot.title         = element_text(hjust   = 0.5, face   ="plain", size   =14)
+    plot.title         = element_text(hjust   = 0.5, face   ="plain", size   =24)
   ) +
   ggtitle("Lipid Turnover and Signaling")
 
 
 quartz(width = 12, height = 6)
 print(p_nested2)
-ggsave("nested_lipid_turnover_analysis2.png", p_nested2,
-       width = 12, height = 6, units = "in", dpi = 300, bg = "white")
+ggsave("fig/main/Fig3b_lipid_turnover_analysis2.png", p_nested2,
+       width = 28, height = 8, units = "in", dpi = 300, bg = "white")
 
 
 
@@ -548,7 +591,7 @@ p_nested3 <- ggplot(ratio_long4, aes(Condition, Value, fill = Condition, colour 
   scale_fill_manual(values = condition_cols) +
   scale_colour_manual(values = condition_cols) +
   labs(x = NULL, y = "Z-scores") +
-  nature_theme +
+  plot_theme +
   facet_grid2(
     rows   = NULL,
     cols   = vars(Group, Ratio),
@@ -557,8 +600,8 @@ p_nested3 <- ggplot(ratio_long4, aes(Condition, Value, fill = Condition, colour 
     strip  = strip_nested(
       background_x   = elem_list_rect(fill   = c("white", "white")),
       text_x         = list(
-        element_text(face   ="plain", size   =10), # Group-level
-        element_text(face   ="plain", size   =10) # Ratio-level
+        element_text(face   ="bold", size   =24), # Group-level
+        element_text(face   ="bold", size   =24) # Ratio-level
       )
     )
   ) +
@@ -568,14 +611,14 @@ p_nested3 <- ggplot(ratio_long4, aes(Condition, Value, fill = Condition, colour 
     panel.grid.major.y = element_line(colour   ="grey90"),
     panel.grid.major.x = element_blank(),
     legend.position    = "none",
-    plot.title         = element_text(hjust   =0.5, face   ="plain", size   =14)
+    plot.title         = element_text(hjust   =0.5, face   ="plain", size   =24)
   ) +
   ggtitle("Carbon sink and allocation")
 
 quartz(width = 12, height = 6)
 print(p_nested3)
-ggsave("nested_lipid_carbon_analysis2.png", p_nested3,
-       width = 10, height = 6, units = "in", dpi = 300, bg = "white")
+ggsave("fig/main/Fig3c_lipid_carbon_analysis2.png", p_nested3,
+       width = 28, height = 8, units = "in", dpi = 300, bg = "white")
 
 
 

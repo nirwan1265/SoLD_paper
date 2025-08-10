@@ -149,7 +149,7 @@ lwp  <- table_lowinput %>% rename(Pct_LowInput  = mean_pct, Species = Lipid)
 
 
 ###############################################################################
-### Supplementary Table 1
+### Supplementary Table 3
 ###############################################################################
 
 # Combine Control and LowInput percentages
@@ -175,7 +175,7 @@ colnames(combined)[3:4] <- c("Control_Percentage", "LowInput_Percentage")
 print(combined, n = Inf)
 
 # Save:
-write.csv(combined, "table/supp/SuppTable1_overlap_control_lowinput_lipid_species_percentages.csv", row.names = FALSE)
+write.csv(combined, "table/supp/SuppTable3_overlap_control_lowinput_lipid_species_percentages.csv", row.names = FALSE)
 
 
 ###############################################################################

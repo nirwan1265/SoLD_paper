@@ -108,7 +108,7 @@ pal          <- viridis(length(classes_all), option = "D")
 names(pal)   <- classes_all
 
 
-plot_theme <- theme_minimal(base_size = 16) +
+plot_theme <- theme_minimal(base_size = 24) +
   theme(
     plot.title     = element_text(
       size   = 14,
@@ -117,19 +117,19 @@ plot_theme <- theme_minimal(base_size = 16) +
       margin = margin(b = 10)
     ),
     axis.title.x   = element_text(
-      size = 18,      # X‐axis title size
+      size = 24,      # X‐axis title size
       face = "bold"
     ),
     axis.title.y   = element_text(
-      size = 18,      # Y‐axis title size
+      size = 24,      # Y‐axis title size
       face = "bold"
     ),
     axis.text.x    = element_text(
-      size = 18,      # X‐axis tick label size
+      size = 24,      # X‐axis tick label size
       color = "black"
     ),
     axis.text.y    = element_text(
-      size = 18,      # Y‐axis tick label size
+      size = 24,      # Y‐axis tick label size
       color = "black"
     ),
     axis.line      = element_line(color = "black"),
@@ -156,14 +156,14 @@ p_bar <- ggplot(pct_mean,
   geom_text(aes(label = ifelse(pct_mean >= threshold,
                                sprintf("%.1f%%", pct_mean), "")),
             position = position_stack(vjust = 0.5),
-            colour   = "white", size = 3) +
+            colour   = "white", size = 8) +
   scale_fill_manual(values = pal, guide = "none") +
   scale_x_continuous(expand = c(0,0),
                      #limits = c(0,100),
                      breaks = seq(0,100,25),
                      labels = function(x) paste0(x, "%")) +
   labs(x = "% of TIC", y = NULL) +
-  theme_classic(base_size = 16) +
+  theme_classic(base_size = 24) +
   theme(axis.line.x = element_line(size = .4),
         axis.line.y = element_line(size = .4),
         axis.text.x    = element_text(face = "bold", size = 16),  # enlarge x‐axis tick labels
@@ -208,8 +208,8 @@ tg <- tableGrob(
   rows = NULL,
   theme = ttheme_minimal(
     base_size = 16,
-    core = list(fg_params = list(fontsize = 16, hjust = 0.5)),
-    colhead = list(fg_params = list(fontsize = 16, fontface = "bold"))
+    core = list(fg_params = list(fontsize = 24, hjust = 0.5)),
+    colhead = list(fg_params = list(fontsize = 24, fontface = "bold"))
   )
 )
 
@@ -314,14 +314,14 @@ p_sc <- ggplot(pct_SC_mean,
   geom_text(aes(label = ifelse(pct_mean >= threshold,
                                sprintf("%.1f%%", pct_mean), "")),
             position = position_stack(vjust = 0.5),
-            colour = "white", size = 3.2) +
+            colour = "white", size = 6) +
   scale_fill_manual(values = pal, guide = "none") +   # ← remove legend
   scale_x_continuous(expand = c(0,0),
                      #limits  = c(0,100),
                      breaks  = seq(0,100,25),
                      labels  = function(x) paste0(x, "%")) +
   labs(x = "% of TIC", y = NULL) +
-  theme_classic(base_size = 16) +
+  theme_classic(base_size = 24) +
   theme(axis.line.x = element_line(size = .4),
         axis.line.y = element_line(size = .4),
         axis.text.x    = element_text(face = "bold", size = 16),  # enlarge x‐axis tick labels
@@ -357,9 +357,9 @@ tbl_sc <- pct_SC_mean %>%
 tg_sc <- tableGrob(
   tbl_sc, rows = NULL,
   theme = ttheme_minimal(
-    base_size = 14,
-    core    = list(fg_params = list(fontsize = 16, hjust = 0.5)),
-    colhead = list(fg_params = list(fontsize = 16, fontface = "bold"))
+    base_size = 24,
+    core    = list(fg_params = list(fontsize = 24, hjust = 0.5)),
+    colhead = list(fg_params = list(fontsize = 24, fontface = "bold"))
   )
 )
 
@@ -392,7 +392,7 @@ grid::grid.draw(fig1b)
 ### Save the plot
 ggplot2::ggsave("fig/supp/SuppFig5A_TIC_lipid_class.png",
                 fig1b,
-                width = 24, height = 8, units = "in", bg = "white")
+                width = 32, height = 8, units = "in", bg = "white")
 
 
 
@@ -477,8 +477,10 @@ make_class_panel <- function(df, cls, label_thresh = 3) {
         TRUE                                    ~ ""
       )
     ),
+    
+
     position = position_stack(vjust = .5),
-    colour = "white", size = 3, na.rm = TRUE) +
+    colour = "white", size = 6, na.rm = TRUE) +
     scale_fill_manual(values = pal_sub) +
     scale_x_continuous(
       expand = c(0,0),
@@ -487,12 +489,17 @@ make_class_panel <- function(df, cls, label_thresh = 3) {
       labels = function(x) paste0(x,"%")
     ) +
     labs(title = cls, x = NULL, y = NULL) +
-    theme_classic(base_size = 18) +
+    theme_classic(base_size = 24) +
     theme(
       plot.title   = element_text(face="bold", hjust=.5),
-      axis.text    = element_text(size=12)
+      axis.text    = element_text(size=24)
     ) +
     theme(legend.position = "none") +
+    theme(axis.line.x = element_line(size = .4),
+          axis.line.y = element_line(size = .4),
+          axis.text.x    = element_text(face = "bold", size = 16),  # enlarge x‐axis tick labels
+          axis.text.y    = element_text(face = "bold", size = 16),  # enlarge y‐axis tick labels
+          axis.title.x   = element_text(face = "bold", size = 16))  +  # enlarge x‐axis label)
     plot_theme
   
   
@@ -519,8 +526,8 @@ make_class_panel <- function(df, cls, label_thresh = 3) {
   tg <- tableGrob(
     tbl, rows = NULL,
     theme = ttheme_minimal(
-      core    = list(fg_params=list(hjust=.5, fontsize=12)),
-      colhead = list(fg_params=list(fontface="bold", fontsize=13))
+      core    = list(fg_params=list(hjust=.5, fontsize=24)),
+      colhead = list(fg_params=list(fontface="bold", fontsize=24))
     )
   )
   
@@ -562,7 +569,7 @@ grid::grid.draw(multi_panel)
 # 10. Save to file
 ggsave("fig/supp/SuppFig5B_TIC_Glycerophospholipid_panels.png", 
        multi_panel,
-       width = 24,    # adjust to your desired width
+       width = 32,    # adjust to your desired width
        height = 8,    # and height
        dpi = 300)
 
@@ -581,6 +588,7 @@ grid::grid.draw(multi_panel)
 # 10. Save to file
 ggsave("fig/supp/SuppFig5C_TIC_Glycerolipid_panels.png", 
        multi_panel,
-       width = 24,    # adjust to your desired width
+       width = 32,    # adjust to your desired width
        height = 8,    # and height
        dpi = 300)
+

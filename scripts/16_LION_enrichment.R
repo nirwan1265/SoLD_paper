@@ -80,4 +80,4 @@ lion_lipid <- ggplot(df2, aes(x=logQ, y=Description)) +
   )
 
 # Save the plot
-ggsave("fig/main/Fig7_LION_enrichment.png",plot=last_plot(), width = 12, height = 14, dpi = 300, bg = "white")
+ggsave("fig/main/Fig1b_LION_enrichment.png",plot=last_plot(), width = 10, height = 10, dpi = 300, bg = "white")

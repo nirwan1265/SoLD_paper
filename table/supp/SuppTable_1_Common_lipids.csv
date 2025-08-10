@@ -1,0 +1,173 @@
+Common_Lipids,Unique_Control,Unique_LowInput
+AEG(o-15:2/15:0),"14(15)-Epoxy-5Z,8Z,11Z-eicosatrienoic acid, methyl ester",.beta.-Amyrin acetate
+AEG(o-16:2/16:0),trans-EKODE-(E)-Ib,1-heptadecanoyl-2-hydroxy-sn-glycero-3-phosphocholine
+AEG(o-16:2/18:2),DG(16:0/16:0),"11,14,17-Eicosatrienoic acid,(Z,Z,Z)-"
+AEG(o-16:3/16:0),DG(16:0/18:0),"13-Keto-9Z,11E-octadecadienoic acid"
+AEG(o-18:3/16:1),DG(16:0/2:0),13S-HOTrE
+AEG(o-18:4/16:1),DG(18:0/18:0),3-Epilupeol
+AEG(o-18:4/18:2),MG(16:1),Alpha-Carotene
+.gamma.-Linolenoyl ethanolamide,MG(18:0),DG(16:1/18:2)
+"8(9)-Epoxy-5Z,11Z,14Z-eicosatrienoic acid, methyl ester",MG(20:4),DG(18:0/20:3)
+"9,12,13,TriHODE",SQDG(16:0/18:0),DG(8:0/8:0)
+FA(22:1),TG(10:0/16:1/18:1),DGTS(34:5)
+Oxo fatty acid (18:3),TG(12:0/12:0/16:1),Fucosterol
+DG(12:0/12:0),TG(12:0/12:0/18:2),Glycerol Tri-n-octanoate - 40.0 eV
+DG(16:0/18:1),TG(12:0/14:0/18:3),Hydroperoxy fatty acid (18:3)
+DG(16:0/18:2),TG(12:0/16:0/18:2),LPC(18:2)
+DG(16:0/18:3),TG(12:0/18:1/18:1),Lupeol
+DG(16:1/18:3),TG(12:0/18:1/18:2),Lycopene
+DG(18:1/18:1),TG(14:0/14:0/16:0),NAE(16:0)
+DG(18:1/18:2),TG(14:0/16:0/16:0),NAE(18:0)
+DG(18:1/18:3),TG(16:0/16:0/18:2),NCGC00380283-01!4-[5-[[4-[5-[acetyl(hydroxy)amino]pentylamino]-4-oxobutanoyl]-hydroxyamino]pentylamino]-4-oxobutanoic acid
+DG(18:1/2:0),TG(16:0/18:1/18:1),PA(16:0/18:1)
+DG(18:2/18:2),TG(16:0/18:1/20:1),PC(16:0/20:1)
+DG(18:2/18:3),TG(16:0/18:1/22:1),PC(16:1/20:4)
+DG(18:3/18:3),TG(16:1/18:1/18:1),PC(16:1/20:5)
+DGDG(16:0/18:1),TG(16:1/20:1/22:1),PC(16:2/16:1)
+DGDG(16:0/18:2),TG(18:0/18:0/20:1),PC(18:2/18:2)
+DGDG(16:0/18:3),TG(18:1/20:0/22:1),PC(18:2/20:4)
+DGDG(18:0/18:2),TG(18:1/20:1/22:1),PC(18:3/18:3)
+DGDG(18:0/18:3),TG(18:2/18:2/20:2),PE(16:1/18:2)
+DGDG(18:2/18:3),TG(18:2/20:3/21:0),PE(18:0/18:3)
+DGDG(18:2/18:4),TG(18:2/22:0/22:3),PE(18:1/18:1)
+MG(12:0),TG(8:0/16:1/18:1),PG(16:0/18:0)
+MG(16:0),CL(18:1),TG(10:0/10:0/14:0)
+MG(18:1),PC(14:0/20:4),TG(14:0/14:1/18:1)
+MG(18:2),PC(18:1/14:0),TG(14:0/16:0/18:2)
+MG(18:3),PC(18:1/22:1),TG(14:0/16:1/18:2)
+MGDG(16:0/18:1),PC(18:1/24:0),TG(14:0/16:1/22:6)
+MGDG(16:0/18:3),PC(18:2/0:0),TG(14:0/18:1/18:1)
+MGDG(18:2/18:2),PC(18:3/0:0),TG(16:0/16:0/20:3)
+MGDG(18:2/18:3),PC(22:0/0:0),TG(16:0/18:0/22:1)
+MGDG(18:3/18:3),PC(22:1/22:1),TG(16:0/18:2/22:0)
+Panaxcerol B,PE(16:0/0:0),TG(18:0/18:0/18:2)
+SQDG(16:0/14:0),PE(18:0/18:1),TG(18:0/18:1/18:2)
+SQDG(16:0/16:0),PE(18:1/18:2),TG(18:0/18:1/22:0)
+SQDG(16:0/18:1),PG(18:0/16:0),TG(18:0/18:2/18:3)
+SQDG(16:0/18:2),PS(18:0/20:4),TG(18:1/18:1/18:1)
+SQDG(16:0/18:3),Cer(d18:2/20:1),TG(18:1/18:1/18:2)
+SQDG(16:1/18:3),GalCer(d18:2/22:1),TG(18:1/18:2/22:0)
+SQDG(18:0/18:3),SPB 18:0;2OH,TG(18:2/18:3/20:1)
+SQDG(18:1/18:3),SPHINGANINE,TG(18:2/18:3/22:1)
+SQDG(18:2/18:3),.alpha.-Ionone,TG(18:3/18:3/20:3)
+SQDG(18:3/18:3),.beta.-Amyrin,TG(8:0/10:0/10:0)
+TG(10:0/10:0/10:0),(-)-Caryophyllene oxide,NA
+TG(10:0/12:0/14:0),alpha-Carotene,NA
+TG(10:0/12:0/16:0),NA,NA
+TG(10:0/14:0/16:0),NA,NA
+TG(10:0/16:0/16:0),NA,NA
+TG(12:0/12:0/12:0),NA,NA
+TG(12:0/12:0/14:0),NA,NA
+TG(12:0/12:0/18:1),NA,NA
+TG(12:0/14:0/16:0),NA,NA
+TG(12:0/14:0/18:1),NA,NA
+TG(12:0/16:0/16:0),NA,NA
+TG(12:0/16:0/18:1),NA,NA
+TG(12:0/16:0/18:3),NA,NA
+TG(12:0/18:1/18:3),NA,NA
+TG(12:0/18:2/18:3),NA,NA
+TG(14:0/14:0/16:1),NA,NA
+TG(14:0/14:0/18:0),NA,NA
+TG(14:0/16:0/18:1),NA,NA
+TG(14:0/18:1/18:2),NA,NA
+TG(14:0/18:1/18:3),NA,NA
+TG(14:0/18:2/18:3),NA,NA
+TG(14:0/18:3/18:3),NA,NA
+TG(16:0/16:0/16:0),NA,NA
+TG(16:0/16:0/18:1),NA,NA
+TG(16:0/16:0/20:1),NA,NA
+TG(16:0/18:0/18:2),NA,NA
+TG(16:0/18:1/18:2),NA,NA
+TG(16:0/18:1/18:3),NA,NA
+TG(16:0/18:1/20:0),NA,NA
+TG(16:0/18:1/20:2),NA,NA
+TG(16:0/18:1/22:0),NA,NA
+TG(16:0/18:2/18:3),NA,NA
+TG(16:0/18:3/18:3),NA,NA
+TG(16:1/16:1/22:5),NA,NA
+TG(16:1/20:1/20:2),NA,NA
+TG(18:0/18:2/18:2),NA,NA
+TG(18:0/18:2/20:1),NA,NA
+TG(18:0/18:2/22:0),NA,NA
+TG(18:1/18:1/20:3),NA,NA
+TG(18:1/18:2/18:2),NA,NA
+TG(18:1/18:2/18:3),NA,NA
+TG(18:1/18:3/22:0),NA,NA
+TG(18:1/20:3/22:0),NA,NA
+TG(18:2/18:2/18:4),NA,NA
+TG(18:2/18:2/22:1),NA,NA
+TG(18:2/18:3/20:3),NA,NA
+TG(18:2/20:2/22:2),NA,NA
+TG(18:2/20:3/22:0),NA,NA
+TG(18:3/18:3/18:3),NA,NA
+DG(18:0/18:2),NA,NA
+LPC(16:0),NA,NA
+LPC(18:3),NA,NA
+LPE(16:0),NA,NA
+PA(16:0/18:2),NA,NA
+PC(14:0/14:0),NA,NA
+PC(14:0/18:0),NA,NA
+PC(14:0/18:2),NA,NA
+PC(14:0/18:3),NA,NA
+PC(14:0/22:5),NA,NA
+PC(14:0/22:6),NA,NA
+PC(16:0/16:0),NA,NA
+PC(16:0/18:0),NA,NA
+PC(16:0/18:1),NA,NA
+PC(16:0/18:2),NA,NA
+PC(16:0/18:3),NA,NA
+PC(16:0/20:3),NA,NA
+PC(16:0/20:4),NA,NA
+PC(16:0/20:5),NA,NA
+PC(16:0/22:5),NA,NA
+PC(16:0/22:6),NA,NA
+PC(16:1/16:1),NA,NA
+PC(16:1/18:2),NA,NA
+PC(18:0/18:1),NA,NA
+PC(18:0/18:2),NA,NA
+PC(18:0/18:3),NA,NA
+PC(18:0/20:2),NA,NA
+PC(18:0/20:3),NA,NA
+PC(18:0/20:4),NA,NA
+PC(18:1/16:0),NA,NA
+PC(18:1/18:1),NA,NA
+PC(18:1/18:2),NA,NA
+PC(18:1/20:1),NA,NA
+PC(18:1/20:4),NA,NA
+PC(18:1/24:1),NA,NA
+PC(18:2/20:0),NA,NA
+PE(12:0/12:0),NA,NA
+PE(14:0/22:6),NA,NA
+PE(16:0/18:0),NA,NA
+PE(16:0/18:1),NA,NA
+PE(16:0/18:2),NA,NA
+PE(16:0/18:3),NA,NA
+PE(16:0/20:4),NA,NA
+PE(16:0/20:5),NA,NA
+PE(18:0/18:2),NA,NA
+PE(18:2/18:2),NA,NA
+PE(18:2/18:3),NA,NA
+PE(18:3/18:3),NA,NA
+PG(16:0/16:0),NA,NA
+PG(16:0/18:1),NA,NA
+PS(18:0/18:2),NA,NA
+alpha-Tocopherol,NA,NA
+Ubidecarenone,NA,NA
+Ubiquinone 9,NA,NA
+Vitamin K1,NA,NA
+Cer(24:1),NA,NA
+GalCer(d18:2/18:1),NA,NA
+GalCer(d18:2/20:1),NA,NA
+Phytosphingosine,NA,NA
+SM(d18:1/17:0),NA,NA
+.beta.-Sitosterol,NA,NA
+gamma-sitosterol,NA,NA
+.alpha.-Amyrin,NA,NA
+.beta.-Cryptoxanthin,NA,NA
+Antheraxanthin,NA,NA
+Apocarotenal,NA,NA
+beta-Carotene,NA,NA
+Cycloartenol acetate,NA,NA
+gibberellic acid,NA,NA
+Lutein,NA,NA
+Zeaxanthin,NA,NA
