@@ -1,4 +1,0 @@
-Chromosome	gene	phenotype	n_snps	best_snp	best_pvalue	phenotype_number
-3	SORBI_3003G161800	Ubiquinone 9	9	SNP_19448162	4.592485e-06	1
-3	SORBI_3003G425100	Ubiquinone 9	9	SNP_72936122	9.128726e-06	1
-5	SORBI_3005G110900	Ubiquinone 9	5	SNP_35398126	9.306319e-06	1
