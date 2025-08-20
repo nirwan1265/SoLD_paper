@@ -29,12 +29,12 @@ suppressPackageStartupMessages({
 ################################################################################
 
 control <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_control_all_lipids_fitted_phenotype_non_normalized.csv") %>%
-  select(-c(2,3,4)) %>%
-  rename(Compound_Name = 1)
+  dplyr::select(-c(2,3,4)) %>%
+  dplyr::rename(Compound_Name = LineRaw)
 
 lowinput <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>%
-  select(-c(2,3,4)) %>%
-  rename(Compound_Name = 1) 
+  dplyr::select(-c(2,3,4)) %>%
+  dplyr::rename(Compound_Name = LineRaw) 
 
 
 ################################################################################
