@@ -1,0 +1,185 @@
+﻿Lipids,CommonName,Class,SubClass
+.alpha.-Amyrin,,Terpenoid,Triterpenoid
+.alpha.-Ionone,,Terpenoid,Monoterpenoid
+.beta.-Amyrin,,Terpenoid,Triterpenoid
+.beta.-Amyrin acetate,,Terpenoid,Triterpenoid
+.beta.-Cryptoxanthin,,Terpenoid,Tetraterpenoid
+.beta.-Sitosterol,,Sterol,Phytosterol
+.gamma.-Linolenoyl ethanolamide,,N-acylethanolamine,
+(-)-Caryophyllene oxide,,Terpenoid,Sesquiterpenoid
+(+)-Pseudoephedrine,Remove,NA,
+"(2-{[3-(hexadecanoyloxy)-2-[octadeca-9,12-dienoyloxy]propyl phosphonato]oxy}ethyl)trimethylazanium",PC(16:0/18:2),Glycerophospholipid,Phosphatidylcholine
+"(2E,4E,12Z)-N-(2-methylpropyl)octadeca-2,4,12-trienamide",Remove,NA,
+"(2R,6R)-2-methyl-6-tridecylpiperidine",Remove,Alkaloid-like compound,
+"(2Z)-2-[(E)-6-(hydroxymethyl)-2,4,8,10-tetramethyldodec-2-enylidene]-4-methylpentanedioic acid",,Prenol,Diterpenoid
+"(4R)-4-((5S,7R,9S,10S,13R,14S,17R)-7-hydroxy-10,13-dimethyl-3-oxohexadecahydro-1H-cyclopenta[a]phenanthren-17-yl)pentanoic acid",Remove,NA,
+"(6E,10E,14E,18E)-2,6,10,15,19,23-hexamethyltetracosa-6,10,14,18-tetraene-1,2,3,22,23-pentol",Remove,Terpenoid,Triterpenoid
+"[(2R)-2-ethylhexyl] 2-cyano-3,3-diphenylprop-2-enoate",Remove,NA,
+"[2,3-di(heptadecanoyloxy)propyl] 2-(trimethylazaniumyl)ethyl phosphate",PC(22:0),Glycerophospholipid,Glycerophosphocholine
+"[2,3-dihydroxypropoxy][3-(hexadecanoyloxy)-2-[octadec-9-enoyloxy]propoxy]phosphinic acid",PG(16:0/18:1),,
+"1-({[2-(2-furylmethyl)-5-methylpyrrolidinyl]amino}methylene)-7-[8-({[2-(2-fury lmethyl)pyrrolidinyl]amino}methylene)-1,6-dihydroxy-3-methyl-5-(methylethyl)-7 -oxo(2-naphthyl)]-3,8-dihydroxy-6-methyl-4-(methylethyl)naphthalen-2-one",Remove,NA,
+1-(1Z-Octadecenyl)-2-(9Z-octadecenoyl)-sn-glycero-3-phosphocholine,PC(18:0/18:1),Glycerolipid,Diacylglycerol
+1-(hexadecanoyloxy)-3-hydroxypropan-2-yl-octadec-9-enoate,DG(16:0/18:1),Glycerolipid,Diacylglycerol
+1-Arachidonoylglycerol,MG(20:4),Glycerolipid,Monoacylglycerol
+1-heptadecanoyl-2-hydroxy-sn-glycero-3-phosphocholine,Remove,Glycerophospholipid,Glycerophosphocholine
+1-Hexadecanoyl-2-(9Z-octadecenoyl)-sn-glycero-3-phosphoethanolamine,PE(16:0/18:1),Glycerophospholipid,Glycerophosphoethanolamine
+1-Hexadecanoyl-sn-glycero-3-phosphocholine,LPC(16:0/0:0),Glycerophospholipid,Glycerophosphocholine
+1-Linoleoylglycerol,MG(0:0/0:0/18:2),Glycerolipid,Monoacylglycerol
+1-Myristoyl-2-stearoyl-sn-glycero-3-phosphocholine,PC(14:0/18:0),Glycerophospholipid,Glycerophosphocholine
+1-Octadecanamine,Remove,NA,NA
+"1-Octadecanoyl-2-(5Z,8Z,11Z,14Z-eicosatetraenoyl)-sn-glycero-3-phosphocholine",PC(18:0/20:4),Glycerophospholipid,Glycerophosphocholine
+1-Oleoyl-2-myristoyl-sn-glycero-3-phosphocholine,PC(18:1/14:0),Glycerophospholipid,Glycerophosphocholine
+1-Oleoyl-2-palmitoyl-sn-glycero-3-phosphocholine,PC(18:1/16:0),NA,NA
+1-Palmitoylglycerol,MG(16:0/0:0/0:0),Glycerolipid,Monoacylglycerol
+1-Phenylpyrrolidine,Remove,NA,NA
+1-Stearoyl-2-linoleoyl-sn-glycero-3-phosphoethanolamine,PE(18:0/18:2),Glycerophospholipid,Glycerophosphoethanolamine
+1-Stearoyl-2-linoleoyl-sn-glycerol,DG(18:0/18:2/0:0),Glycerolipid,Diacylglycerol
+1-Stearoyl-2-oleoyl-sn-glycero-3-phosphoethanolamine,PE(18:0/18:1),Glycerophospholipid,Glycerophosphoethanolamine
+"1,2-Benzenedicarboxylic acid",Remove,NA,NA
+"1,2-Di-(9Z-octadecenoyl)-sn-glycero-3-phosphoethanolamine",PE(18:1/18:1),Glycerophospholipid,Phosphatidylethanolamine
+"1,2-Dierucoyl-sn-glycero-3-phosphocholine",PC(22:1/22:1),Glycerophospholipid,Phosphatidylcholine
+"1,2-Dihexadecanoyl-sn-glycero-3-phosphocholine",PC(16:0/16:0),Glycerophospholipid,Phosphatidylcholine
+"1,2-dihydroxyheptadec-16-yn-4-yl acetate",Remove,NA,NA
+"1,2-Dilauroyl-sn-glycero-3-phosphoethanolamine",PE(12:0/12:0),Glycerophospholipid,Glycerophosphoethanolamine
+"1,2-Dilinoleoyl-sn-glycero-3-phosphoethanolamine",PE(18:2/18:2),Glycerophospholipid,Glycerophosphoethanolamine
+"1,2-Dioleoyl-sn-glycerol",DG(18:1/18:1),Glycerolipid,Diacylglycerol
+"1,2-Ditetradecanoyl-sn-glycero-3-phosphocholine",PC(14:0/14:0),Glycerophospholipid,Glycerophosphocholine
+"1,2,6,6,10,17,20-heptamethyl-17-[N-(2-methylphenyl)carbamoyl]-12-oxopentacyclo [12.8.0.0<2,11>.0<5,10>.0<15,20>]docos-13-en-7-yl acetate",Remove,NA,NA
+"11,14,17-Eicosatrienoic acid,(Z,Z,Z)-",Remove,NA,NA
+"13-Keto-9Z,11E-octadecadienoic acid",,Fatty acid,Oxidized fatty acid
+"13,14-Dihydro-15-ketoprostaglandin F2.alpha. isopropyl ester",Remove,Fatty acid derivative,Prostaglandin
+"13S-Hydroxy-9Z,11E,15Z-octadecatrienoic acid",13S-HOTrE,Fatty acid,Oxylipin
+14-demethyllanosterol,Remove,Sterol,NA
+"14(15)-Epoxy-5Z,8Z,11Z-eicosatrienoic acid, methyl ester",,Fatty acid,Oxylipins
+"16,16-Dimethylprostaglandin A1",Remove,Fatty acid derivative,Prostaglandin
+"17.alpha.-Methyl-5.beta.-androstan-3.alpha.,17.beta.-diol",Remove,Steroid,Androgen
+"1H-Indole-3-carboxamide, 1-(5-fluoropentyl)-N-tricyclo[3.3.1.1(3,7)]dec-1-yl-",Remove,Terpenoid,Sesterterpenoid
+"2-Ethylhexyl 2-cyano-3,3-diphenylacrylate",Remove,NA,NA
+2-Linoleoylglycerol,MG(0:0/18:2),Glycerolipid,Monoacylglycerol
+"2,2'-Dithiobis(benzothiazole)",Remove,,
+22-Hydoxy-2-hopen-1-one,Remove,Terpenoid,Sesquiterpenoid
+24S-Hydroxycholesterol,Remove,Sterol,Phytosterol
+"3-Cyclopentene-1-octanoic acid, 2-(3-hydroxy-1-penten-1-yl)-5-oxo-",,Fatty acid,
+3-Epilupeol,,Terpenoid,Triterpenoid
+3-Hydroxyechinenone,,Terpenoid,Tetraterpenoid
+3-Methoxylimaprost,Remove,Fatty acid derivative,Prostaglandin
+3.10S-Hydroxypheophorbide a ,,Tetrapyrrole,Chlorophyll/derivative
+"4-amino-5-(5-hydroxy-2',6-dimethyl-5'-prop-1-en-2-ylspiro[7-oxabicyclo[4.1.0]heptane-3,1'-cyclopentane]-2-yl)oxy-5-oxopentanoic acid",,Tetrapyrrole,Chlorophyll/derivative
+"4,4'-Sulfonylbis[2-(prop-2-en-1-yl)phenol]",Remove,Fatty acid derivative,Epoxyeicosatrienoic acid
+4.alpha./.beta.-Hydroxyprostanozol,Remove,,
+"5-Androstene-3.beta.,17.beta.-diol",Remove,Steroid,Androgen
+"5.alpha.-Pregnan-3.alpha.,17-diol-20-one 3-sulfate",Remove,Steroid,NA
+"5(6)-Epoxy-8Z,11Z,14Z-eicosatrienoic acid, methyl ester",Remove,NA,NA
+7-Oxocholesterol,Remove,Sterol,Oxysterol
+"8(9)-Epoxy-5Z,11Z,14Z-eicosatrienoic acid, methyl ester",,Fatty acid,Oxidized fatty acid
+9-Oxo-11-(3-pentyl-2-oxiranyl)-10E-undecenoic acid,trans-EKODE-(E)-Ib,Fatty acid,NA
+"9,12-Octadecadiynoic acid",ODYA,Fatty acid,NA
+"9,12,13,TriHODE",,Fatty acid,Oxylipins
+AC1L1X1Z,Remove,NA,NA
+alpha-Tocopherol,,Vitamin,
+B10A30 Faulkner legacy library looks like sterol or lipid needs to be verified,Remove,NA,NA
+Betulin,Remove,NA,NA
+Bis(2-ethylhexyl) sebacate,Remove,NA,
+Boldenone cypionate,,Steroid,Androgen
+Celaxanthin,,Terpenoid,Tetraterpenoid
+Cembrane_Diterpene_minus_Me,Remove,NA,NA
+Cer(24:1),,Sphingolipid,Ceramide
+Cer(d18:2/20:1),,Sphingolipid,Ceramides
+Chamissonolide,,Terpenoid,Sesquiterpenoid
+Chlorophyll a,,Tetrapyrrole,Chlorophyll/derivative
+"Cholesta-4,6-dien-3-one",Remove,NA,NA
+"Cholestan-3-one,(5.alpha.)-",Remove,Sterol,Sterol derivatives
+Cholesterol,Remove,NA,NA
+cis-2-Decenoic acid,,Fatty acid,NA
+CL(18:1),,Glycerophospholipid,Cardiolipin
+CocamidoprpylBetaine,Remove,NA,NA
+Cycloartenol acetate,,Terpenoid,Triterpenoid
+D-erythro-Sphingosine C-20,,Fatty acid amide,
+DBP,Remove,NA,
+"Di(2,6-dimethyl-4-heptyl) phthalate",Remove,NA,
+"Di(3,7-dimethyl-1-octyl) phthalate",Remove,NA,
+Diadinochrome,Terpenoid,Tetraterpenoid,
+Dibutyl phthalate,Remove,NA,
+"Didodecyl 3,3'-thiodipropionate",Remove,Lipid-like compound,Thioester antioxidant
+Diisodecyl phthalate,Remove,NA,
+Diisooctyl phthalate,Remove,NA,
+Dimethachlor,Remove,NA,
+Dioctyl phthalate,Remove,NA,
+Dipterocarpol,Remove,NA,NA
+Empenthrin,Remove,NA,
+Erucamide,Fatty acid,NA,
+Ethcathinone,Remove,NA,
+Fucosterol,,Sterol,Oxysterol
+Glochidone,Remove,NA,NA
+Glycerol Tri-n-octanoate - 40.0 eV,Remove,Glycerolipid,Triacylglycerol
+h_42_ethylestrenol_m,Remove,NA,NA
+Hexadecylacetylglycerol,DG(o-16:0/2:0/0:0),Glycerolipid,Diacylglycerol
+Hydroperoxy fatty acid (18:3),,Fatty acid,
+MLS002695918-01!70356-09-1,Remove,NA,
+Mono-2-ethylhexyl phthalate,Remove,NA,NA
+Monoelaidin,Remove,NA,
+Monoisobutyl phthalate,Remove,NA,NA
+N-acyl amino acid (C15:0),Remove,Fatty acid,
+N-acylethanolamide (FA(12:0)),,Fatty acid amide,
+N-acylethanolamide (FA(15:0)),Remove,Fatty acid amide,
+N-Cyclohexanecarbonylpentadecylamine,Remove,NA,
+"N,N-Dimethyldodecylamine N-oxide",Remove,NA,NA
+NAE(16:0),,Fatty acid,N-acylethanolamine
+NAE(18:0),,Fatty acid,N-acylethanolamine
+Nandrolone,Remove,NA,
+NCGC00164361-03!decanedioic acid,Remove,Terpenoid,Sesterterpenoid
+"NCGC00179780-02_C20H32O_(5xi,9xi)-Beyer-15-en-18-ol",Remove,NA,NA
+NCGC00380283-01!4-[5-[[4-[5-[acetyl(hydroxy)amino]pentylamino]-4-oxobutanoyl]-hydroxyamino]pentylamino]-4-oxobutanoic acid,Remove,,
+"NCGC00384683-01_C30H50O_Lup-20(29)-en-3-ol,(3alpha)-",Remove,NA,NA
+"NCGC00385006-01_C25H36O2_Dicyclopenta[a,d]cycloocten-3(3aH)-one, 7-[(2Z)-1,5-dimethyl-2,4-hexadien-1-yl]-6,6a,7,8,9,9a,10,10a-octahydro-4-(hydroxymethyl)-1,9a-dimethyl-,(4E,6aS,7R,9aR,10aS)-",Remove,Terpenoid,Sesterterpenoid
+"NCGC00385123-01_C22H30O6_7b,9-Dihydroxy-3-(hydroxymethyl)-1,1,6,8-tetramethyl-5-oxo-1,1a,1b,4,4a,5,7a,7b,8,9-decahydro-9aH-cyclopropa[3,4]benzo[1,2-e]azulen-9a-yl acetate",Remove,Terpenoid,Diterpenoid
+"NCGC00386020-01_C18H28O3_8-{(1S,5R)-4-Oxo-5-[(2Z)-2-penten-1-yl]-2-cyclopenten-1-yl}octanoic acid",Remove,NA,NA
+Nostoxanthin,Remove,Terpenoid,Tetraterpenoid
+Ophiobolin A,Remove,Terpenoid,Sesterterpenoid
+Oxandrolone,Remove,Steroid,Androgen
+Palmitoylserinol,Remove,Fatty acid amide derivative,
+Panaxatriol,Remove,NA,NA
+Panaxcerol B,Remove,Glycerolipid,Monoacylglycerol
+"phenylmethyl(2S,3R)-3-hydroxy-2-[(phenylmethoxy)carbonylamino]butanoate",Remove,NA,NA
+Pheophorbide a,Remove,Tetrapyrrole,Chlorophyll/derivative
+Pheophytin a,Remove,Tetrapyrrole,Chlorophyll/derivative
+Phthalic anhydride,Remove,NA,NA
+Phytosphingosine,,Sphingolipid,
+Pretilachlor,Remove,NA,NA
+Primidone,Remove,NA,NA
+Protopanaxadiol,Remove,Terpenoid,Triterpenoid
+Schaftoside,,Flavonoid,
+Scutellarein tetramethyl ether,Remove,Flavonoid,Flavonoid derivative
+Sebacic acid,Remove,Dicarboxylic acid,
+Simazine,Remove,NA,NA
+SM(d18:1/17:0),Remove,Sphingolipid,Sphingomyelin
+SPHINGANINE,,Sphingolipid,NA
+Stearidonic acid methyl ester,Remove,NA,NA
+Sumaresinolic acid,Remove,Terpenoid,Triterpenoid
+Tetrapentylammonium cation,Remove,NA,NA
+Tri-p-tolylamine,Remove,NA,NA
+"trimethyl(2-{[2-[octadeca-9,12-dienoyloxy]-3-(octadecanoyloxy)propyl phosphonato]oxy}ethyl)azanium",PC(18:0/18:2),Glycerophospholipid,Phosphatidylcholine
+Ubidecarenone,,Prenol,
+Ubiquinone 9,,Prenol,NA
+Vitamin K1,,Prenol,
+Zeaxanthin,,Terpenoid,Tetraterpenoid
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,

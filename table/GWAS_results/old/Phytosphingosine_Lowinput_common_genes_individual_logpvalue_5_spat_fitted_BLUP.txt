@@ -1,0 +1,4 @@
+Chromosome	gene	phenotype	n_snps	best_snp	best_pvalue	phenotype_number
+2	SORBI_3002G132400	Phytosphingosine	212	SNP_18837770	9.469482e-06	1
+4	SORBI_3004G132100	Phytosphingosine	74	SNP_19655176	9.038453e-06	1
+5	SORBI_3005G125400	Phytosphingosine	2	SNP_54781972	4.550793e-06	1
