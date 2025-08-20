@@ -10,6 +10,9 @@ library(stringr)
 library(vroom)
 library(SpATS)
 library(gstat)
+library(purrr)
+library(tibble)
+library(data.table)
 
 # ───────────────────────────────────────────────────────────────────────────────
 # 1.  Read & tidy the field map and phenotypes
@@ -380,6 +383,7 @@ fitted_df <- filtered_data %>%
 # 3.  Loop: fit SpATS, pull BLUPs, join into blup_df; 
 #    also save diagnostics for DG(20:1) only
 # ───────────────────────────────────────────────────────────────────────────────
+setDT(fitted_df)  
 for(tr in trait_names) {
   message("Fitting trait: ", tr)
   

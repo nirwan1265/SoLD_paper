@@ -32,13 +32,13 @@ library(ggbreak)
 
 # Read the raw files 
 control <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_control_all_lipids_fitted_phenotype_non_normalized.csv") %>%
-  select(-c(2,3,4)) %>%
-  rename(Compound_Name = 1)
+  select(-c(2,3,4))
+colnames(control)[1] <- "Compound_Name"  # Rename the first column to "Compound_Name"
 dim(control)
-lowinput <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>%
-  select(-c(2,3,4)) %>%
-  rename(Compound_Name = 1)
 
+lowinput <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_lowinput_all_lipids_fitted_phenotype_non_normalized.csv") %>%
+  select(-c(2,3,4))
+colnames(lowinput)[1] <- "Compound_Name"  # Rename the first column to "Compound_Name"
 
 # Valid classes
 valid_classes <- c("DGDG","MGDG",
@@ -48,11 +48,6 @@ valid_classes <- c("DGDG","MGDG",
                    "LPC","LPE","PG","PA","PS"
                    )
 
-# valid_classes <- c("TG","DG","MG",
-#                    "PC","PE","PI",
-#                    "DGDG","MGDG",
-#                    "SQDG","SM","AEG",
-#                    "LPC","LPE","PG","PA","PS","Cer","Gal")
 class_pat <- paste0("\\b(", paste(valid_classes, collapse = "|"), ")\\b")
 
 # ╔══════════════════════════════════════════════════════════════════╗
@@ -64,39 +59,41 @@ long_prep_global <- function(df) {
   df_long <- df %>%
     pivot_longer(-c(Compound_Name, Condition),
                  names_to = "Lipid", values_to = "Intensity") %>%
-    rename(Sample = Compound_Name)
+    dplyr::rename(Sample = Compound_Name)
   
   # 1) TIC per sample → relative abundance
   df_long <- df_long %>%
-    group_by(Sample) %>%
-    mutate(TIC       = sum(Intensity, na.rm = TRUE),
+    dplyr::group_by(Sample) %>%
+    dplyr::mutate(TIC       = sum(Intensity, na.rm = TRUE),
            rel_abund = Intensity / TIC) %>%
     ungroup()
   
   # 2) small pseudo-count per sample → log10
   df_long <- df_long %>%
-    group_by(Sample) %>%
-    mutate(minpos = ifelse(
+    dplyr::group_by(Sample) %>%
+    dplyr::mutate(minpos = ifelse(
       all(is.na(rel_abund) | rel_abund <= 0),
       NA_real_, min(rel_abund[rel_abund > 0], na.rm = TRUE)),
       eps    = ifelse(is.na(minpos), 0, minpos * 0.5)) %>%
     ungroup() %>%
-    mutate(log_rel = log10(rel_abund + eps))
+    dplyr::mutate(log_rel = log10(rel_abund + eps))
   
   # 3) summarise mean log10(relative abundance) per lipid class
   df_long <- df_long %>%
-    mutate(Class = str_extract(Lipid, class_pat)) %>%
+    dplyr::mutate(Class = str_extract(Lipid, class_pat)) %>%
     filter(!is.na(Class)) %>%
-    group_by(Sample, Condition, Class) %>%
-    summarise(class_log = mean(log_rel, na.rm = TRUE), .groups = "drop")
+    dplyr::group_by(Sample, Condition, Class) %>%
+    dplyr::summarise(class_log = mean(log_rel, na.rm = TRUE), .groups = "drop")
   
   return(df_long)
 }
 
 # combine Control + LowInput, then run prep
-combined  <- bind_rows(control  %>% mutate(Condition = "Control"),
-                       lowinput %>% mutate(Condition = "LowInput"))
+combined  <- bind_rows(control  %>% dplyr::mutate(Condition = "Control"),
+                       lowinput %>% dplyr::mutate(Condition = "LowInput"))
+colnames(combined)
 long_all  <- long_prep_global(combined)
+str(control)
 
 # Remove na:
 long_all <- long_all %>%
@@ -290,7 +287,7 @@ opls_plot <- ggplot(scores_df, aes(x = t1, y = to1, color = Condition)) +
   # styling
   theme_bw(base_size = 14) +
   theme_classic(base_size = 14) +
-  nature_theme +
+  
   # legend inside the panel
   theme(
     legend.position      = c(0.95, 0.95),        # 95% from left, 95% from bottom
@@ -305,11 +302,12 @@ opls_plot <- ggplot(scores_df, aes(x = t1, y = to1, color = Condition)) +
     legend.spacing.y     = unit(0.2, "cm")
   ) +
   plot_theme
+
 quartz()
 print(opls_plot)
 
 # Save the plot
-#ggsave("fig/main/Fig2c_OPLS_scores_plot.png", plot = opls_plot, width = 10, height = 6, dpi = 300, bg = "white")
+ggsave("fig/main/Fig2c_OPLS_scores_plot.png", plot = opls_plot, width = 10, height = 6, dpi = 300, bg = "white")
 
 # 2) Run the permutation test (200 label-swaps)
 perm_res <- opls(
@@ -468,10 +466,10 @@ p_q2_zoom  <- make_hist_zoom("Q²",  bw = 0.002, col = "#FDE725FF")
 
 quartz()
 perm_plot <- (p_r2y_zoom | p_q2_zoom)
-
+perm_plot
 
 # Save the plot
-ggsave("fig/supp/SuppFig6_OPLS_permutation_plot.png", plot = perm_plot, width = 12, height = 8, dpi = 300, bg = "white")
+#ggsave("fig/supp/SuppFig6_OPLS_permutation_plot.png", plot = perm_plot, width = 12, height = 8, dpi = 300, bg = "white")
 
 
 
@@ -500,19 +498,21 @@ library(forcats)
 library(ggplot2)
 
 # --- your buckets ---
-mem_sulfolipid   <- c("PG_SQDG","PC_SQDG","PE_SQDG","PS_SQDG","SQDG_TG","DGDG_SQDG")
+mem_sulfolipid   <- c("PG_SQDG","PC_SQDG","PE_SQDG","PS_SQDG","DGDG_SQDG")
 mem_galactolipid <- c("DGDG_MGDG","MGDG_PG","MG_MGDG","DGDG_MG","MGDG_PE","MGDG_PC", "MGDG_PS")
 mem_phospholipid <- c("PC_PS","PE_PS","PA_PS","PG_PS")
 
 turn_diacylglycerol <- c("DG_TG","DG_MG","DG_PE","DG_PC","DG_PG","PA_TG")
 turn_lysophospho    <- c("LPC_PS","LPE_PS","LPC_PE","LPC_PG","LPC_LPE","LPE_MGDG","LPC_MG")
+turn_triacylglycerol <- c("MGDG_TG","PS_TG","SQDG_TG")
 
 group_map <- c(
   setNames(rep("Sulfolipid adjustments",   length(mem_sulfolipid)),   mem_sulfolipid),
   setNames(rep("Galactolipid dynamics",    length(mem_galactolipid)), mem_galactolipid),
   setNames(rep("Phospholipid homeostasis", length(mem_phospholipid)), mem_phospholipid),
   setNames(rep("DG turnover / signaling",  length(turn_diacylglycerol)), turn_diacylglycerol),
-  setNames(rep("Lyso-phospho turnover",    length(turn_lysophospho)), turn_lysophospho)
+  setNames(rep("Lyso-phospho turnover",    length(turn_lysophospho)), turn_lysophospho),
+  setNames(rep("TG turnover / signaling",  length(turn_triacylglycerol)), turn_triacylglycerol)
 )
 
 vip_df <- vip_hits %>%
@@ -523,7 +523,7 @@ vip_df <- vip_hits %>%
     Group,
     levels = c("Sulfolipid adjustments","Galactolipid dynamics",
                "Phospholipid homeostasis","DG turnover / signaling",
-               "Lyso-phospho turnover","Other")
+               "Lyso-phospho turnover","TG turnover / signaling","Other")
   ))
 
 # reorder within each facet without extra deps
@@ -554,23 +554,15 @@ p_vip_facets
 
 
 
-
-
-
 # --- your buckets ---
-mem_sulfolipid   <- c("PG_SQDG","PC_SQDG","PE_SQDG","PS_SQDG","SQDG_TG","DGDG_SQDG")
-mem_galactolipid <- c("DGDG_MGDG","MGDG_PG","MG_MGDG","DGDG_MG","MGDG_PE","MGDG_PC","MGDG_PS")
-mem_phospholipid <- c("PC_PS","PE_PS","PA_PS","PG_PS")
-
-turn_diacylglycerol <- c("DG_TG","DG_MG","DG_PE","DG_PC","DG_PG","PA_TG")
-turn_lysophospho    <- c("LPC_PS","LPE_PS","LPC_PE","LPC_PG","LPC_LPE","LPE_MGDG","LPC_MG")
 
 group_map <- c(
   setNames(rep("Sulfolipid",   length(mem_sulfolipid)),   mem_sulfolipid),
   setNames(rep("Galactolipid",    length(mem_galactolipid)), mem_galactolipid),
   setNames(rep("Phospholipid", length(mem_phospholipid)), mem_phospholipid),
   setNames(rep("Diacylglycerol",  length(turn_diacylglycerol)), turn_diacylglycerol),
-  setNames(rep("Lyso-phospho",    length(turn_lysophospho)), turn_lysophospho)
+  setNames(rep("Lyso-phospho",    length(turn_lysophospho)), turn_lysophospho),
+  setNames(rep("Triacyl",  length(turn_triacylglycerol)), turn_triacylglycerol)
 )
 
 # ---------------------------
@@ -584,7 +576,7 @@ vip_df <- vip_hits %>%
     Group,
     levels = c("Sulfolipid","Galactolipid",
                "Phospholipid","Diacylglycerol",
-               "Lyso-phospho","Other")
+               "Lyso-phospho","Triacyl","Other")
   )) %>%
   group_by(Group) %>%
   mutate(Lipid_f = fct_reorder(Lipid, VIP, .desc = FALSE)) %>%
@@ -698,7 +690,7 @@ p_out <- p_out & theme(
   legend.key            = element_rect(fill = NA, colour = NA),
   legend.margin         = margin(4, 6, 4, 6)
 )
-
+p_out
 
 # High-res PNG (journal friendly)
 ggsave("VIP_by_group_boxes.png", plot = p_out,
