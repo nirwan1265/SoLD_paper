@@ -990,8 +990,8 @@ dir_path <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/r
 # 2) grab all .txt files, name them by the basename sans “.txt”
 files <- list.files(dir_path, pattern="\\.txt$", full.names=TRUE)
 names(files) <- basename(files) %>% str_remove("\\.txt$")
-files <- files[c(1:4,8)]
-files <- files[5:8]
+#files <- files[c(1:4,8)]
+files <- files[5:7]
 
 # 3) read the first file as “master” for rs/chr/ps
 master <- vroom(files[[1]]) %>% 
@@ -1025,7 +1025,7 @@ colnames(final_df) <- c("SNP","Chromosome","Position",
                         "PC(16:0_20:3)","PC(16:0_22:5)","PC(16:0_22:6)","PC(18:1_20:1)","PE(16:0_18:1)")
 
 colnames(final_df) <- c("SNP","Chromosome","Position",
-                        "PC(18:1_24:1)","PC(18:1_24:1)","PC(18:2_20:0)","PC(18:3_0:0)",)
+                        "PC(18:1_24:1)","PC(18:1_24:1)","PC(18:2_20:0)","PC(18:3_0:0)")
 
 
 
