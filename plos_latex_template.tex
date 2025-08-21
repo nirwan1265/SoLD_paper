@@ -84,6 +84,7 @@
 \newunicodechar{₂}{$_2$}
 \newunicodechar{ }{~}
 \newunicodechar{ }{\,}
+\usepackage{siunitx} % optional, for units
 
 % Use adjustwidth environment to exceed column width (see example table in text)
 \usepackage{changepage}
@@ -930,6 +931,51 @@ As depicted in Figure \ref{fig:Fig6}A, our combined enzyme-reaction network, lip
   \end{adjustwidth}
 \end{table}
 
+\begin{table}[!ht]
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}           % tighter columns
+  \renewcommand{\arraystretch}{1.2}     % a bit more row height
+  \caption{\textbf{Key enriched reactions in the LINEX2 sub-network (low-input vs.\ control)}}
+  \label{tab:linex_reactions}
+  \begin{tabularx}{\linewidth}{@{}%
+      p{0.18\linewidth}                 % Pathway
+      p{0.22\linewidth}                 % Stoichiometry
+      p{0.26\linewidth}                 % Enzymes
+      X                                 % Interpretation
+    @{}}
+    \toprule
+    \textbf{Pathway} & \textbf{Stoichiometry} & \textbf{Putative enzyme(s)} & \textbf{Interpretation (low-input)} \\
+    \midrule
+    Lipolysis axis
+      & DG $\rightarrow$ MG + FA
+      & LIPE-like lipase
+      & Provides MG for re-esterification or signalling. \\
+    & MG + FA $\rightarrow$ TG
+      & \textit{PNPLA3} (triacylglycerol synthase)
+      & \textbf{$\downarrow$ flux}: storage synthesis suppressed. \\
+    & TG $\rightarrow$ DG + FA
+      & \textit{PNPLA1} (SORBI\_3001G041900)
+      & \textbf{$\uparrow$ lipolysis}: dominant driver of DG pool. \\
+    \addlinespace
+    Phospholipid recycling
+      & PE + DG $\rightleftharpoons$ LPE + TG
+      & LRO1-type acyltransferase
+      & Membrane PE shuttles acyl chains to TG. \\
+    \addlinespace
+    Alternative TG conversions
+      & PE $\rightarrow$ DG + PI (acyl transfer)
+      & EPTB (phosphoethanolamine phosphotransferase)
+      & Recycles PE headgroups into TG $\Rightarrow$ DG cascade. \\
+    & TG $\rightarrow$ RHEA:32843
+      & Unspecified lipase
+      & Alternative TG hydrolysis branch. \\
+    & LPC $\leftrightarrow$ DG
+      & Unspecified transferase
+      & LPC\,$\leftrightarrow$\,DG interconversion at droplet surface. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
 The conversion of TG to DG catalyzed by PNPLA1 is identified as a critical process, complemented by the transformation from DG to TG facilitated by PNLPLA3. This enzymatic relationship suggests that modifications in TG turnover via PNPLA1 could account for the observed variations in lipid profiles (Fig X) when contrasting LI conditions to the C.
 
@@ -945,16 +991,19 @@ Additionally, the LION lipid-ontology enrichment analysis (Figure \ref{fig:Fig6}
 Furthermore, five independent GWAS results for TGs (Figure \ref{fig:Fig6}C) consistently identify a single locus on chromosome 1 annotated as the triacylglycerol lipase gene SORBI\_3001G041900 (SbPNPLA1) above the pvalue cutoffe Sum\_TG, TG\_54\_6, TG\_54\_7, TG\_56\_4, and TG\_56\_6 plots. The recurrent emergence of this peak across both aggregate and individual species traits highlights the crucial role of PNPLA1 in triacylglycerol homeostasis. Collectively, these findings support a model wherein genetic variation at the PNPLA1 locus directs the variability in lipid storage and mobilization, especially under cold and nutrient-deficient conditions.
 
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{fig/main/Fig6.png}
-  \caption{\textbf{Integrated lipid‐metabolism network, ontology enrichment, and GWAS of triacylglycerol traits.}
-    \textbf{(A)} Enzyme‐reaction network assembled in \texttt{LaTeX2Enrich}, showing diacylglycerols (DGs), monoacylglycerols (MGs), and triacylglycerols (TGs) as nodes.  Edges denote biochemical conversions: DG → MG (LIPE), MG → TG (PNLPLA3), TG → DG (PNPLA1, highlighted), LPC → DG, DG → LPC, TG → RHEA:32843, PE → DG (EPTB), and PE/DG → LPE (LRO1).  The prominent PNPLA1‐catalyzed TG→DG reaction (blue‐outlined node) suggests a key role in our low‑input vs.\ control comparison.
-    \textbf{(B)} LION lipid‐ontology enrichment results.  The top enriched categories (−log\textsubscript{10}(FDR $q$) > 2, red dashed line) are “triacylglycerols [GL0301]”, “lipid storage”, “lipid droplet”, “headgroup with neutral charge” and “glycerolipids [GL]”.  This concords with our GWAS hits at PNPLA1/PNLPLA3, both involved in TG ↔ DG cycling.
-    \textbf{(C)} Multi‑track Manhattan plots (CMplot, \texttt{multracks=TRUE}) for five traits (Sum\_TG, TG\_54\_6, TG\_54\_7, TG\_56\_4, TG\_56\_6).  Chromosome 1 (green vertical line) harbors a cluster of highly significant SNPs (–log\textsubscript{10} $p$ ≥ 7, red dots) at the triacylglycerol lipase locus SORBI\_3001G041900 (annotated).  All five traits share this peak, underscoring the importance of TG→DG hydrolysis in modulating lipid levels under low‑input vs.\ control conditions.}
-  \label{fig:Fig6}
-\end{figure}
 
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{fig/main/Fig4.png} % <- your composite with A–D
+  \caption{\textbf{Network enrichment and chain/unsaturation trends under low input.}
+  \textbf{(A)} LINEX$^2$ lipid–enzyme network enrichment using \emph{ratio} contrasts between lipid classes; nodes are lipids (circles) colored by class (MG, DG, TG, SQDG) and enzymes (triangles), edges are curated conversions. Node size scales with absolute enrichment score.
+  \textbf{(B)} LINEX$^2$ enrichment using \emph{absolute differences} (LowInput$-$Control) at the species level; same glyphs and legend as in (A).
+  \textbf{(C)} Condition effect versus total chain length: points are individual lipid species and the blue line is a LOESS smoother ($\pm$~95\% CI in gray) of $\Delta Z = Z_{\mathrm{LowInput}} - Z_{\mathrm{Control}}$ plotted against the sum of acyl carbons. The curve dips below zero for mid chain lengths (C\,$\sim$\,34–50) and rises toward very long chains (C\,$\sim$\,56–60), consistent with loss of membrane lipids and relative enrichment of long-chain TAG. 
+  \textbf{(D)} Condition effect versus total unsaturation (sum of double bonds). The downward trend indicates preferential depletion of highly unsaturated species under low input. 
+  For (C–D), intensities were TIC-normalized, log-transformed with a small sample-wise pseudocount, $Z$-scored within condition and lipid, and then differenced (LowInput$-$Control) per species; the smoother was fit with LOESS (span~0.9). MG, DG, TG, SQDG: mono/di/triacylglycerol and sulfoquinovosyldiacylglycerol.}
+  \label{fig:Fig4}
+\end{figure*}
 
 
 
