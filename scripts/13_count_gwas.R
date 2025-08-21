@@ -11,6 +11,15 @@ dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/f
 dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/annotation/"
 file_list <- list.files(path = dir,pattern = "*.txt")
 
+## MG and DG
+file_list <- file_list[c(9:24,38:42)]
+
+# PE and DG
+file_list <- file_list[c(90:105)]
+
+# SQDG
+file_list <- file_list[c(112:117)]
+
 # Neutral lipids
 file_list <- file_list[c(38:42,9:24)]
 
@@ -36,6 +45,9 @@ file_list <- file_list[c(48:108,110)]
 # Lowinput
 dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/sum_ratio/lowinput/annotation/"
 file_list <- list.files(path = dir,pattern = "*.txt")
+
+# PE DG and TG LPE
+file_list <- file_list[c(46,116)]
 
 
 # Sum MG
@@ -166,7 +178,7 @@ combined_results <- combined_results %>%
 head(combined_results)
 
 # Save the file
-write.table(combined_results, "table/GWAS_results/Sum_MG_lipids_ratios_Lowinput_common_genes_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+write.table(combined_results, "table/GWAS_results/Neutral_lipid_MG_DG_Lowinput_common_genes_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 getwd()
 # write.table(combined_results, "table/GWAS_results/11_14_17_Eicosatrienoic_acid__Z_Z_Z___common_genes_lowinput_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 # write.table(combined_results, "table/GWAS_results/gibberellic_acid_common_genes_lowinput_individual_logpvalue_4_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
