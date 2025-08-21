@@ -869,12 +869,12 @@ Our GWAS for zeaxanthin has identified the gene SORBI\_3002G033800, which has an
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{fig/main/Fig3.png}
-  \caption{\textbf{Low‐input lipid GWAS Manhattan plots for traditional and non‐traditional lipids.}
-    \textbf{(A)} Manhattan plots for five TG species (TG\_58\_3, TG\_58\_4, TG\_58\_5, TG\_60\_4, TG\_60\_5), all peaking at an acyl‐CoA:diacylglycerol acyltransferase locus (\textit{SORBI\_3010G170000}) in chromosome 10; the vertical green dashed line marks the SNP position for this gene.  
-    \textbf{(B)} SQDG(32:0) Manhattan plot, highlighting a sulfolipid synthase gene (\textit{SORBI\_3002G000600}).  
-    \textbf{(C)} \(\alpha\)‐Carotene Manhattan plot, identifying an alternative oxidase (\textit{SORBI\_3006G202500}).  
-    \textbf{(D)} \(\beta\)‐Sitosterol Manhattan plot, pinpointing a cellulose synthase (\textit{SORBI\_3003G049600}).  
-    \textbf{(E)} Gibberellic acid Manhattan plot, at a MADS‐box transcription factor locus (\textit{SORBI\_3007G090421}).  
+  \caption{\textbf{Low‐input lipid GWAS Manhattan plots}
+    \textbf{(A)} Manhattan plots for five Phosphplipids PC(16:0/20:3),PC(16:0/22:5),PC(16:0/22:6),PC(16:1/20:1), and PE(16:1/18:1), all peaking at PHR1 locus (\textit{SORBI\_3001G384300}) in chromosome 1; the vertical green dashed line marks the SNP position for this gene.  
+    \textbf{(B)} Manhattan plots for five TG species TG(18:1/18:3/22:0),TG(18:1/20:3/22:0),PC(18:2/18:2/16:4),TG(18:2/20:3/22:0), and TG(18:3/18:3/18:3), all peaking at DGAT1 locus (\textit{SORBI\_3010G170000}) in chromosome 10; the vertical green dashed line marks the SNP position for this gene. 
+    \textbf{(C)} Sum of SQDG Manhattan plot, identifying an adenylate sulfate kinase (\textit{SORBI\_3005G195600}).  
+    \textbf{(D)} \(\alpha\)‐Carotene Manhattan plot, identifying an alternative oxidase (\textit{SORBI\_3006G202500}).  
+    \textbf{(E)} Gibberellic acid Manhattan plot, at a sugar transporter SORBI/_3010G030600 and a MADS‐box transcription factor locus (\textit{SORBI\_3007G090421}) .  
     \textbf{(F)} Zeaxanthin Manhattan plot, marking a chloroplast RNA‐binding protein (\textit{SORBI\_3001G357200}).  
     Green dots indicate SNPs within or near the highlighted genes in panels B–F. Panels A and B show traditional lipids (–log\textsubscript{10} $p$\(\geq\)7), and panels C–F show non‐traditional lipids (–log\textsubscript{10} $p$\(\geq\)5).}
   \label{fig:Fig3}
@@ -901,48 +901,22 @@ Our GWAS for zeaxanthin has identified the gene SORBI\_3002G033800, which has an
 
 
 
-\subsection*{Integrated Lipid‐Metabolism Network, Ontology Enrichment, and Genetic Regulation of Triacylglycerol Homeostasis Indentifies a Triacylglycerol lipase}
+\subsection*{Integrated Lipid‐Metabolism Network, Ontology Enrichment, and GWAS Analaysis Idenfies Key Lipid Transitions Under Low Input}
 
 As depicted in Figure \ref{fig:Fig6}A, our combined enzyme-reaction network, lipid enrichment analysis and genome-wide signals elucidates the interactions between DGs, MGs, TGs, and PEs. Three pivotal pathways are identified, as demonstrated in Table \ref{tab:linex_reactions}.
 
 \begin{table}[!ht]
-  \begin{adjustwidth}{-2.25in}{0in}
-    \centering
-    \caption{\textbf{Key enriched reactions in the LINEX2 sub‐network (low‐input vs.\ control)}}
-    \label{tab:linex_reactions}
-    \begin{tabularx}{\textwidth}{@{} l X X X @{}}
-      \toprule
-      \textbf{Pathway} & \textbf{Stoichiometry} & \textbf{Putative enzyme(s)} & \textbf{Interpretation (low‐input)} \\
-      \midrule
-      \multirow{3}{*}{\makecell[l]{\textbf{Lipolysis} \\ \textbf{axis}}} 
-        & DG $\rightarrow$ MG + FA                  & LIPE‐like lipase                                   & Provides MG for re‐esterification or signalling.             \\
-        & MG + FA $\rightarrow$ TG                  & \textit{PNPLA3} (triacylglycerol synthase)         & \textbf{$\downarrow$ Flux} — storage synthesis suppressed.  \\
-        & TG $\rightarrow$ DG + FA                  & \textit{PNPLA1} (SORBI\_3001G041900)               & \textbf{$\uparrow$ Lipolysis} — dominant driver of DG pool. \\
-      \addlinespace
-      \makecell[l]{\textbf{Phospholipid} \\ \textbf{recycling}} 
-        & PE + DG $\rightleftharpoons$ LPE + TG     & LRO1‐type acyl‐transferase                         & Membrane PE shuttles acyl chains to TG.                     \\
-      \addlinespace
-      \multirow{3}{*}{\makecell[l]{\textbf{Alternative} \\ \textbf{TG conversions}}}
-        & PE $\rightarrow$ DG + PI (acyl transfer)  & EPTB (phosphoethanolamine phosphotransferase)      & Recycles PE headgroups into TG $\Rightarrow$ DG cascade.     \\
-        & TG $\rightarrow$ RHEA:32843               & Unspecified lipase                                 & Alternative TG hydrolysis branch.                           \\
-        & LPC $\leftrightarrow$ DG                  & Unspecified transferase                            & LPC $\leftrightarrow$ DG interconversion at droplet surface. \\
-      \bottomrule
-    \end{tabularx}
-  \end{adjustwidth}
-\end{table}
-
-\begin{table}[!ht]
   \centering
   \footnotesize
-  \setlength{\tabcolsep}{4pt}           % tighter columns
-  \renewcommand{\arraystretch}{1.2}     % a bit more row height
+  \setlength{\tabcolsep}{4pt}
+  \renewcommand{\arraystretch}{1.2}
   \caption{\textbf{Key enriched reactions in the LINEX2 sub-network (low-input vs.\ control)}}
   \label{tab:linex_reactions}
   \begin{tabularx}{\linewidth}{@{}%
-      p{0.18\linewidth}                 % Pathway
-      p{0.22\linewidth}                 % Stoichiometry
-      p{0.26\linewidth}                 % Enzymes
-      X                                 % Interpretation
+      p{0.18\linewidth}
+      p{0.22\linewidth}
+      p{0.26\linewidth}
+      X
     @{}}
     \toprule
     \textbf{Pathway} & \textbf{Stoichiometry} & \textbf{Putative enzyme(s)} & \textbf{Interpretation (low-input)} \\
@@ -963,6 +937,14 @@ As depicted in Figure \ref{fig:Fig6}A, our combined enzyme-reaction network, lip
       & LRO1-type acyltransferase
       & Membrane PE shuttles acyl chains to TG. \\
     \addlinespace
+    \textbf{Plastid sulfolipid (SQDG) cycling}
+      & DG + UDP–sulfoquinovose $\rightarrow$ SQDG + UDP
+      & \textit{SQD2} (sulfoquinovosyldiacylglycerol synthase)
+      & Builds anionic sulfolipid in thylakoid membranes; phosphate-sparing replacement of phospholipids. \\
+    & SQDG + H$_2$O $\rightarrow$ DG + sulfoquinovose
+      & Putative sulfoquinovosidase (\textit{YihQ}-like)
+      & SQDG turnover can release DG for TG/phospholipid remodeling; adjusts anionic lipid pool under stress. \\
+    \addlinespace
     Alternative TG conversions
       & PE $\rightarrow$ DG + PI (acyl transfer)
       & EPTB (phosphoethanolamine phosphotransferase)
@@ -976,6 +958,8 @@ As depicted in Figure \ref{fig:Fig6}A, our combined enzyme-reaction network, lip
     \bottomrule
   \end{tabularx}
 \end{table}
+
+
 
 The conversion of TG to DG catalyzed by PNPLA1 is identified as a critical process, complemented by the transformation from DG to TG facilitated by PNLPLA3. This enzymatic relationship suggests that modifications in TG turnover via PNPLA1 could account for the observed variations in lipid profiles (Fig X) when contrasting LI conditions to the C.
 
