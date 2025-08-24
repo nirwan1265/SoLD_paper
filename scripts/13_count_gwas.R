@@ -98,7 +98,7 @@ file_list <- file_list[!str_detect(file_list, "FA|Cer|GalCer|SM|AEG")]
 
 # Empty vectors
 results <- tibble()          
-p_value_threshold <- 1e-5
+p_value_threshold <- 1e-7
 -log10(p_value_threshold)
 
 # Loop through the files
@@ -178,7 +178,7 @@ combined_results <- combined_results %>%
 head(combined_results)
 
 # Save the file
-write.table(combined_results, "table/GWAS_results/Neutral_lipid_MG_DG_Lowinput_common_genes_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+write.table(combined_results, "table/GWAS_results/All_lipids_glycero_galacto_Lowinput_common_genes_individual_logpvalue_7_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 getwd()
 # write.table(combined_results, "table/GWAS_results/11_14_17_Eicosatrienoic_acid__Z_Z_Z___common_genes_lowinput_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 # write.table(combined_results, "table/GWAS_results/gibberellic_acid_common_genes_lowinput_individual_logpvalue_4_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")

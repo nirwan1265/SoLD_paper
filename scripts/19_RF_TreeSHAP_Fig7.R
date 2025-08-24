@@ -18,6 +18,7 @@ library(patchwork)
 library(stringr)
 library(viridis) 
 library(tidyr)
+library(tibble)
 
 ################################################################################
 ###### LOAD THE LIPIDS, PCA, AND PHENOTYPES
@@ -25,8 +26,14 @@ library(tidyr)
 
 ## Get the lipids, Log10 transformed
 lipids <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_control_all_lipids_fitted_phenotype_non_normalized.csv") %>%
-  select(-c(2,3,4)) %>%
-  rename(Line = 1)
+  dplyr::select(-c(2,3,4)) %>%
+  dplyr::rename(Line = 1)
+
+
+## SUms and ratios
+#lipids <- vroom("data/SPATS_fitted/BLUP_GWAS_phenotype/Final_control_all_lipids_BLUPs_sum_ratios.csv" )%>%
+#  dplyr::rename(Line = 1)
+
 
 # choose a small pseudocount for zeros (adjust if you prefer)
 pseudocount <- 1
@@ -40,7 +47,6 @@ lipids <- lipids %>%
 # result
 lipids
 
-
 ### Lipid Class
 lipid_class_info <- vroom("data/lipid_class/final_lipid_classes.csv",
                           show_col_types = FALSE) %>%
@@ -49,8 +55,8 @@ lipid_class_info <- vroom("data/lipid_class/final_lipid_classes.csv",
 
 ## 1. Build a named vector: names = old lipid IDs, values = CommonName
 rep_map <- lipid_class_info %>%
-  filter(!is.na(CommonName), CommonName != "") %>%
-  select(Line, CommonName) %>%
+  dplyr::filter(!is.na(CommonName), CommonName != "") %>%
+  dplyr::select(Line, CommonName) %>%
   deframe()                       # named vector: rep_map["DG(34:1)"] = "whatever"
 
 ## 2. Replace column names
@@ -93,8 +99,9 @@ print(changed, row.names = FALSE)
 #   )
 
 ### Get the phenotypes in the field
+
 # Our data: Plant height and Flowering Time
-pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,3))
+pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,2))
 
 # Plant Height and Stem Diameter
 pheno <- vroom("data/phenotypes/plantheight_diameter_SAP.csv") %>% dplyr::select(c(1,2))
@@ -103,7 +110,7 @@ pheno <- vroom("data/phenotypes/plantheight_diameter_SAP.csv") %>% dplyr::select
 pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,4))
 
 # Yield Traits
-pheno <- vroom("data/phenotypes/yield_traits_Richard_E_Boyles.csv") %>% dplyr::select(c(1,3))
+pheno <- vroom("data/phenotypes/yield_traits_Richard_E_Boyles.csv") %>% dplyr::select(c(1,2))
 
 colnames(pheno)[1] <- "Line"
 colnames(pheno)[2] <- "FlowerTime"
@@ -275,7 +282,7 @@ mean_df <- df_long %>%
 ### Plot
 
 # Pre-set theme
-nature_theme <- theme_minimal(base_size = 16) +
+plot_theme <- theme_minimal(base_size = 24) +
   theme(
     plot.title     = element_text(
       size   = 14,
@@ -302,11 +309,13 @@ nature_theme <- theme_minimal(base_size = 16) +
     axis.line      = element_line(color = "black"),
     panel.grid     = element_blank(),
     
-    legend.position = "top",
-    legend.title    = element_blank(),
-    legend.text     = element_text(
-      size = 16        # legend label size
-    ),
+    legend.position      = c(0.95, 0.95),
+    legend.justification = c("right","top"),
+    legend.background    = element_rect(fill="white", color="grey70", size=0.4),
+    legend.direction     = "vertical",
+    legend.spacing.y     = unit(0.2,"cm"),
+    legend.title         = element_blank(),
+    legend.text          = element_text(size=16),
     
     plot.margin    = margin(15, 15, 15, 15)
   )
@@ -337,14 +346,14 @@ cv_plot <- ggplot(df_long, aes(x = Iteration, y = Value, color = Metric)) +
     x     = "CV iteration",
     y     = "Metric value"
   ) +
-  nature_theme
+  plot_theme
 
 
 quartz()
 print(cv_plot)
 
 # Save the plot
-ggsave("fig/main/Fig7a_CV_RF_metrics.png",cv_plot, width = 8, height = 6, dpi = 300,
+ggsave("Fig4a_CV_RF_metrics_PlantHeight_rra.png",cv_plot, width = 8, height = 6, dpi = 300,
        units = "in", bg = "white")
 
 ################################################################################
@@ -428,7 +437,7 @@ shap_rank <- tibble(
 top20 <- shap_rank %>% slice_head(n = 20)
 print(shap_rank, n = Inf)
 
-### Convert to shapviz and plot
+ ### Convert to shapviz and plot
 sv <- shapviz(ts, X = X)   # TreeSHAP under the hood
 
 ### ts is your treeshap result, ts$shaps is an (n_samples × n_features) matrix
@@ -445,7 +454,7 @@ global_rank <- tibble(
 top50 <- global_rank %>% slice_head(n = 24)
 print(top50, n = 50)
 
-write.csv(global_rank, "table/SuppTable_lipid_SHAP_Plant_Height_Ruben_Rellan_Alvarez.csv", row.names = FALSE)
+write.csv(global_rank, "table/SuppTable_lipid_SHAP_PlantHeight_rraw.csv", row.names = FALSE)
 
 
 # 3) Bar chart of global importance
@@ -519,24 +528,25 @@ residuals <- ggplot(df_ft_long, aes(x = Value, fill = Type)) +
     x = "Phenotypic value",
     y = "Density"
   ) +
-  nature_theme +
+  plot_theme +
   theme(legend.position = "top")
 
 quartz()
 print(residuals)
 
 # Save the plot 
-# ggsave("Fig7b_Residuals_phenotype.png", residuals, width = 8, height = 6, dpi = 300,
-#        units = "in", bg = "white")
+ggsave("Fig4b_Residuals_phenotype_rra.png", residuals, width = 8, height = 6, dpi = 300,
+       units = "in", bg = "white")
 
 
-# Some lipid (first column of lipids_adj after Line)
-lipid_name <- colnames(lipids_adj)[176]
+# For example plot take some lipid (first column of lipids_adj after Line); here we take TG 10 10 10 
+lipid_name <- colnames(lipids_adj)[64]
 
 df_lip <- tibble(
-  raw   = lipid_mat[,175], # Zeaxanthin
+  raw   = lipid_mat[,64], # TG(10:0/10:0/10:0)
   resid = lipids_adj[[lipid_name]]
 )
+
 # assume lipid_name is already set, and df_lip has columns `raw` and `resid`
 df_lip_long <- df_lip %>%
   pivot_longer(
@@ -556,25 +566,25 @@ lipid_residuals <- ggplot(df_lip_long, aes(x = Value, fill = Type)) +
   geom_density(alpha = 0.6, color = NA) +
   # facet_wrap(~ Type, scales = "free_x", ncol = 2) +
   scale_fill_manual(values = c(
-    "Raw Zeaxanthin"              = "#440154FF",
-    "PC residualized Zeaxanthin"  = "#FDE725FF"
+    "Raw Sum_PA"              = "#440154FF",
+    "PC residualized Sum_PA"  = "#FDE725FF"
   )) +
   labs(
     x = "Abundance",
     y = "Density"
   ) +
-  nature_theme +
   theme(
     strip.text      = element_text(size = 12, face = "bold"),
     legend.position = "top"
-  )
+  ) +
+  plot_theme
 
 quartz()
 print(lipid_residuals)
 
 # Save the lipid residuals plot
-# ggsave("Fig7c_Residuals_lipid.png", lipid_residuals, width = 8, height = 6, dpi = 300,
-#        units = "in", bg = "white")
+ggsave("Fig4c_Residuals_lipid.png", lipid_residuals, width = 8, height = 6, dpi = 300,
+       units = "in", bg = "white")
 
 
 ### Observed vs Predicted FT
@@ -582,17 +592,17 @@ df_pred <- tibble(obs = test_y, pred = preds)
 p_obs_pred <- ggplot(df_pred, aes(x = obs, y = pred)) +
   geom_point(alpha = 0.6) +
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "gray50") +
-  labs(title = "Observed vs Predicted Flowering Time",
+  labs(title = "Observed vs Predicted Plant Height",
        x = "Observed residual phenotype",
        y = "RF predicted residual phenotype") +
   annotate("text", x = Inf, y = -Inf, hjust = 1.1, vjust = -0.5,
            label = sprintf("RMSE = %.3f\nR² = %.3f", metrics$RMSE, metrics$R2)) +
-  nature_theme
+  plot_theme
 quartz()
 p_obs_pred
 
 # Save the plot
-# ggsave("Fig7d_obs_vs_pred.png", p_obs_pred, width = 6, height = 6, dpi = 300, units = "in", bg = "white")
+ggsave("Fig4d_obs_vs_pred_PlantHeight_rra.png", p_obs_pred, width = 6, height = 6, dpi = 300, units = "in", bg = "white")
 
 ### OOB error vs number of trees
 ntree_seq <- c(100, 250, 500, 750, 1000, 1500)
@@ -612,13 +622,13 @@ p_oob <- ggplot(df_oob, aes(x = ntree, y = OOB_RMSE)) +
   geom_line() + geom_point() +
   labs(title = "OOB RMSE vs Number of Trees",
        x = "Number of Trees", y = "OOB RMSE") +
-  nature_theme
+  plot_theme
 
 quartz()
 p_oob
 
 # save the plot
-#ggsave("fig/supp/SuppFig_Hyperparameter_oob_vs_trees.png", width = 8, height = 6, dpi = 300)
+ggsave("fig/supp/SuppFig_Hyperparameter_oob_vs_trees.png", width = 8, height = 6, dpi = 300)
 
 ### Hyperparameter tuning surface (mtry × min.node.size)
 tuning_df <- tune_res$results
@@ -633,13 +643,13 @@ tuning_df <- tune_res$results
 #        x = "mtry", y = "min.node.size") +
 #   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
 #   theme_minimal(base_size = 16) +
-#   nature_theme
+#   plot_theme
 # quartz()
 # p_tune
-# 
-# #Save the plot
-# ggsave("fig/supp/SuppFig_Hyperparameter_Tuning_surface.png", width = 16, height = 6, dpi = 300)
-# 
+
+#Save the plot
+#ggsave("fig/supp/SuppFig_Hyperparameter_Tuning_surface.png", width = 16, height = 6, dpi = 300)
+
 # 
 
 # ###Global SHAP importance & Beeswarm for top 50
@@ -681,8 +691,8 @@ p_shap_bar <- ggplot(top50, aes(
     x     = NULL,
     y     = "Mean |SHAP| (days)"
   ) +
-  nature_theme
-
+  plot_theme
+print(shap_cum, n = Inf)
 
 # 1) compute cumulative‐importance and select features covering 80%
 shap_cum <- shap_rank %>%
@@ -691,7 +701,7 @@ shap_cum <- shap_rank %>%
 
 # 1) pick the top‐80% lipids as a character vector
 selected_lipids <- shap_cum %>% 
-  filter(cum_pct <= 0.7569354) %>% 
+  filter(cum_pct <= 0.8) %>% 
   pull(Lipid)
 
 # 2) reverse it once, to make the top feature end up at the top of a flipped axis
@@ -709,11 +719,12 @@ p_shap_bar <- shap_rank %>%
     x     = NULL,
     y     = "Mean |SHAP|"
   ) + 
-  nature_theme +
+  
   theme(
     axis.text.y  = element_blank(),  # remove the lipid names
     axis.ticks.y = element_blank()   # remove the tick marks
-  )
+  ) +
+  plot_theme
 
 
 # 3) beeswarm, using the exact same levels (so the top‐item is at the top)
@@ -756,24 +767,22 @@ p_shap_bee <- ggplot(shap_long2, aes(
     x     = "SHAP value",
     y     = NULL
   ) +
-  nature_theme +
   theme(
     legend.position = "right",
     #plot.title      = element_text(hjust = 0.5),
     #axis.text.y     = element_text(size = 8)
-  )
+  ) +
+  plot_theme
 
 
 # 4) combine side by side, giving more room on the left
 quartz()
-(p_shap_bee + p_shap_bar) +
+x <- (p_shap_bee + p_shap_bar) +
   plot_layout(ncol = 2, widths = c(2, 1))
 
+x
 
-# Save the plot
-x <- (p_shap_bee + p_shap_bar)
-
-ggsave("Fig7e_SHAP_beeswarm.png", x, width = 24, height = 12, dpi = 300, units = "in", bg = "white")
+ggsave("Fig4e_SHAP_beeswarm_sum_ratio.png", x, width = 24, height = 12, dpi = 300, units = "in", bg = "white")
 # ggsave("SuppFig_SHAP_StemDiameter.png", x, width = 32, height = 24, dpi = 300, units = "in", bg = "white")
 
 # 5) stitch side‑by‑side
@@ -816,7 +825,7 @@ cutoff_shap <- ggplot(shap_cum, aes(x = seq_along(MeanAbsSHAP), y = cum_pct)) +
     y     = "Cumulative importance",
     title = "Pareto plot of SHAP importance"
   ) +
-  nature_theme
+  plot_theme
 
 #save the plot
 ggsave("SuppFig_SHAP_cumulative_importance.png", cutoff_shap, width = 8, height = 6, dpi = 300, units = "in", bg = "white")
