@@ -105,16 +105,39 @@ print(changed, row.names = FALSE)
 ### Get the phenotypes in the field
 
 # Our data: Plant height and Flowering Time
-pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,3))
+# pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,3))
+# pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,2))
 
 # Plant Height and Stem Diameter
-pheno <- vroom("data/phenotypes/plantheight_diameter_SAP.csv") %>% dplyr::select(c(1,2))
+#pheno <- vroom("data/phenotypes/plantheight_diameter_SAP.csv") %>% dplyr::select(c(1,3))
 
 # Grain carotenoids
-pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,4))
+# Lutein
+#pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,2))
 
-# Yield Traits
-pheno <- vroom("data/phenotypes/yield_traits_Richard_E_Boyles.csv") %>% dplyr::select(c(1,2))
+# Zeaxanthin
+#pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,3))
+
+# Beta Carotein
+#pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,4))
+
+# Beta Cryptoxanthin
+#pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,6))
+
+# Alpha Carotene
+pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,7))
+
+# # Yield Traits
+
+# Grain_number_per_primary_panicle 
+#pheno <- vroom("data/phenotypes/yield_traits_Richard_E_Boyles.csv") %>% dplyr::select(c(1,2))
+
+# Thousand_grain_weight_gm 
+#pheno <- vroom("data/phenotypes/yield_traits_Richard_E_Boyles.csv") %>% dplyr::select(c(1,3))
+
+# Grain_yield_per_primary_panicle_gm
+#pheno <- vroom("data/phenotypes/yield_traits_Richard_E_Boyles.csv") %>% dplyr::select(c(1,4))
+
 
 colnames(pheno)[1] <- "Line"
 colnames(pheno)[2] <- "FlowerTime"
@@ -357,12 +380,17 @@ quartz()
 print(cv_plot)
 
 # Save the plot
-ggsave("Fig4a_CV_RF_metrics_FloweringTime_sum_ratio_rra.png",cv_plot, width = 8, height = 6, dpi = 300,
-       units = "in", bg = "white")
+# ggsave("Fig4a_CV_RF_metrics_FloweringTime_sum_ratio_rra.png",cv_plot, width = 8, height = 6, dpi = 300,
+#        units = "in", bg = "white")
 
 ################################################################################
 ###### FINAL MODEL FITTING AND EVALUATION
 ################################################################################
+
+### Check the tuned min.node.size
+## Cap min.node.size to something sensible
+min_node <- ifelse(tune_res$recommended.pars$min.node.size > 15, 15, tune_res$recommended.pars$min.node.size)
+
 
 ### Fit the final RF model with tuned parameters
 rf_model <- ranger(
@@ -370,7 +398,7 @@ rf_model <- ranger(
   y               = train_y,
   num.trees       = 1000,
   mtry            = tune_res$recommended.pars$mtry,
-  min.node.size   = tune_res$recommended.pars$min.node.size,
+  min.node.size   = min_node,
   sample.fraction = tune_res$recommended.pars$sample.fraction,
   importance      = "none",
   num.threads     = 10,
@@ -394,7 +422,7 @@ rmse <- sqrt(mean((preds - test_y)^2))
 mae  <- mean(abs(preds - test_y))
 
 # 3) Pearson correlation & R²
-pearson_r <- cor(preds, test_y)
+pearson_r <- cor(preds, as.vector(test_y))
 r2        <- pearson_r^2
 
 # 4) Bias (mean error)
@@ -456,9 +484,9 @@ global_rank <- tibble(
 
 ### Grab the top 20
 top50 <- global_rank %>% slice_head(n = 24)
-print(top50, n = 50)
+print(global_rank, n = 50)
 
-write.csv(global_rank, "table/supp/SuppTable_lipid_SHAP_FloweringTime_Sum_Ratio_rra.csv", row.names = FALSE)
+write.csv(global_rank, "table/supp/SuppTable_lipid_SHAP_Grain_yield_per_primary_panicle_gm.csv", row.names = FALSE)
 
 
 # 3) Bar chart of global importance
