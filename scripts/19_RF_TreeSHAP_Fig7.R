@@ -105,11 +105,12 @@ print(changed, row.names = FALSE)
 ### Get the phenotypes in the field
 
 # Our data: Plant height and Flowering Time
-# pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,3))
-# pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,2))
+# DTA
+#pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,3))
+#pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,2))
 
 # Plant Height and Stem Diameter
-#pheno <- vroom("data/phenotypes/plantheight_diameter_SAP.csv") %>% dplyr::select(c(1,3))
+#pheno <- vroom("data/phenotypes/plantheight_diameter_SAP.csv") %>% dplyr::select(c(1,2))
 
 # Grain carotenoids
 # Lutein
@@ -119,13 +120,13 @@ print(changed, row.names = FALSE)
 #pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,3))
 
 # Beta Carotein
-#pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,4))
+pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,4))
 
 # Beta Cryptoxanthin
 #pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,6))
 
 # Alpha Carotene
-pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,7))
+#pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,7))
 
 # # Yield Traits
 
@@ -391,6 +392,34 @@ print(cv_plot)
 ## Cap min.node.size to something sensible
 min_node <- ifelse(tune_res$recommended.pars$min.node.size > 15, 15, tune_res$recommended.pars$min.node.size)
 
+# Use the same preprocessing outputs you already computed:
+final_X <- lipids_adj %>% dplyr::select(-Line) %>% as.data.frame()
+final_y <- rFT
+
+rf_final <- ranger(
+  x               = final_X,
+  y               = final_y,
+  num.trees       = 1000,
+  mtry            = tune_res$recommended.pars$mtry,
+  min.node.size   = min_node,
+  sample.fraction = tune_res$recommended.pars$sample.fraction,
+  importance      = "none",
+  num.threads     = 10,
+  seed            = 42
+)
+
+# TreeSHAP on the 100% model
+um_final <- unify(rf_final, final_X)
+ts_final <- treeshap(um_final, final_X)
+
+# Global importance
+global_rank <- tibble(
+  Feature = colnames(ts_final$shaps),
+  MeanAbs = colMeans(abs(ts_final$shaps))
+) %>% arrange(desc(MeanAbs))
+
+# Sve this with full data
+
 
 ### Fit the final RF model with tuned parameters
 rf_model <- ranger(
@@ -451,7 +480,7 @@ print(metrics)
 X <- lipids_adj %>% select(-Line) %>% as.data.frame()
 
 ### Convert your ranger forest into a "unified" model
-um <- unify(rf_model,X)
+um <- unify(rf_final,X)
 
 ### treeshap wants an “unwrapped” ranger forest + the same data.frame
 ts <- treeshap(um, X)
@@ -486,7 +515,7 @@ global_rank <- tibble(
 top50 <- global_rank %>% slice_head(n = 24)
 print(global_rank, n = 50)
 
-write.csv(global_rank, "table/supp/SuppTable_lipid_SHAP_Grain_yield_per_primary_panicle_gm.csv", row.names = FALSE)
+write.csv(global_rank, "table/supp/SuppTable_lipid_SHAP_Zeaxanthin.csv", row.names = FALSE)
 
 
 # 3) Bar chart of global importance
@@ -567,15 +596,15 @@ quartz()
 print(residuals)
 
 # Save the plot 
-ggsave("Fig4b_Residuals_phenotype_FLowering_Time_Sum_Ratio_rra.png", residuals, width = 8, height = 6, dpi = 300,
-       units = "in", bg = "white")
+# ggsave("Fig4b_Residuals_phenotype_FLowering_Time_Sum_Ratio_rra.png", residuals, width = 8, height = 6, dpi = 300,
+#        units = "in", bg = "white")
 
 
 # For example plot take some lipid (first column of lipids_adj after Line); here we take TG 10 10 10 
-lipid_name <- colnames(lipids_adj)[97]
+lipid_name <- colnames(lipids_adj)[139]
 
 df_lip <- tibble(
-  raw   = lipid_mat[,97], # TG(10:0/10:0/10:0)
+  raw   = lipid_mat[,139], # TG(10:0/10:0/10:0)
   resid = lipids_adj[[lipid_name]]
 )
 
@@ -589,8 +618,8 @@ df_lip_long <- df_lip %>%
   mutate(
     Type = recode(
       Type,
-      raw   = paste0("Raw ", lipid_name),
-      resid = paste0("PC residualized ", lipid_name)
+      raw   = paste0("Raw PA(16:0/18:2)", lipid_name),
+      resid = paste0("PC residualized PA(16:0/18:2)", lipid_name)
     )
   )
 
@@ -598,8 +627,8 @@ lipid_residuals <- ggplot(df_lip_long, aes(x = Value, fill = Type)) +
   geom_density(alpha = 0.6, color = NA) +
   # facet_wrap(~ Type, scales = "free_x", ncol = 2) +
   scale_fill_manual(values = c(
-    "Raw Sum_LPC_Sum_SM"              = "#440154FF",
-    "PC residualized Sum_LPC_Sum_SM"  = "#FDE725FF"
+    "Raw PA(16:0/18:2)"              = "#440154FF",
+    "PC residualized PA(16:0/18:2)"  = "#FDE725FF"
   )) +
   labs(
     x = "Abundance",
@@ -611,12 +640,12 @@ lipid_residuals <- ggplot(df_lip_long, aes(x = Value, fill = Type)) +
     legend.position = "top"
   )
 
-quartz()
-print(lipid_residuals)
+# quartz()
+# print(lipid_residuals)
 
 # Save the lipid residuals plot
-ggsave("Fig4c_Residuals_lipid_FloweringTime_Sum_Ratio_rra.png", lipid_residuals, width = 8, height = 6, dpi = 300,
-       units = "in", bg = "white")
+# ggsave("Fig4c_Residuals_lipid_FloweringTime_Sum_Ratio_rra.png", lipid_residuals, width = 8, height = 6, dpi = 300,
+#        units = "in", bg = "white")
 
 
 ### Observed vs Predicted FT
@@ -724,7 +753,6 @@ p_shap_bar <- ggplot(top50, aes(
     y     = "Mean |SHAP| (days)"
   ) +
   plot_theme
-print(shap_cum, n = Inf)
 
 # 1) compute cumulative‐importance and select features covering 80%
 shap_cum <- shap_rank %>%
@@ -827,7 +855,7 @@ x <- (p_shap_bee + p_shap_bar) +
 
 x
 
-ggsave("Fig4e_SHAP_beeswarm_FloweringTime_Sum_Ratio_rra.png", x, width = 32, height = 26, dpi = 300, units = "in", bg = "white")
+ggsave("Fig4e_SHAP_beeswarm_FloweringTime_rra.png", x, width = 32, height = 16, dpi = 300, units = "in", bg = "white")
 # ggsave("SuppFig_SHAP_StemDiameter.png", x, width = 32, height = 24, dpi = 300, units = "in", bg = "white")
 
 
