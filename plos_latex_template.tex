@@ -594,6 +594,62 @@ In order to evaluate the contribution of each lipid to the predictions of P, the
 
 \subsection*{Pathway Enrichment Analysis}
 
+
+\subsection*{Random-forest modeling and TreeSHAP interpretation}
+\paragraph{Lipid data processing}
+Raw intensity tables were imported and processed in R, with sample identifiers being standardized on a per-sample basis. To achieve variance stabilization and address zero values, each lipid feature underwent transformation as outlined in \(\log_{10}(x + 1)\), employing a small pseudocount of 1. Following this transformation, lipid columns were median-centered across samples through feature-wise subtraction of the column median, effectively removing global offsets while maintaining inter-sample variability. No supplementary total-ion current scaling was applied within this analytical pipeline.
+
+\paragraph{Phenotype and population structure covariates}
+The dataset's phenotypic characteristics comprised plant height and flowering time as the response variables. In order to mitigate the potential for the model to emphasize population structure instead of underlying biological factors, both the response variables and lipid predictors were adjusted using residualization against the principal components through the method of ordinary least squares (OLS).
+
+Let \(y\) denote the phenotype of the SAP and \(X_{\mathrm{PC}}\) the PC design matrix (with intercept). We computed the residual phenotype as
+\[
+rFT \;=\; y - \hat{y}, 
+\qquad 
+\hat{y} \;=\; X_{\mathrm{PC}}\,(X_{\mathrm{PC}}^{\top}X_{\mathrm{PC}})^{-1}X_{\mathrm{PC}}^{\top}y,
+\]
+i.e.\ the residuals from the regression \(y \sim X_{\mathrm{PC}}\).
+For the lipid matrix \(L\) (samples \(\times\) features), we removed PC effects feature-wise via the same projection:
+\[
+L_{\mathrm{adj}} \;=\; L \;-\; P L,
+\qquad
+P \;=\; X_{\mathrm{PC}}\,(X_{\mathrm{PC}}^{\top}X_{\mathrm{PC}})^{-1}X_{\mathrm{PC}}^{\top}.
+\]
+The adjusted lipid matrix \(L_{\mathrm{adj}}\) and the residual phenotype \(rFT\) were used for all downstream modeling.
+
+\paragraph{Train/test split stratified by genetic background}
+In order to maintain a balance of population structure across the splits, we employed \(k\)-means clustering in principal component (PC) space, as referenced in \(k=6\). An 80/20 train/test split was subsequently carried out, stratified by cluster as indicated by caret \texttt{createDataPartition}. To ensure the reproducibility of the findings, random seeds were fixed.
+
+\paragraph{Random forest tuning, cross-validation, and training}
+We employed a random forest model (ranger in R) to represent \(rFT\) as a function of the adjusted lipid features. The hyperparameters were optimized using \texttt{tuneRanger}, with 1,000 trees and a search conducted over \texttt{mtry}, \texttt{min.node.size}, \texttt{sample.fraction}, to minimize the root-mean-squared error (RMSE) within the training dataset. To assess the expected generalization performance on the training data, we implemented a 5-fold cross-validation using \texttt{mlr} with the optimized parameters and reported the fold-wise RMSE, mean absolute error (MAE), and \(R^2\).
+
+A conclusive forest model (ranger; 1,000 trees) was constructed using the complete training dataset in conjunction with the optimized parameters. Due to the potential issue where excessively large \texttt{min.node.size} values may lead to over-smoothing of trees, resulting in predictions that are nearly constant, we imposed a practical limitation: if the optimized \texttt{min.node.size} exceeded 15, it was adjusted to 15 for the final construction, while all other optimized values remained unchanged.
+
+\paragraph{Model evaluation metrics}
+We evaluated the final model once on the test set. The following metrics were computed:
+\[
+\mathrm{RMSE} \;=\; \sqrt{\frac{1}{n}\sum_{i=1}^{n}\bigl(\hat{y}_i - y_i\bigr)^2}, 
+\qquad
+\mathrm{MAE} \;=\; \frac{1}{n}\sum_{i=1}^{n}\bigl|\hat{y}_i - y_i\bigr|,
+\]
+\[
+r \;=\; \mathrm{cor}(\hat{\bm{y}}, \bm{y}), 
+\qquad
+R^2 \;=\; r^2,
+\qquad
+\mathrm{Bias} \;=\; \frac{1}{n}\sum_{i=1}^{n}\bigl(\hat{y}_i - y_i\bigr),
+\]
+\[
+\mathrm{NRMSE}~(\%) \;=\; \frac{\mathrm{RMSE}}{\mathrm{SD}(rFT)} \times 100\%.
+\]
+
+\paragraph{TreeSHAP computation and feature ranking}
+In order to achieve reliable and local attributions for each lipid, exact TreeSHAP values were calculated for the fitted forest employing \texttt{treeshap}. The trained \texttt{ranger} model was subsequently transformed into a unified tree representation (\texttt{unify}), wherein TreeSHAP was executed on the identical feature frame utilized during the training phase. This procedure results in an \(n \times p\) matrix of SHAP values \(\phi_{ij}\), representing the impact of lipid \(j\) on sample \(i\). The global importance associated with lipid \(j\) was encapsulated as the mean absolute SHAP.\[
+\overline{|\phi|}_j \;=\; \frac{1}{n}\sum_{i=1}^{n} \bigl|\phi_{ij}\bigr|,
+\]
+and features were ranked by \(\overline{|\phi|}_j\) in descending order.
+
+
 \subsection*{Data Availability}
 Data processing and statistical analyzes were performed in R (version 4.3.3) using. All the codes, figures, and pipeline are described in the GitHub repository: github.com/nirwan1265/SoLD\_paper.
 
@@ -899,6 +955,17 @@ Our GWAS for zeaxanthin has identified the gene SORBI\_3002G033800, which has an
 %\subsubsection*{1.1 Sulfolipid (SQDG) Collapse Under LI Stress Adaptation}
 
 
+\subsection*{Random-forest SHAP identifies lipid predictors of phenotypic variation}
+
+Kernel-density curves were superimposed for both the raw data (depicted in purple) and the data following regression on population principal components (PCs) (depicted in yellow). As observed in \textbf{Fig.~4A}, there is a notable transformation in plant height post-adjustment: the distribution compresses into a constrained, mean-zero residual (as intended) with significantly reduced variability, in contrast to the raw phenotype, which spans a wide, right-shifted spectrum. This observation suggests that a considerable portion of the variation in height is associated with the population structure captured by the PCs. Therefore, eliminating this component is imperative to ensure that subsequent models do not erroneously interpret genetic-background differences as biological variation.
+
+In contrast, \textbf{Fig.~4B} provides an example of a representative lipid species, TG(10:0/10:0/10:0). Post PC adjustment, there is only a modest shift in density characterized by a slight recentering and minor change in variance, while the overall shape remains unimodal and akin to the original distribution. This pattern indicates that, for this TG, the population structure accounts for only a minimal portion of the variability; thus, the majority of the signal is preserved post-adjustment. Collectively, the panels demonstrate that our PC residualization effectively removes strong structure from the phenotype while maintaining lipid abundances mostly intact, which is precisely the desired outcome prior to predictive modeling and TreeSHAP interpretation.
+
+(\textbf{C}) The training set underwent a five-fold cross-validation. Points represent fold-wise Root Mean Square Error (RMSE), Mean Absolute Error (MAE), and $R^2$; dashed lines indicate the mean across folds, suggesting consistent performance across different splits. (\textbf{D}) An agreement plot on the \emph{held-out} test set illustrates the Random Forest (RF)-predicted residual phenotype in comparison with the observed residual phenotype; the dashed line represents the identity ($y=x$). The annotated RMSE and $R^2$ provide a summary of out-of-sample error and explained variance. The dispersion of the cloud around the identity line illustrates calibration, potential bias, and outliers.
+
+To interpret the fitted forest, we calculated precise TreeSHAP values for all lipids. Panel~\textbf{C} presents a SHAP \\"beeswarm\\" plot for the leading features, ordered by global importance. Each point represents a line; the $x$-axis denotes the sample-specific SHAP value, indicating its contribution to the prediction of residual flowering time, while the point's color reflects the standardized lipid abundance (cool colors representing low abundance and warm colors, high abundance). Warm colors located on the positive side suggest lipids whose greater abundance tends to \emph{increase} the prediction, whereas cool colors on the negative side suggest lipids whose increased abundance tends to \emph{decrease} the prediction. Panel~\textbf{D} displays the associated global importance as the mean absolute SHAP (mean\\,$\phi$) per lipid, offering an order-of-magnitude ranking that is direction-independent. The ranking is principally comprised of several short/medium-chain triacylglycerols (e.g., TG species enriched with 10:0–12:0 chains), supplemented by contributors from neutral and plastid membranes (e.g., MG/MGDG, selected PCs, and SQDG). The beeswarm plots indicate that higher abundance of prominent TGs generally influences predictions consistently, whereas several phospho/galactolipid features show variable bidirectional effects across lines. In conjunction with the shifts in class/subclass composition (increase in TG and DG; decrease in MGDG/SQDG; PC$\downarrow$/PE$\uparrow$) and the network/GWAS evidence (DGATs, PNPLA1, SQD2, PLD, LCAT-like), the SHAP analysis identifies neutral-lipid remodeling as the predominant predictor of the phenotype, while concurrently acknowledging plastid and phospholipid remodeling signals."
+}
+
 
 
 \subsection*{Integrated Lipid‐Metabolism Network, Ontology Enrichment, and GWAS Analaysis Idenfies Key Lipid Transitions Under Low Input}
@@ -986,6 +1053,19 @@ Genetic associations place enzyme “handles’’ directly onto the enriched ed
 
 In sum, low-input triggers a coherent remodeling program in which PNPLA1-mediated TG breakdown, DGAT1/3-mediated TG synthesis, PLD/PAP-derived DG supply, LCAT-like acyl editing, and plastid \textit{SQD2} draw on the same DG node. The net effect is redistribution of acyl chains from phospholipids and plastid galacto/sulfolipids into neutral TG, with plastids concurrently substituting SQDG for phosphate-demanding anionic phospholipids. The integrated evidence—enriched reaction paths (Fig.\ \textbf{A–B}), ontology shifts (Fig.\ \textbf{B}), class/subclass compositions (Fig.\ \textbf{1A}, \textbf{S5B–C}), and species-level smooths (Fig.\ \textbf{C–D})—all point to this same lipolysis–re-acylation switch and SQDG cycling as hallmarks of the low-input state.
 
+% In preamble: \usepackage{graphicx}
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{fig/main/Fig4.png}
+  \caption{\textbf{Random-forest pipeline: residualization, model performance, and SHAP-based interpretation.}
+  \textbf{A}, Kernel-density plots of the phenotype (example: plant height) before (purple) and after PC residualization (yellow). Residualization collapses population-structure variation and recenters values near zero while retaining spread/ordering needed for prediction. 
+  \textbf{B}, Example lipid (TG(10:0/10:0/10:0)) before (purple) and after PC residualization (yellow). Changes are modest relative to the phenotype, indicating that lipid variance is largely biological once PC effects are removed. 
+  \textbf{C}, Five-fold cross-validation on the training set for the tuned random forest (1{,}000 trees); points show per-fold RMSE, MAE, and $R^2$, with dashed lines marking fold means, demonstrating stable generalization across folds. 
+  \textbf{D}, Held-out test performance: RF predictions versus observed residual phenotype, with the 1:1 line shown (dashed). The model attains RMSE $\approx 24.2$ and $R^2 \approx 0.69$. 
+  \textbf{E}, TreeSHAP interpretation of the final model. Left, beeswarm: each point is a sample’s SHAP value for the top features (color encodes standardized abundance); positive values increase the predicted residual phenotype. Right, global ranking by mean absolute SHAP identifies the most phenotype-informative lipids (notably several short/medium-chain TG species alongside selected membrane lipids such as PC/PE, MGDG, and SQDG). 
+  Together, the panels show that PC residualization removes confounding, the RF model generalizes, and SHAP pinpoints the lipid species that most strongly drive predictions.}
+  \label{fig:fig4_rf_shap}
+\end{figure}
 
 
 
