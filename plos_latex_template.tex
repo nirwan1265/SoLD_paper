@@ -903,7 +903,7 @@ Our GWAS for zeaxanthin has identified the gene SORBI\_3002G033800, which has an
 
 \subsection*{Integrated Lipid‐Metabolism Network, Ontology Enrichment, and GWAS Analaysis Idenfies Key Lipid Transitions Under Low Input}
 
-As depicted in Figure \ref{fig:Fig6}A, our combined enzyme-reaction network, lipid enrichment analysis and genome-wide signals elucidates the interactions between DGs, MGs, TGs, and PEs. Three pivotal pathways are identified, as demonstrated in Table \ref{tab:linex_reactions}.
+As depicted in Figure \ref{fig:Fig4}A and \ref{fig:Fig4}B, our combined enzyme-reaction network, lipid enrichment analysis, and genome-wide signals elucidate the interactions between DGs, MGs, TGs, PEs, and SQDGs. Nine pivotal pathways are identified, as demonstrated in Table \ref{tab:linex_reactions}.
 
 \begin{table}[!ht]
   \centering
@@ -937,7 +937,7 @@ As depicted in Figure \ref{fig:Fig6}A, our combined enzyme-reaction network, lip
       & LRO1-type acyltransferase
       & Membrane PE shuttles acyl chains to TG. \\
     \addlinespace
-    \textbf{Plastid sulfolipid (SQDG) cycling}
+    Plastid sulfolipid (SQDG) cycling
       & DG + UDP–sulfoquinovose $\rightarrow$ SQDG + UDP
       & \textit{SQD2} (sulfoquinovosyldiacylglycerol synthase)
       & Builds anionic sulfolipid in thylakoid membranes; phosphate-sparing replacement of phospholipids. \\
@@ -960,10 +960,9 @@ As depicted in Figure \ref{fig:Fig6}A, our combined enzyme-reaction network, lip
 \end{table}
 
 
-
 The conversion of TG to DG catalyzed by PNPLA1 is identified as a critical process, complemented by the transformation from DG to TG facilitated by PNLPLA3. This enzymatic relationship suggests that modifications in TG turnover via PNPLA1 could account for the observed variations in lipid profiles (Fig X) when contrasting LI conditions to the C.
 
-Additionally, the LION lipid-ontology enrichment analysis (Figure \ref{fig:Fig6}B) identifies significant terms such as "triacylglycerols [GL0301]" (FDR = 0.002), "lipid storage" (FDR = 0.008), "lipid droplet" (FDR = 0.008), "headgroup with neutral charge" (FDR = 0.012), and "glycerolipids [GL]" (FDR = 0.015) at a significance threshold of (−log₁₀ q > 1.3). These enriched terms suggest the accumulation and mobilization of TG pools, aligning with the biochemical roles of PNPLA1 and PNPLA3 in the recycling of triglycerides and diglycerides (TG~$\leftrightarrow$~DG):
+Additionally, the LION lipid-ontology enrichment analysis (Figure \ref{fig:}B) identifies significant terms such as "triacylglycerols [GL0301]" (FDR = 0.002), "lipid storage" (FDR = 0.008), "lipid droplet" (FDR = 0.008), "headgroup with neutral charge" (FDR = 0.012), and "glycerolipids [GL]" (FDR = 0.015) at a significance threshold of (−log₁₀ q > 1.3). These enriched terms suggest the accumulation and mobilization of TG pools, aligning with the biochemical roles of PNPLA1 and PNPLA3 in the recycling of triglycerides and diglycerides (TG~$\leftrightarrow$~DG):
 
 \begin{array}{rcl}
 \text{TG} & 
@@ -974,6 +973,53 @@ Additionally, the LION lipid-ontology enrichment analysis (Figure \ref{fig:Fig6}
 
 Furthermore, five independent GWAS results for TGs (Figure \ref{fig:Fig6}C) consistently identify a single locus on chromosome 1 annotated as the triacylglycerol lipase gene SORBI\_3001G041900 (SbPNPLA1) above the pvalue cutoffe Sum\_TG, TG\_54\_6, TG\_54\_7, TG\_56\_4, and TG\_56\_6 plots. The recurrent emergence of this peak across both aggregate and individual species traits highlights the crucial role of PNPLA1 in triacylglycerol homeostasis. Collectively, these findings support a model wherein genetic variation at the PNPLA1 locus directs the variability in lipid storage and mobilization, especially under cold and nutrient-deficient conditions.
 
+\subsection*{}
+
+
+
+
+\subsection*{Integrated LION, LINEX2, and GWAS Analyses Reveal Lipid Remodeling Under Lowinput}
+
+Across three orthogonal readouts—reaction topology (LINEX2), lipid ontology (LION), and genetics (GWAS)—low-input consistently resolves to a lipolysis–re-acylation program that reallocates acyl chains from membranes into neutral storage while plastids tune their anionic surface by turning over SQDG. In the LINEX2 sub-network (Fig.\ \textbf{A–B}), the most connected transitions form a TG$\leftrightarrow$DG core coupled to acyl-editing links between phospholipids and neutral lipids (e.g., \mbox{PE + DG $\rightleftharpoons$ LPE + TG} and \mbox{LPC $\leftrightarrow$ DG}) and to a plastid branch that interconverts DG and SQDG via sulfoquinovose. LION enrichment reinforces this same architecture: terms related to glycerolipids, lipid droplets, and neutral headgroups are elevated in low-input, whereas multiple glycerophospholipid classes and membrane biophysical signatures (intrinsic curvature, lateral diffusion, transition temperature) trend downward (Fig.\ \textbf{B}). The class/subclass compositions match these directions: in Fig.\ \textbf{1A}, TG increases (2.7\%$\rightarrow$5.4\%) with a modest DG rise (13.8\%$\rightarrow$14.8\%); PE rises (5.8\%$\rightarrow$6.6\%), while plastid SQDG decreases (2.9\%$\rightarrow$1.4\%); MGDG decreases (34.5\%$\rightarrow$32.1\%); PC shows a mild decrease (25.6\%$\rightarrow$24.8\%); DGDG is essentially flat (12.7\%$\rightarrow$13.0\%). Subclass bars (Fig.\ \textbf{S5B–C}) echo this: glycerolipids show TG up (4.0\%$\rightarrow$7.9\%) and DG up (20.3\%$\rightarrow$21.9\%) with MGDG and SQDG down (50.6\%$\rightarrow$47.3\%; 4.3\%$\rightarrow$2.0\%), and the phospholipid pool tilts from PC toward PE (PC 79.9\%$\rightarrow$76.9\%; PE 18.4\%$\rightarrow$20.8\%), alongside small PG/LPC increases (LPE, PA $<0.1\%$). Together, these orthogonal signals point to acyl flux from structural phospholipids (especially PC) and plastid galactolipids/sulfolipids toward neutral TG, with PE and lysophospholipid edits mediating the transfer.
+
+Genetic associations place enzyme “handles’’ directly onto the enriched edges and rationalize the species-level patterns. A patatin-like lipase, \textit{PNPLA1} (SORBI\_3001G041900), associates with twelve TG species (e.g., TG(18{:}1\_18{:}2\_18{:}3), TG(16{:}0\_18{:}1\_22{:}0)), fitting the TG$\rightarrow$DG$+$FA arm of the cycle and explaining the slight DG accumulation that feeds downstream edits or plastid demand. Re-esterification back to TG is anchored by \textit{DGAT1}/TAG1 (SORBI\_3010G170000) and \textit{DGAT3} (SORBI\_3009G034600), whose hits span MG, DGDG(16{:}0\_18{:}3), and multiple TGs; the \textit{DGAT3} bias toward polyunsaturated TGs is consistent with the smooth trends versus chain length/unsaturation (Fig.\ \textbf{C–D}) characteristic of storage-oriented remodeling. On the plastid branch, \textit{SQD2} (SORBI\_3001G427300) maps to SQDG(16{:}0\_16{:}0 / 16{:}0\_18{:}1 / 16{:}0\_18{:}3) (and one TG), exactly the DG$\rightarrow$SQDG step; the observed SQDG decrease with low-input suggests heightened turnover/substitution that spares phosphate and adjusts the thylakoid surface charge while competing with DGAT for DG. A \textit{PLD} locus (SORBI\_3005G222500) linked to DG and TG species provides a membrane-to-DG route via PA$\rightarrow$DG (PAP), supplying substrate both for DGAT (storage) and \textit{SQD2} (plastid). Finally, two broad LCAT-like associations—\textit{LCAT-like 4} (SORBI\_3006G214500; 22 hits across MG, DG, TG, PC/PE/PG, MGDG/DGDG, SQDG) and \textit{LCAT-like 1} (SORBI\_3001G103800; PC and TG hits)—fit the lysophospholipid acyl-shuttling implicit in the \mbox{LPC $\leftrightarrow$ DG} and \mbox{PG + DG $\rightleftharpoons$ LPC + TG} edges and help explain the modest PC$\downarrow$/PE$\uparrow$ tilt.
+
+In sum, low-input triggers a coherent remodeling program in which PNPLA1-mediated TG breakdown, DGAT1/3-mediated TG synthesis, PLD/PAP-derived DG supply, LCAT-like acyl editing, and plastid \textit{SQD2} draw on the same DG node. The net effect is redistribution of acyl chains from phospholipids and plastid galacto/sulfolipids into neutral TG, with plastids concurrently substituting SQDG for phosphate-demanding anionic phospholipids. The integrated evidence—enriched reaction paths (Fig.\ \textbf{A–B}), ontology shifts (Fig.\ \textbf{B}), class/subclass compositions (Fig.\ \textbf{1A}, \textbf{S5B–C}), and species-level smooths (Fig.\ \textbf{C–D})—all point to this same lipolysis–re-acylation switch and SQDG cycling as hallmarks of the low-input state.
+
+
+
+
+\subsection*{Integrated Lipid‐Metabolism Network, Ontology Enrichment, and GWAS Analaysis Idenfies Key Lipid Transitions Under Low Input}
+
+
+\noindent \textbf{Network-level shifts (LINEX2).}
+The reaction sub-network enriched in low-input samples is dominated by a lipolysis–re-acylation axis that shuttles acyl chains between membranes and storage (Fig.\ \textbf{A–B}). Three features stand out:
+\begin{enumerate}\itemsep3pt
+  \item \textbf{TG $\leftrightarrow$ DG cycling.} Reactions converting triacylglycerol (TG) to diacylglycerol (DG) {+} free fatty acid (FA), and the reverse re-esterification of MG/DG back to TG, are over-represented, indicating active remodeling of the neutral-lipid pool.
+  \item \textbf{Phospholipid $\leftrightarrow$ neutral-lipid crosstalk.} The edge \mbox{PE + DG $\rightleftharpoons$ LPE + TG} suggests a PE-based acyl-transfer route that moves acyl chains from membrane glycerophospholipids into TG (a Lands–cycle–like edit). The \mbox{LPC $\leftrightarrow$ DG} connection is consistent with lysophospholipid acyl transfer at the droplet surface.
+  \item \textbf{Plastid anionic-lipid cycling.} \mbox{DG + UDP–sulfoquinovose $\rightarrow$ SQDG + UDP}, and the reverse hydrolytic route \mbox{SQDG + H$_2$O $\rightarrow$ DG + sulfoquinovose}, indicate dynamic sulfoquinovosyldiacylglycerol (SQDG) turnover—i.e., plastid membranes swapping phosphate-containing anionic lipids for SQDG and feeding DG back to the glycerolipid pool when needed.
+\end{enumerate}
+
+\noindent \textbf{Ontology-level consequences (LION).}
+LION enrichment mirrors the network picture (Fig.\ \textbf{B}). Terms increased in low-input include \emph{glycerolipids} (DG/TG), \emph{lipid droplet}/\emph{lipid storage}, and \emph{headgroup with neutral charge}, consistent with accumulation of neutral storage lipids. Terms decreased include \emph{glycerophospholipids} (PC/PE subclasses) and membrane biophysical signatures (e.g., intrinsic curvature, lateral diffusion/transition-temperature terms), pointing to depletion or acyl editing of structural phospholipids. Together, these ontologies argue for redistribution of acyl chains from zwitterionic/anionic membrane lipids into storage TG, alongside plastid-specific adjustments.
+
+\noindent \textbf{Genetic anchors (GWAS) that map onto the same reactions.}
+GWAS hits pin enzymes to the enriched edges and explain species-level patterns:
+\begin{itemize}\itemsep3pt
+  \item \textbf{TG lipolysis $\rightarrow$ DG + FA: \textit{PNPLA1} (SORBI\_3001G041900).} Associations to 12 TG species (e.g., TG(18:1\_18:2\_18:3), TG(16:0\_18:1\_22:0)) implicate a patatin-like lipase in the TG$\rightarrow$DG arm highlighted by LINEX2, shifting the DG/TG balance and feeding DG into downstream editing or SQDG synthesis.
+  \item \textbf{DG + acyl–CoA $\rightarrow$ TG: \textit{DGAT1}/TAG1 (SORBI\_3010G170000) and \textit{DGAT3} (SORBI\_3009G034600).} Hits spanning MG, DGDG(16:0\_18:3) and multiple TGs (with \textit{DGAT3} biased to polyunsaturated TGs) anchor re-esterification back to TG and help explain the chain/unsaturation smooths (Fig.\ \textbf{C–D}).
+  \item \textbf{DG + UDP–sulfoquinovose $\rightarrow$ SQDG + UDP: \textit{SQD2} (SORBI\_3001G427300).} Associations with SQDG(16:0\_16:0/16:0\_18:1/16:0\_18:3) (and one TG) fit the plastid branch; \textit{SQD2} builds sulfolipid in thylakoids, likely sparing phosphate and tuning anionic surface charge under low-input while competing with DGAT for the DG substrate.
+  \item \textbf{PC/PE $\rightarrow$ PA + headgroup: \textit{PLD} (SORBI\_3005G222500).} Links to DG and TG species suggest PLD-derived PA, dephosphorylated to DG (via PAP), supplies DG for DGAT or for \textit{SQD2}—exactly the membrane-to-storage trafficking seen in LINEX2 and LION.
+  \item \textbf{Lysophospholipid acyl transfer / acyl editing: LCAT-like enzymes.} 
+  \textit{LCAT-like 4} (SORBI\_3006G214500; 22 hits across MG, DG, TG, PC/PE/PG, MGDG/DGDG, SQDG) and \textit{LCAT-like 1} (SORBI\_3001G103800; PC and TG hits) are consistent with phospholipid$\rightarrow$neutral-lipid acyl flow and the \mbox{LPC $\leftrightarrow$ DG} / \mbox{PG + DG $\rightleftharpoons$ LPC + TG} edges.
+\end{itemize}
+
+\noindent \textbf{Composition evidence (stacked bars) supports the model.}
+Class-level composition (Fig.\ \textbf{1A}) shows \textbf{TG increase} (2.7\% $\rightarrow$ 5.4\%), \textbf{DG slight increase} (13.8\% $\rightarrow$ 14.8\%), \textbf{PE increase} (5.8\% $\rightarrow$ 6.6\%), and \textbf{SQDG decrease} (2.9\% $\rightarrow$ 1.4\%), with \mbox{MGDG decrease} (34.5\% $\rightarrow$ 32.1\%), mild \mbox{PC decrease} (25.6\% $\rightarrow$ 24.8\%), and DGDG $\sim$stable (12.7\% $\rightarrow$ 13.0\%). 
+Subclass panels corroborate this: glycerolipids (S5B) show \textbf{TG up} (4.0\% $\rightarrow$ 7.9\%) and \textbf{DG up} (20.3\% $\rightarrow$ 21.9\%), with \textbf{MGDG down} (50.6\% $\rightarrow$ 47.3\%) and \textbf{SQDG down} (4.3\% $\rightarrow$ 2.0\%); phospholipids (S5C) show a \textbf{PC$\downarrow$ / PE$\uparrow$ tilt} (PC 79.9\% $\rightarrow$ 76.9\%; PE 18.4\% $\rightarrow$ 20.8\%), small PG and LPC increases, LPE/PA $<0.1\%$.
+
+\noindent \textbf{Synthesis and interpretation.}
+Across three orthogonal layers, low-input drives a coherent remodeling program: (\emph{i}) enhanced TG$\leftrightarrow$DG cycling; (\emph{ii}) PE-mediated acyl transfer into TG and LPC/DG interconversion; and (\emph{iii}) plastid SQDG cycling that competes with DGAT for DG. The composition and ontology shifts (neutral lipids and droplets up; phospholipid/biophysical signatures down; SQDG/galactolipids reduced) and the genetic anchors (\textit{PNPLA1}, \textit{DGAT1/3}, \textit{SQD2}, \textit{PLD}, LCAT-like enzymes) converge on the same mechanism. We propose that, under low-input, plants reallocate acyl chains from structural phospholipids to storage TG while plastids substitute SQDG for phosphate-demanding anionic phospholipids. The species-level smooths versus chain length and unsaturation (Fig.\ \textbf{C–D}) are consistent with storage-oriented remodeling into variably unsaturated, sometimes longer-chain TGs, with relative depletion/editing of membrane PCs/PEs and plastid galactolipids.
 
 
 
