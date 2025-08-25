@@ -30,12 +30,16 @@ lipids <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_contr
   dplyr::rename(Line = 1)
 
 
-## SUms and ratios
-#lipids <- vroom("data/SPATS_fitted/BLUP_GWAS_phenotype/Final_control_all_lipids_BLUPs_sum_ratios.csv" )%>%
-#  dplyr::rename(Line = 1)
-
+## Sums and ratios
+# lipids <- vroom("data/SPATS_fitted/BLUP_GWAS_phenotype/Final_control_all_lipids_BLUPs_sum_ratios.csv" ) %>%
+#   dplyr::rename(Line = 1)
+# 
+# # Filter all columns with partial match to AEG, SM, Cer, GalCer, Galcer
+# lipids <- lipids %>%
+#   dplyr::select(-contains(c("AEG", "SM", "Cer", "GalCer", "Galcer","FA")))
 
 # choose a small pseudocount for zeros (adjust if you prefer)
+# NOTE: This is not required for sums and ratios. Ratios have negative values cause we are taking the log and then the difference
 pseudocount <- 1
 
 lipids <- lipids %>%
@@ -101,7 +105,7 @@ print(changed, row.names = FALSE)
 ### Get the phenotypes in the field
 
 # Our data: Plant height and Flowering Time
-pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,2))
+pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,3))
 
 # Plant Height and Stem Diameter
 pheno <- vroom("data/phenotypes/plantheight_diameter_SAP.csv") %>% dplyr::select(c(1,2))
@@ -353,7 +357,7 @@ quartz()
 print(cv_plot)
 
 # Save the plot
-ggsave("Fig4a_CV_RF_metrics_PlantHeight_rra.png",cv_plot, width = 8, height = 6, dpi = 300,
+ggsave("Fig4a_CV_RF_metrics_FloweringTime_sum_ratio_rra.png",cv_plot, width = 8, height = 6, dpi = 300,
        units = "in", bg = "white")
 
 ################################################################################
@@ -437,7 +441,7 @@ shap_rank <- tibble(
 top20 <- shap_rank %>% slice_head(n = 20)
 print(shap_rank, n = Inf)
 
- ### Convert to shapviz and plot
+### Convert to shapviz and plot
 sv <- shapviz(ts, X = X)   # TreeSHAP under the hood
 
 ### ts is your treeshap result, ts$shaps is an (n_samples × n_features) matrix
@@ -454,7 +458,7 @@ global_rank <- tibble(
 top50 <- global_rank %>% slice_head(n = 24)
 print(top50, n = 50)
 
-write.csv(global_rank, "table/SuppTable_lipid_SHAP_PlantHeight_rraw.csv", row.names = FALSE)
+write.csv(global_rank, "table/supp/SuppTable_lipid_SHAP_FloweringTime_Sum_Ratio_rra.csv", row.names = FALSE)
 
 
 # 3) Bar chart of global importance
@@ -504,8 +508,8 @@ df_ft_long <- tibble(
   ) %>%
   # give each level a short code that we can re‐label
   mutate(Type = recode(Type,
-                       raw   = "Raw Phenotype",
-                       resid = "PC Residualized Phenotype"))
+                       raw   = "Raw Flowering Time",
+                       resid = "PC Residualized Flowering Time"))
 
 
 residuals <- ggplot(df_ft_long, aes(x = Value, fill = Type)) +
@@ -520,8 +524,8 @@ residuals <- ggplot(df_ft_long, aes(x = Value, fill = Type)) +
   # ) +
   scale_fill_manual(
     values = c(
-      "Raw Phenotype"      = "#440154FF",
-      "PC Residualized Phenotype" = "#FDE725FF"
+      "Raw Flowering Time"      = "#440154FF",
+      "PC Residualized Flowering Time" = "#FDE725FF"
     )
   ) +
   labs(
@@ -535,15 +539,15 @@ quartz()
 print(residuals)
 
 # Save the plot 
-ggsave("Fig4b_Residuals_phenotype_rra.png", residuals, width = 8, height = 6, dpi = 300,
+ggsave("Fig4b_Residuals_phenotype_FLowering_Time_Sum_Ratio_rra.png", residuals, width = 8, height = 6, dpi = 300,
        units = "in", bg = "white")
 
 
 # For example plot take some lipid (first column of lipids_adj after Line); here we take TG 10 10 10 
-lipid_name <- colnames(lipids_adj)[64]
+lipid_name <- colnames(lipids_adj)[97]
 
 df_lip <- tibble(
-  raw   = lipid_mat[,64], # TG(10:0/10:0/10:0)
+  raw   = lipid_mat[,97], # TG(10:0/10:0/10:0)
   resid = lipids_adj[[lipid_name]]
 )
 
@@ -566,24 +570,24 @@ lipid_residuals <- ggplot(df_lip_long, aes(x = Value, fill = Type)) +
   geom_density(alpha = 0.6, color = NA) +
   # facet_wrap(~ Type, scales = "free_x", ncol = 2) +
   scale_fill_manual(values = c(
-    "Raw Sum_PA"              = "#440154FF",
-    "PC residualized Sum_PA"  = "#FDE725FF"
+    "Raw Sum_LPC_Sum_SM"              = "#440154FF",
+    "PC residualized Sum_LPC_Sum_SM"  = "#FDE725FF"
   )) +
   labs(
     x = "Abundance",
     y = "Density"
   ) +
+  plot_theme +
   theme(
     strip.text      = element_text(size = 12, face = "bold"),
     legend.position = "top"
-  ) +
-  plot_theme
+  )
 
 quartz()
 print(lipid_residuals)
 
 # Save the lipid residuals plot
-ggsave("Fig4c_Residuals_lipid.png", lipid_residuals, width = 8, height = 6, dpi = 300,
+ggsave("Fig4c_Residuals_lipid_FloweringTime_Sum_Ratio_rra.png", lipid_residuals, width = 8, height = 6, dpi = 300,
        units = "in", bg = "white")
 
 
@@ -592,7 +596,7 @@ df_pred <- tibble(obs = test_y, pred = preds)
 p_obs_pred <- ggplot(df_pred, aes(x = obs, y = pred)) +
   geom_point(alpha = 0.6) +
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "gray50") +
-  labs(title = "Observed vs Predicted Plant Height",
+  labs(title = "Observed vs Predicted Flowering Time",
        x = "Observed residual phenotype",
        y = "RF predicted residual phenotype") +
   annotate("text", x = Inf, y = -Inf, hjust = 1.1, vjust = -0.5,
@@ -602,7 +606,7 @@ quartz()
 p_obs_pred
 
 # Save the plot
-ggsave("Fig4d_obs_vs_pred_PlantHeight_rra.png", p_obs_pred, width = 6, height = 6, dpi = 300, units = "in", bg = "white")
+ggsave("Fig4d_obs_vs_pred_FloweringTime_Sum_Ratio_rra.png", p_obs_pred, width = 6, height = 6, dpi = 300, units = "in", bg = "white")
 
 ### OOB error vs number of trees
 ntree_seq <- c(100, 250, 500, 750, 1000, 1500)
@@ -628,7 +632,7 @@ quartz()
 p_oob
 
 # save the plot
-ggsave("fig/supp/SuppFig_Hyperparameter_oob_vs_trees.png", width = 8, height = 6, dpi = 300)
+ggsave("fig/supp/SuppFig_Hyperparameter_oob_vs_trees_FloweringTime_Sum_Ratio_rra.png", width = 8, height = 6, dpi = 300)
 
 ### Hyperparameter tuning surface (mtry × min.node.size)
 tuning_df <- tune_res$results
@@ -648,7 +652,7 @@ tuning_df <- tune_res$results
 # p_tune
 
 #Save the plot
-#ggsave("fig/supp/SuppFig_Hyperparameter_Tuning_surface.png", width = 16, height = 6, dpi = 300)
+#ggsave("fig/supp/SuppFig_Hyperparameter_Tuning_surface_PlantHeight_rra.png", width = 16, height = 6, dpi = 300)
 
 # 
 
@@ -687,7 +691,7 @@ p_shap_bar <- ggplot(top50, aes(
   geom_col(fill = "steelblue") +
   coord_flip() +
   labs(
-    title = "Top 50 Lipids by Mean |SHAP|",
+    title = "Top 50 Lipids by Mean |SHAP|",
     x     = NULL,
     y     = "Mean |SHAP| (days)"
   ) +
@@ -724,7 +728,14 @@ p_shap_bar <- shap_rank %>%
     axis.text.y  = element_blank(),  # remove the lipid names
     axis.ticks.y = element_blank()   # remove the tick marks
   ) +
-  plot_theme
+  plot_theme  +
+  theme(
+    panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+    panel.grid.minor.y = element_line(color = "grey92", linewidth = 0.2),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+  )
+
 
 
 # 3) beeswarm, using the exact same levels (so the top‐item is at the top)
@@ -772,7 +783,13 @@ p_shap_bee <- ggplot(shap_long2, aes(
     #plot.title      = element_text(hjust = 0.5),
     #axis.text.y     = element_text(size = 8)
   ) +
-  plot_theme
+  plot_theme +
+  theme(
+    panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+    panel.grid.minor.y = element_line(color = "grey92", linewidth = 0.2),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+  )
 
 
 # 4) combine side by side, giving more room on the left
@@ -782,50 +799,42 @@ x <- (p_shap_bee + p_shap_bar) +
 
 x
 
-ggsave("Fig4e_SHAP_beeswarm_sum_ratio.png", x, width = 24, height = 12, dpi = 300, units = "in", bg = "white")
+ggsave("Fig4e_SHAP_beeswarm_FloweringTime_Sum_Ratio_rra.png", x, width = 32, height = 26, dpi = 300, units = "in", bg = "white")
 # ggsave("SuppFig_SHAP_StemDiameter.png", x, width = 32, height = 24, dpi = 300, units = "in", bg = "white")
-
-# 5) stitch side‑by‑side
-quartz()
-(p_shap_bee + p_shap_bar) +
-  plot_layout(ncol = 2, widths = c(2,1))
-
-
-
 
 
 ### Cut off for SHAP importance
-shap_cum <- shap_rank %>% 
-  arrange(desc(MeanAbsSHAP)) %>% 
-  mutate(cum_pct = cumsum(MeanAbsSHAP) / sum(MeanAbsSHAP))
-
-# figure out which rank first exceeds 80%
-cutoff_idx <- which(shap_cum$cum_pct >= 0.80)[1]
-
-quartz()
-cutoff_shap <- ggplot(shap_cum, aes(x = seq_along(MeanAbsSHAP), y = cum_pct)) +
-  geom_line(size = 1) +
-  # vertical line at the cutoff rank
-  geom_vline(xintercept = cutoff_idx, linetype = "dashed", color = "red") +
-  # horizontal line at 80%
-  geom_hline(yintercept = 0.80,    linetype = "dashed", color = "red") +
-  # annotation text at the intersection
-  annotate(
-    "text",
-    x    = cutoff_idx + 5,      # nudge to the right
-    y    = 0.80 + 0.03,         # nudge upward
-    label = sprintf("rank = %d\n80%% cum. imp.", cutoff_idx),
-    color = "red",
-    hjust = 0,
-    size  = 4
-  ) +
-  scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
-  labs(
-    x     = "Feature rank (by mean |SHAP|)",
-    y     = "Cumulative importance",
-    title = "Pareto plot of SHAP importance"
-  ) +
-  plot_theme
-
-#save the plot
-ggsave("SuppFig_SHAP_cumulative_importance.png", cutoff_shap, width = 8, height = 6, dpi = 300, units = "in", bg = "white")
+# shap_cum <- shap_rank %>% 
+#   arrange(desc(MeanAbsSHAP)) %>% 
+#   mutate(cum_pct = cumsum(MeanAbsSHAP) / sum(MeanAbsSHAP))
+# 
+# # figure out which rank first exceeds 80%
+# cutoff_idx <- which(shap_cum$cum_pct >= 0.80)[1]
+# 
+# quartz()
+# cutoff_shap <- ggplot(shap_cum, aes(x = seq_along(MeanAbsSHAP), y = cum_pct)) +
+#   geom_line(size = 1) +
+#   # vertical line at the cutoff rank
+#   geom_vline(xintercept = cutoff_idx, linetype = "dashed", color = "red") +
+#   # horizontal line at 80%
+#   geom_hline(yintercept = 0.80,    linetype = "dashed", color = "red") +
+#   # annotation text at the intersection
+#   annotate(
+#     "text",
+#     x    = cutoff_idx + 5,      # nudge to the right
+#     y    = 0.80 + 0.03,         # nudge upward
+#     label = sprintf("rank = %d\n80%% cum. imp.", cutoff_idx),
+#     color = "red",
+#     hjust = 0,
+#     size  = 4
+#   ) +
+#   scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+#   labs(
+#     x     = "Feature rank (by mean |SHAP|)",
+#     y     = "Cumulative importance",
+#     title = "Pareto plot of SHAP importance"
+#   ) +
+#   plot_theme
+# cutoff_shap
+# #save the plot
+# ggsave("SuppFig_SHAP_cumulative_importance.png", cutoff_shap, width = 8, height = 6, dpi = 300, units = "in", bg = "white")
