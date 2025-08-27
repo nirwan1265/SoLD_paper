@@ -107,7 +107,7 @@ print(changed, row.names = FALSE)
 # Our data: Plant height and Flowering Time
 # DTA
 #pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,3))
-#pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,2))
+pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,2))
 
 # Plant Height and Stem Diameter
 #pheno <- vroom("data/phenotypes/plantheight_diameter_SAP.csv") %>% dplyr::select(c(1,2))
@@ -120,7 +120,7 @@ print(changed, row.names = FALSE)
 #pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,3))
 
 # Beta Carotein
-pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,4))
+#pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,4))
 
 # Beta Cryptoxanthin
 #pheno <- vroom("data/phenotypes/grain_carotenoid_Clara_Cruet_Burgos.csv") %>% dplyr::select(c(1,6))
@@ -215,6 +215,33 @@ colnames(lipids_adj) <- colnames(lipid_mat)
 
 ### Re‑join the Line IDs so you can keep track
 lipids_adj <- bind_cols(Line = dat2$Line, lipids_adj)
+
+
+
+
+
+
+
+# Correleation
+cor_results <- data.frame(Lipid = character(),
+                          Correlation = numeric(),
+                          P_value = numeric(),
+                          stringsAsFactors = FALSE)
+for (lipid in colnames(lipids_adj)[-1]) { # Exclude the first column 'Line'
+  cor_test <- cor.test(lipids_adj[[lipid]], rFT, method = "pearson")
+  cor_results <- rbind(cor_results, data.frame(
+    Lipid = lipid,
+    Correlation = cor_test$estimate,
+    P_value = cor_test$p.value
+  ))
+}  
+
+# Adjust p-values for multiple testing using Benjamini-Hochberg method
+cor_results$Adj_P_value <- p.adjust(cor_results$P_value, method = "BH")
+
+# Sort results by absolute correlation
+cor_results <- cor_results %>%
+  arrange(desc(abs(Correlation)))
 
 
 
@@ -515,7 +542,7 @@ global_rank <- tibble(
 top50 <- global_rank %>% slice_head(n = 24)
 print(global_rank, n = 50)
 
-write.csv(global_rank, "table/supp/SuppTable_lipid_SHAP_Zeaxanthin.csv", row.names = FALSE)
+#write.csv(global_rank, "table/supp/SuppTable_lipid_SHAP_Zeaxanthin.csv", row.names = FALSE)
 
 
 # 3) Bar chart of global importance
@@ -592,8 +619,8 @@ residuals <- ggplot(df_ft_long, aes(x = Value, fill = Type)) +
   plot_theme +
   theme(legend.position = "top")
 
-quartz()
-print(residuals)
+# quartz()
+# print(residuals)
 
 # Save the plot 
 # ggsave("Fig4b_Residuals_phenotype_FLowering_Time_Sum_Ratio_rra.png", residuals, width = 8, height = 6, dpi = 300,
@@ -659,11 +686,11 @@ p_obs_pred <- ggplot(df_pred, aes(x = obs, y = pred)) +
   annotate("text", x = Inf, y = -Inf, hjust = 1.1, vjust = -0.5,
            label = sprintf("RMSE = %.3f\nR² = %.3f", metrics$RMSE, metrics$R2)) +
   plot_theme
-quartz()
-p_obs_pred
+# quartz()
+# p_obs_pred
 
 # Save the plot
-ggsave("Fig4d_obs_vs_pred_FloweringTime_Sum_Ratio_rra.png", p_obs_pred, width = 6, height = 6, dpi = 300, units = "in", bg = "white")
+# ggsave("Fig4d_obs_vs_pred_FloweringTime_Sum_Ratio_rra.png", p_obs_pred, width = 6, height = 6, dpi = 300, units = "in", bg = "white")
 
 ### OOB error vs number of trees
 ntree_seq <- c(100, 250, 500, 750, 1000, 1500)
@@ -685,11 +712,11 @@ p_oob <- ggplot(df_oob, aes(x = ntree, y = OOB_RMSE)) +
        x = "Number of Trees", y = "OOB RMSE") +
   plot_theme
 
-quartz()
-p_oob
-
-# save the plot
-ggsave("fig/supp/SuppFig_Hyperparameter_oob_vs_trees_FloweringTime_Sum_Ratio_rra.png", width = 8, height = 6, dpi = 300)
+# quartz()
+# p_oob
+# 
+# # save the plot
+# ggsave("fig/supp/SuppFig_Hyperparameter_oob_vs_trees_FloweringTime_Sum_Ratio_rra.png", width = 8, height = 6, dpi = 300)
 
 ### Hyperparameter tuning surface (mtry × min.node.size)
 tuning_df <- tune_res$results
@@ -768,29 +795,29 @@ selected_lipids <- shap_cum %>%
 levels_order <- rev(selected_lipids)
 
 # 2) bar chart of those lipids
-p_shap_bar <- shap_rank %>% 
-  filter(Lipid %in% levels_order) %>% 
-  mutate(Lipid = factor(Lipid, levels = levels_order)) %>% 
-  ggplot(aes(x = Lipid, y = MeanAbsSHAP)) +
-  geom_col(fill = "#440154FF") +
-  coord_flip() +
-  labs(
-    #title = "Top Lipids Covering 80% of SHAP Importance",
-    x     = NULL,
-    y     = "Mean |SHAP|"
-  ) + 
-  
-  theme(
-    axis.text.y  = element_blank(),  # remove the lipid names
-    axis.ticks.y = element_blank()   # remove the tick marks
-  ) +
-  plot_theme  +
-  theme(
-    panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
-    panel.grid.minor.y = element_line(color = "grey92", linewidth = 0.2),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank()
-  )
+# p_shap_bar <- shap_rank %>% 
+#   filter(Lipid %in% levels_order) %>% 
+#   mutate(Lipid = factor(Lipid, levels = levels_order)) %>% 
+#   ggplot(aes(x = Lipid, y = MeanAbsSHAP)) +
+#   geom_col(fill = "#440154FF") +
+#   coord_flip() +
+#   labs(
+#     #title = "Top Lipids Covering 80% of SHAP Importance",
+#     x     = NULL,
+#     y     = "Mean |SHAP|"
+#   ) + 
+#   
+#   theme(
+#     axis.text.y  = element_blank(),  # remove the lipid names
+#     axis.ticks.y = element_blank()   # remove the tick marks
+#   ) +
+#   plot_theme  +
+#   theme(
+#     panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+#     panel.grid.minor.y = element_line(color = "grey92", linewidth = 0.2),
+#     panel.grid.major.x = element_blank(),
+#     panel.grid.minor.x = element_blank()
+#   )
 
 
 
@@ -822,42 +849,167 @@ shap_long2 <- as_tibble(ts$shaps) %>%
   filter(Lipid %in% levels_order) %>%
   mutate(Lipid = factor(Lipid, levels = levels_order))
 
-p_shap_bee <- ggplot(shap_long2, aes(
-  x     = SHAP, 
-  y     = Lipid, 
-  color = FeatureValue
-)) +
-  geom_jitter(height = 0.2, size = 1, alpha = 0.6) +
-  scale_color_gradient(low  = "blue", high = "red", name = "Feature\nvalue") +
-  labs(
-    #title = "SHAP Beeswarm of Lipids Covering 80% Importance",
-    x     = "SHAP value",
-    y     = NULL
+# p_shap_bee <- ggplot(shap_long2, aes(
+#   x     = SHAP, 
+#   y     = Lipid, 
+#   color = FeatureValue
+# )) +
+#   geom_jitter(height = 0.2, size = 1, alpha = 0.6) +
+#   scale_color_gradient(low  = "blue", high = "red", name = "Feature\nvalue") +
+#   labs(
+#     #title = "SHAP Beeswarm of Lipids Covering 80% Importance",
+#     x     = "SHAP value",
+#     y     = NULL
+#   ) +
+#   theme(
+#     legend.position = "right",
+#     #plot.title      = element_text(hjust = 0.5),
+#     #axis.text.y     = element_text(size = 8)
+#   ) +
+#   plot_theme +
+  # theme(
+  #   panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+  #   panel.grid.minor.y = element_line(color = "grey92", linewidth = 0.2),
+  #   panel.grid.major.x = element_blank(),
+  #   panel.grid.minor.x = element_blank()
+  # )
+# 
+# 
+# # 4) combine side by side, giving more room on the left
+# quartz()
+# x <- (p_shap_bee + p_shap_bar) +
+#   plot_layout(ncol = 2, widths = c(2, 1))
+# 
+# x
+# 
+# ggsave("Fig4e_SHAP_beeswarm_FloweringTime_rra.png", x, width = 32, height = 16, dpi = 300, units = "in", bg = "white")
+# ggsave("SuppFig_SHAP_StemDiameter.png", x, width = 32, height = 24, dpi = 300, units = "in", bg = "white")
+
+
+
+# --- order only within selected_lipids by mean|SHAP| ---
+levels_order <- shap_rank %>%
+  filter(Lipid %in% selected_lipids) %>%
+  arrange(desc(MeanAbsSHAP)) %>%
+  pull(Lipid) %>% unique() %>% rev()   # top importance at the top
+
+# --- beeswarm (only selected) ---
+df_bee <- shap_long2 %>%
+  filter(Lipid %in% selected_lipids) %>%
+  mutate(Lipid = factor(Lipid, levels = levels_order))
+
+# --- mean table (only selected) ---
+df_mean <- shap_rank %>%
+  filter(Lipid %in% selected_lipids) %>%
+  mutate(Lipid = factor(Lipid, levels = levels_order))
+
+# --- map mean|SHAP| to SHAP scale for overlay ---
+sh_min <- min(df_bee$SHAP, na.rm = TRUE)
+sh_max <- max(df_bee$SHAP, na.rm = TRUE)
+mn_min <- min(df_mean$MeanAbsSHAP, na.rm = TRUE)
+mn_max <- max(df_mean$MeanAbsSHAP, na.rm = TRUE)
+
+a <- (sh_max - sh_min) / (mn_max - mn_min)
+b <- sh_min - a * mn_min
+
+df_mean <- df_mean %>% mutate(x_bar = a * MeanAbsSHAP + b)
+
+# --- single plot: top axis = Mean|SHAP|, bottom axis = SHAP ---
+p_super <- ggplot() +
+  geom_segment(
+    data = df_mean,
+    aes(y = Lipid, yend = Lipid, x = sh_min, xend = x_bar),
+    linewidth = 3, alpha = 0.35, color = "#440154FF", lineend = "round"
   ) +
+  geom_jitter(
+    data = df_bee,
+    aes(x = SHAP, y = Lipid, color = FeatureValue),
+    height = 0.2, size = 1.1, alpha = 0.65
+  ) +
+  scale_color_gradient(low = "blue", high = "red", name = "Feature\nvalue") +
+  scale_x_continuous(
+    name = "SHAP value",
+    sec.axis = sec_axis(~ (. - b) / a, name = "Mean |SHAP|")
+  ) +
+  scale_y_discrete(drop = TRUE) +     # drop any unused levels
+  labs(y = NULL) +
+  
   theme(
-    legend.position = "right",
-    #plot.title      = element_text(hjust = 0.5),
-    #axis.text.y     = element_text(size = 8)
+    legend.position    = "right",
+    axis.text.y        = element_text(size = 7),
+    plot.margin        = margin(5.5, 30, 5.5, 5.5),
+    panel.spacing.x    = unit(0.5, "lines")
+  ) + plot_theme +
+  coord_cartesian(clip = "off") +
+  theme(
+    panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
+    panel.grid.minor.y = element_line(color = "grey92", linewidth = 0.2),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+  ) + 
+  theme_minimal(base_size = 32)
+  
+
+p_super
+
+
+
+
+
+### CORRELATION PLOT
+# --- 1) Filter & order to match your SHAP figure -----------------------------
+cor_filtered <- cor_results %>%
+  filter(Lipid %in% selected_lipids) %>%
+  mutate(
+    Lipid = factor(Lipid, levels = levels_order),   # <- same order as p_super
+    Sig = case_when(
+      Adj_P_value < 0.001 ~ "***",
+      Adj_P_value < 0.01  ~ "**",
+      Adj_P_value < 0.05  ~ "*",
+      TRUE                ~ ""
+    )
+  )
+
+# --- 2) Correlation lollipop (left panel) ------------------------------------
+p_cor <- ggplot(cor_filtered, aes(x = Correlation, y = Lipid)) +
+  geom_segment(aes(x = 0, xend = Correlation, yend = Lipid),
+               linewidth = 1, color = "grey70") +
+  geom_point(aes(color = Correlation), size = 8) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
+  # tiny nudge so stars don't sit on the points
+  geom_text(aes(label = Sig),
+            nudge_x = ifelse(cor_filtered$Correlation >= 0, 0.03, -0.03),
+            size = 10, color = "black") +
+  scale_color_gradient2(low = "blue", mid = "grey80", high = "red",
+                        midpoint = 0, name = "r") +
+  scale_x_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.5)) +
+  labs(x = "Pearson r", y = NULL) +
+  (if (exists("plot_theme")) plot_theme else theme_minimal()) +
+  theme(
+    legend.position    = "right",
+    plot.margin        = margin(5.5, 10, 5.5, 5.5)
   ) +
   plot_theme +
   theme(
     panel.grid.major.y = element_line(color = "grey85", linewidth = 0.3),
     panel.grid.minor.y = element_line(color = "grey92", linewidth = 0.2),
     panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank()
-  )
+    panel.grid.minor.x = element_blank(),
+    legend.position      = c(1, 0.95),
+  ) 
 
+p_cor
+# --- 3) Hide y labels on the SHAP overlay (right panel) for a clean join -----
+p_super_clean <- p_super +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        plot.margin  = margin(5.5, 30, 5.5, 0))
 
-# 4) combine side by side, giving more room on the left
+# --- 4) Combine: correlation (left) + SHAP overlay (right) -------------------
 quartz()
-x <- (p_shap_bee + p_shap_bar) +
-  plot_layout(ncol = 2, widths = c(2, 1))
-
+x <- p_super_clean | p_cor + plot_layout(widths = c(0.65, 0.35))
 x
-
-ggsave("Fig4e_SHAP_beeswarm_FloweringTime_rra.png", x, width = 32, height = 16, dpi = 300, units = "in", bg = "white")
-# ggsave("SuppFig_SHAP_StemDiameter.png", x, width = 32, height = 24, dpi = 300, units = "in", bg = "white")
-
+ggsave("Fig4e_SHAP_beeswarm_corr_PlantHeight_rra.png", x, width = 32, height = 16, dpi = 300, units = "in", bg = "white")
 
 ### Cut off for SHAP importance
 # shap_cum <- shap_rank %>% 
@@ -894,3 +1046,11 @@ ggsave("Fig4e_SHAP_beeswarm_FloweringTime_rra.png", x, width = 32, height = 16, 
 # cutoff_shap
 # #save the plot
 # ggsave("SuppFig_SHAP_cumulative_importance.png", cutoff_shap, width = 8, height = 6, dpi = 300, units = "in", bg = "white")
+
+
+
+
+
+
+
+
