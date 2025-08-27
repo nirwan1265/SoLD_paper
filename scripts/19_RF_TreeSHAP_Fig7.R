@@ -445,7 +445,7 @@ global_rank <- tibble(
   MeanAbs = colMeans(abs(ts_final$shaps))
 ) %>% arrange(desc(MeanAbs))
 
-# Sve this with full data
+# Save this with full data
 
 
 ### Fit the final RF model with tuned parameters
@@ -946,8 +946,7 @@ p_super <- ggplot() +
     panel.grid.minor.y = element_line(color = "grey92", linewidth = 0.2),
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank()
-  ) + 
-  theme_minimal(base_size = 32)
+  ) 
   
 
 p_super
@@ -999,6 +998,7 @@ p_cor <- ggplot(cor_filtered, aes(x = Correlation, y = Lipid)) +
   ) 
 
 p_cor
+
 # --- 3) Hide y labels on the SHAP overlay (right panel) for a clean join -----
 p_super_clean <- p_super +
   theme(axis.text.y = element_blank(),
@@ -1042,7 +1042,7 @@ ggsave("Fig4e_SHAP_beeswarm_corr_PlantHeight_rra.png", x, width = 32, height = 1
 #     y     = "Cumulative importance",
 #     title = "Pareto plot of SHAP importance"
 #   ) +
-#   plot_theme
+#    <- 
 # cutoff_shap
 # #save the plot
 # ggsave("SuppFig_SHAP_cumulative_importance.png", cutoff_shap, width = 8, height = 6, dpi = 300, units = "in", bg = "white")
