@@ -398,65 +398,6 @@ These shifts are mirrored in our sorghum data: unsaturation indices rise under e
 %---------------------------------------------------------------
 
 
-\subsection*{OPLS-DA}
-4. Supervised multivariate discrimination of the lipidomes
-4.1 What OPLS‑DA does—in plain language
-Orthogonal‑Projection to Latent Structures Discriminant Analysis (OPLS‑DA) is a supervised extension of Principal‑Component Analysis that forces the first latent component to explain only variance that is correlated with a user‑defined class vector (here, Control vs Low‑input). Any systematic variation that is orthogonal to class membership—batch differences, genotype heterogeneity, stochastic noise—is captured in subsequent, “orthogonal” components.
-The outcome is a model that
-
-separates classes as strongly as possible along a single predictive axis (t1),
-
-isolates uninformative variance on orthogonal axes (to1, to2, …), and
-
-provides a Variable‑Importance in Projection (VIP) score for every lipid, ranking its contribution to class separation.
-
-Because the method is supervised, we rigorously guard against over‑fitting by (i) k‑fold cross‑validation (Q²) and (ii) permutation testing.
-
-4.2 Model quality and diagnostic overview (Fig. 6a–d)
-<div align="center"><em>Insert composite “overview” panel here</em></div>
-Panel (a) – Component summary 
-The model contains one predictive component (p1) and two orthogonal components (o1, o2). Predictive component p1 alone explains 94 % of the class variance (R²Y) and 94 % of its cross‑validated predictability (Q²Y), well above the commonly accepted 0.5 threshold (grey reference line). Orthogonal components capture residual variation in the lipid matrix (R²X ≈ 0.70 in total) that is unrelated to treatment.
-
-Panel (b) – Permutation test 
-Two‑hundred random permutations of the class vector were fitted to the same data (grey dots). None of the permuted models approaches the real model’s Q² or R² (black bars on the right). The probability of obtaining an equal or better model by chance is pR²Y = 0.05; pQ² = 0.05, confirming that the discrimination is not an over‑fit artefact.
-
-Panel (c) – Observation diagnostics 
-Score‑distance (SD, leverage) is plotted against orthogonal distance (OD, residual variance). Dashed lines denote the 95 % Hotelling T² limits. Only five genotypes (labels s441, s736, s447…) exceed one or both thresholds; visual inspection of chromatograms revealed no technical issue, hence they were retained.
-
-Panel (d) – Score plot 
-Each point represents a genotype; blue = Control, red = Low‑input. The two classes form well‑separated, compact clouds along the predictive axis t1 (39 % of total lipid variance), while the orthogonal axis to1 (30 %) captures within‑class dispersion. The 95 % confidence ellipse encloses every sample except the mild outliers identified in panel (c). Together with the high Q², this demonstrates a robust lipidomic signature of the Low‑input treatment.
-
-4.3 Discriminatory lipids revealed by VIP analysis (Fig. 6e)
-<div align="center"><em>Insert VIP bar plot (top 30) here</em></div>
-VIP values quantify how strongly each lipid contributes to the predictive component. A conservative cut‑off of VIP > 1.3 (dashed line) yielded 28 discriminatory species (Supplementary Table S7). The top ten are displayed in Fig. 6e and encompass several structural classes:
-
-Rank	Lipid (annotation)	Class	VIP	Change in Low‑input†
-1	Nostoxanthin	Terpenoid	1.88	 ↑ 4.1‑fold
-2	Triethylene‑glycol bis(2‑ethyl‑hexanoate)	Plasticizer ‡	1.82	 ↓ 3.6‑fold
-3	ε‑Decalactone	Organic compound	1.79	 ↑ 2.9‑fold
-…	…	…	…	…
-
-† Fold‑change refers to median linear intensity.
-‡ Likely exogenous contaminant; retained for completeness but excluded from biological discussion.
-
-Biologically meaningful drivers include:
-
-Triacyl‑glycerols TG(56:6), TG(46:0) – consistently enriched under Low‑input, supporting the nitrogen‑remobilisation hypothesis (Fig. 6e, pale‑blue bars).
-
-Phosphatidylethanolamine PE(34:1) – depleted in Low‑input, aligning with the phospholipid‑to‑glycolipid replacement model under combined low P/low N.
-
-β‑Sitosterol – a sterol known to modulate membrane order, markedly increased (VIP 1.55), coherent with the observed membrane‑integrity ratios (Fig. 5).
-
-These VIP‑identified species therefore corroborate and extend the univariate ratio analysis.
-
-4.4 Interpretation
-The OPLS‑DA model demonstrates that field Low‑input treatment imprints a strong, coherent lipidomic signature across 350–380 sorghum genotypes, explaining > 80 % of class variance with excellent predictability.
-
-Discriminating lipids belong to storage (TG), membrane (PE) and signalling (sterols, terpenoids) pools, suggesting a coordinated adjustment of carbon and nutrient allocation.
-
-The very limited number of statistical outliers and the stringent permutation validation underline the robustness of the result.
-
-Together, these findings establish a quantitative link between agronomic low‑input management and the sorghum lipidome, and highlight specific lipid species that can serve as biomarkers for future breeding or physiological studies.
 
 \section*{Materials and methods}
 
@@ -968,13 +909,150 @@ To test whether our lipidomics to predict phenotypes observed in an independent 
 
 
 \subsubsection*{Salient TreeSHAP features across phenotypes.}
-\emph{Stem diameter:} Plastid membrane lipids ranked highest, led by SQDG(18{:}3/18{:}3), with DGDG(16{:}0/18{:}1) also prominent; growth‐related signals such as gibberellic acid and the oxylipin 9,12,13‐TriHODE appeared among the top features, alongside PA(16{:}0/18{:}2) and several medium/long‐chain TGs. This points to a link between plastid anionic/galactolipid remodeling, oxylipin signaling, and stem thickening.\\
-\emph{β‐Carotene:} The panel was topped by carotenoid and apocarotenoid markers (β‐carotene itself and apocarotenal), with multiple PUFA‐rich TGs and very‐long‐chain PCs (e.g., PC(18{:}1/24{:}0)) among the best predictors, consistent with carotenoid metabolism and neutral‐lipid packaging.\\
-\emph{Lutein:} Lutein was the top predictor, as expected, with zeaxanthin, apocarotenal, and PC(18{:}1/18{:}1) close behind; several TGs (e.g., TG(12{:}0/18{:}1/18{:}1)) also scored high, suggesting that both carotenoid abundance and storage‐lipid context inform the signal.\\
-\emph{Zeaxanthin:} Zeaxanthin‐related chemistry surfaced via antheraxanthin (xanthophyll cycle) among the top features, together with a series of PUFA‐rich TGs and DG(16{:}0/16{:}0), again indicating a coupling between xanthophyll levels and neutral‐lipid buffering.\\
-\emph{Grain number per primary panicle:} High‐ranking predictors were long‐chain TGs (e.g., TG(16{:}0/18{:}1/22{:}0), TG(18{:}0/18{:}2/22{:}0)) and MG(20{:}4), together with the carotenoid‐derived volatile \emph{$\alpha$}‐ionone and structural PCs (and CL(18{:}1)), pointing to a nexus of reserve lipids, carotenoid cleavage products, and membrane composition with reproductive output.\\
-\emph{Thousand‐grain weight:} Membrane phospholipids led (PC(18{:}1/20{:}4) top), with MG(18{:}2) and LPE(16{:}0) highlighting lysophospholipid editing; antioxidant/apocarotenoid markers (e.g., apocarotenal, ubiquinone, \emph{$\alpha$}‐tocopherol) also featured, suggesting grain mass tracks both phospholipid remodeling and redox‐active isoprenoids.\\
-\emph{Grain yield per primary panicle:} The carotenoid‐derived volatile \textbf{\emph{$\alpha$}‐ionone} was the top predictor, followed by PE/LPE species (PE(16{:}0/0{:}0), LPE(16{:}0)), MG(20{:}4), TG(18{:}0/18{:}2/22{:}0), and DGDG(18{:}0/18{:}3), indicating joint contributions from carotenoid turnover, phospho/galactolipid state, and storage lipids to yield.
+
+
+\subsubsection{Plant height: TreeSHAP interpretation}
+
+\emph{Triacylglycerols}
+The feature ranking is overwhelmingly enriched for medium–chain triacylglycerols (TGs), e.g.\ \textit{TG(10{:}0/10{:}0/10{:}0)}, \textit{TG(10{:}0/12{:}0/16{:}0)}, \textit{TG(12{:}0/12{:}0/14{:}0)}, \textit{TG(12{:}0/12{:}0/16{:}1)}, with many additional medium–chain TGs among the top hits. Medium–chain fatty acids are rapidly funneled through $\beta$-oxidation, providing a ``fast-burn'' carbon/ATP source. This pattern indicates that taller plants are those with larger, more accessible neutral-lipid reserves that can be mobilized to meet the steep carbon and energy demands of stem elongation (cell wall biosynthesis, lignification, and meristematic growth).
+
+\emph{Hormonal and signaling context}
+\textit{Gibberellic acid} appears among the important predictors but at a lower rank than the TG suite, suggesting a division of labor. GA acts as the developmental trigger for elongation, while the realized growth magnitude is constrained by fuel availability. Consistent with this, classical lipid signals (\textit{PA(16{:}0/18{:}2)}, and sphingolipid nodes (\textit{Cer(d18{:}2/20{:}1)}; \textit{SPB 18{:}0;2OH}; \textit{SPHINGANINE}) register as supporting cues rather than the leading axis.
+
+\emph{Membrane remodeling and turnover markers}
+Chloroplast and extraplastid membrane lipids contribute secondary signal: \textit{MGDG(18{:}2/18{:}2)}, \textit{SQDG(16{:}0/18{:}2)}, \textit{PC(18{:}1/22{:}1)}, and \textit{PC(18{:}1/18{:}2)} are consistent with the need to expand and remodel membranes during rapid cell proliferation. Carotenoid-derived volatiles (\textit{apocarotenal}; \textit{$\alpha$-ionone}, $0.320$) and sterols (\textit{$\gamma$-sitosterol}, $0.337$) likely report redox/stress status and membrane organization accompanying fast growth.
+
+
+\subsubsection{Flowering Time}
+The signal is dominated by coordinated changes in signaling lipids, storage lipids, and membrane builders i.e., a whole-system metabolic shift rather than a single pathway.
+
+\emph{Phosphatidic acid (PA)}
+The top feature is PA(16:0/18:2), a classic second messenger made rapidly by PLD/DGK during stress and hormone responses. PA can modulate growth hubs (e.g., TOR/SnRK1), which aligns with the biology of the floral transition turn down vegetative growth, execute a developmental program. Its prominence suggests PA is a key integrator of cues that move the apex toward flowering.
+
+\emph{Sphingolipid control of cell fate and stress}
+High-ranking ceramide (Cer(d18:2/20:1)) and its bases (SPB 18:0;2OH; sphinganine) point to sphingolipid signaling. These molecules are central to programmed cell death, stress, and senescence—processes that accompany meristem reprogramming and resource reallocation when plants commit to flowering.
+
+\emph{Hormones}
+Gibberellic acid (0.053) appears among the top predictors, matching its well-known role in promoting flowering. The apocarotenoid α-ionone (0.051) hints at carotenoid breakdown/signaling intersecting with developmental timing—consistent with stress/redox cues that often accompany the switch.
+
+\emph{Triacylglycerol (TG) }
+A long list of TGs e.g., TG(14:0/18:1/18:2), TG(18:1/18:2/18:2), TG(18:0/18:2/18:2), TG(12:0/12:0/14:0), TG(10:0/10:0/10:0) signals mobilization of carbon/energy. Breaking down storage lipids can feed β-oxidation and supply building blocks for rapidly growing floral tissues. The mixture of medium-chain and PUFA-containing TGs suggests active lipolysis and remodeling rather than a single static pool.
+
+\emph{Membrane remodeling and lipid precursors}
+Features such as DG(16:0/18:0) (0.068), PE(18:1/18:2) (0.056), and PC(14:0/14:0) (0.064) indicate broad membrane reconfiguration. DG is a hub precursor for both storage and membrane lipids; PE/PC composition shifts are expected when tissues change identity (vegetative → reproductive) and when trafficking between ER and plastids ramps up.
+
+
+%\emph{Additional signaling lipids}
+%MG(20:4) (0.090) and the ether lipid AEG(o-18:4/16:1) (0.045) point to active lipase/β-oxidation routes and potential oxidative-stress buffering, respectively—both plausible in a high-demand transition.
+
+
+\subsubsection{Stem diameter:} Plastid membrane lipids ranked highest, led by SQDG(18{:}3/18{:}3), with DGDG(16{:}0/18{:}1) also prominent; growth‐related signals such as gibberellic acid and the oxylipin 9,12,13‐TriHODE appeared among the top features, alongside PA(16{:}0/18{:}2) and several medium/long‐chain TGs. This points to a link between plastid anionic/galactolipid remodeling, oxylipin signaling, and stem thickening.\\
+
+
+\subsubsection{β‐Carotene:} \\
+The top signals are not random. They cohere into four biochemical themes that make sense for a plastid-derived, fat-soluble pigment.
+
+\emph{Neutral-lipid storage context}. Many of the strongest predictors are TGs for example TG(12:0/16:0/18:2), TG(14:0/18:3/18:3), TG(12:0/18:2/18:3), TG(12:0/18:1/18:1), TG(12:0/18:1/18:3), and TG(8:0/16:1/18:1). Because carotenoids partition into lipid droplets, a TG-rich, PUFA-bearing background likely provides both solubilization and sequestration capacity, stabilizing β-carotene at higher levels. In short, TG abundance/composition behaves like a storage-capacity proxy for carotenoid load.
+
+%\emph{Plastid membrane setting}. Galactolipids characteristic of thylakoid membranes—DGDG(18:0/18:3), DGDG(18:2/18:3), and MGDG(18:2/18:2)—also rank highly. β-Carotene is synthesized and housed in the thylakoid; the MGDG/DGDG profile (especially its PUFA content) tunes membrane fluidity and the local environment of carotenoid enzymes. The model is effectively “reading” chloroplast membrane remodeling as a correlate of carotenoid output.
+
+%\emph{Extra-plastid phospholipids that interface with plastids}. Several PCs/PEs—PC(18:1/24:0), PC(18:0/18:1), PC(18:1/20:4), PC(16:1/16:1), PS(18:0/18:2), PE(18:0/18:2), PC(16:0/18:2)—point to ER/plasma-membrane processes that supply acyl chains and signals to plastids. Very-long-chain and PUFA-rich PCs often mark active acyl editing and ER \leftrightarrow. plastid lipid exchange, which in turn shapes thylakoid composition and carotenoid biosynthesis.
+
+\emph{Direct pathway sentinels and stress/redox markers}. On-pathway molecules like apocarotenal (a carotenoid breakdown product), β-carotene itself, and α-carotene appear among the top features, providing an internal validity check that the model is capturing carotenoid metabolism. Ubidecarenone (CoQ10)—another isoprenoid—implicates shared precursor and redox state across isoprenoid branches. Oxylipin trans-EKODE and γ-linolenoyl ethanolamide (NAE 18:3) indicate stress and redox signaling commonly co-regulated with antioxidant carotenoids. Finally, DG(16:0/2:0), DG(18:1/2:0), and MG(20:4) sit at key lipid branch points and act as second messengers, reflecting the remodeling that accompanies high carotenoid accumulation.
+
+
+\subsubsection{Lutein:} 
+It’s consistent with carotenoid biochemistry and with what you saw for β-carotene, but tuned to xanthophyll biology.
+
+\emph{Carotenoid network}
+The model puts lutein itself at the top , with strong support from zeaxanthin , $\alpha$-carotene , and $\beta$-cryptoxanthin. That quartet is exactly what you’d expect if the model is reading out the carotenoid biosynthetic and functional neighborhood: $\alpha$-carotene feeds the $\varepsilon$,$\beta$ branch that yields lutein; zeaxanthin is a partner xanthophyll in photoprotection (xanthophyll cycle); $\beta$-cryptoxanthin sits in the $\beta$-branch and often co-varies under high-light/redox cues. In short, the model isn’t latching onto a single compound—it’s capturing the co-regulated carotenoid module that travels with high lutein.
+
+\emph{Apocarotenoids and N-acylethanolamides}
+Apocarotenal and γ-linolenoyl ethanolamide (NAE 18:3) indicate active carotenoid turnover and lipid signaling. Apocarotenoids are oxidative cleavage products of carotenoids and can act as signaling molecules; NAEs and related oxylipin routes often escalate under stress, conditions that also upregulate photoprotective xanthophylls. Their presence suggests lutein levels reflect not just synthesis and storage, but dynamic turnover and feedback via redox/stress pathways.
+
+\emph{Triacylglycerols}
+A dense block of TGs is among the top drivers. E.g., TG(12:0/18:1/18:1), TG(12:0/12:0/18:2), TG(18:1/20:1/22:1), TG(12:0/16:0/18:2), TG(12:0/18:1/18:3). Lutein is fat-soluble and partitions into hydrophobic phases; abundant/PUFA-rich TGs indicate lipid-droplet/plastoglobule capacity that can solubilize and protect lutein. The repeated appearance of medium- to long-chain and PUFA-containing TGs points to droplets with favorable packing and fluidity for xanthophyll accommodation.
+
+\emph{Phospholipids}
+Multiple phospholipids rise in importance—PC(18:1/18:1) (0.00195), PC(16:0/18:1) (0.00163), PC(16:1/16:1) (0.00144), PC(16:0/22:6) (0.00139), plus PE(16:0/18:2) (0.00145) and PS(18:0/18:2) (0.00154). PCs/PE/PS are ER-centric membrane lipids that participate in acyl editing and ER↔plastid lipid exchange. Their chain-length/unsaturation signatures often mirror membrane remodeling under high light and development, which in turn influences thylakoid composition—the very milieu where lutein is bound. The signal here says: extra-plastid membrane state and inter-organelle lipid traffic are part of the lutein phenotype.
+
+
+%\emph{Sphingolipid and very-long-chain context}
+%The appearance of Cer(24:1) (0.00161) points to sphingolipid signaling/membrane organization, which can modulate photosynthetic membranes and stress responses. Together with very-long-chain PCs (e.g., PC 24:0/22:6 contexts), this supports a picture of membrane microdomain remodeling that coincides with high lutein states.
+
+
+\subsubsection{Zeaxanthin}
+
+We modeled zeaxanthin from lipidomics with a random forest and interpreted feature effects using mean absolute SHAP values ($\overline{|\phi|}$). Larger $\overline{|\phi|}$ indicates a stronger average contribution to the prediction across genotypes.
+
+\emph{The xanthophyll cycle}
+A defining result is the prominence of the xanthophyll cycle intermediate \textit{antheraxanthin}, indicating that zeaxanthin variation is driven by enzyme-level conversion dynamics (VDE/ZE) rather than only steady-state pools. Genotypes with higher antheraxanthin{\,$\leftrightarrow$\,}zeaxanthin flux under stress/light show the highest zeaxanthin.
+
+\emph{Hormonal link: gibberellic acid (GA)}
+\textit{Gibberellic acid} ranks among the top predictors, suggesting coordination between developmental programs and photoprotection. GA may (i) mark growth stages demanding enhanced NPQ capacity or (ii) cross-talk with stress pathways that activate the xanthophyll cycle. This provides a concrete, testable axis linking hormone status to zeaxanthin.
+
+\emph{Thylakoid membrane context}
+Chloroplast lipids \textit{DGDG(18{:}0/18{:}2)} and multiple \textit{SQDG} species highlight that thylakoid composition predicts zeaxanthin capacity. Because zeaxanthin binds antenna complexes in PSII, the galacto-/sulfolipid matrix sets the biophysical environment for both accumulation and rapid turnover.
+
+\emph{Substrate/flux readiness}
+High-ranking \textit{DG(16{:}0/16{:}0)}, \textit{DG(18{:}0/18{:}2)}, and \textit{MG(18{:}3)} indicate that glycerolipid backbone availability and flux support (i) membrane maintenance/remodeling and (ii) neutral-lipid synthesis, both conducive to zeaxanthin homeostasis.
+
+\emph{Storage/sequestration theme}
+Multiple triacylglycerols (TGs) \textit{TG(12{:}0/16{:}0/18{:}3)}, \textit{TG(14{:}0/18{:}3/18{:}3)}, \textit{TG(12{:}0/18{:}1/18{:}2)}, \textit{TG(14{:}0/16{:}0/18{:}1)} point to neutral-lipid capacity (lipid droplets/plastoglobules) and PUFA-rich environments that stabilize hydrophobic pigments.
+
+\emph{Turnover and redox markers}
+Signals such as \textit{apocarotenal} reflect active carotenoid turnover and redox state, consistent with zeaxanthin’s rapid, reversible role in non-photochemical quenching.
+
+Zeaxanthin is predicted by a four-part system: (i) \emph{xanthophyll-cycle activity} (antheraxanthin), (ii) a \emph{hormonal axis} (GA) coordinating development and photoprotection, (iii) \emph{thylakoid composition} (DGDG/SQDG) setting the functional membrane context, and (iv) \emph{neutral-lipid capacity} (PUFA-rich TGs) for sequestration. Compared with lutein’s more constitutive network profile, zeaxanthin reads out as a conversion-driven, stress-responsive phenotype.
+
+
+\subsubsection{Grain number per primary panicle:}
+
+The #1 feature, MG(20:4) (MeanAbs = 7.08), is a lipid-turnover flag: monoacylglycerols rise when lipases remodel membranes. Together with high-ranking DG(16:0/18:0) and DG(16:1/18:3), plus head-group lipids (PC(14:0/18:2), PC(16:1/16:1), PS(18:0/18:2), PE(18:0/18:2)), the profile points to intense membrane recycling and resynthesis—exactly what’s needed during floret initiation, meiosis, and rapid cell division in the developing panicle.
+
+\emph{Energy supply from mitochondria}
+The prominence of cardiolipin CL(18:1) is a strong mitochondrial signal. CL scaffolds respiratory complexes, so its importance implies that ATP production capacity in the panicle tissues constrains final grain set (sink strength).
+
+\emph{Specialized neutral-lipid pools}
+Unlike plant height (which favored medium-chain TGs), grain number elevates TGs with long/very-long chains—e.g., TG(16:0/18:1/22:0), TG(18:0/18:2/22:0), TG(18:1/20:0/22:1), TG(18:0/18:0/20:1). These species are typical of reproductive tissues (tapetum, pollen coat, cuticle), suggesting roles in structural provisioning and signaling rather than generic fuel.
+
+\emph{Developmental signaling and fate decisions} 
+Sphingolipid nodes—SPB 18:0;2OH (2.55) and sphinganine (2.39)—plus the apocarotenoid α-ionone (3.18) indicate lipid-derived signals that likely help determine which florets abort vs. set grain. DAGs also serve as second messengers, reinforcing a signal-integration layer atop membrane remodeling.
+
+\emph{Panicle (chloroplast) contribution} 
+The sulfolipid SQDG(16:0/14:0) (2.73) and PG(18:0/16:0) (2.20) tie grain number to plastid membrane status—consistent with panicle photosynthesis supporting early grain set.
+
+
+
+\subsubsection{Thousand‐grain weight:} 
+What TGW is capturing. In the RF + TreeSHAP readout, TGW looks like a build-and-protect phenotype: seeds that can (i) assemble membranes and oil bodies efficiently and (ii) protect unsaturated stores from oxidative damage end up heavier.
+
+\emph{Antioxidant shield (key insight)} The #1 phospholipid PC(18:1/20:4) (0.0193) and the #2 α-tocopherol (vitamin E) (0.0172) anchor a strong redox/antioxidant signal. Tocopherol guards PUFA-rich oils against peroxidation during grain filling; its high importance suggests genotypes with more robust antioxidant buffering can pack and retain more biomass. Supporting isoprenoid/redox markers—ubidecarenone (CoQ) (0.0127), β-carotene (0.0128), zeaxanthin (0.0124), and apocarotenal (0.0154)—reinforce that oxidative control is a limiting step for final seed mass.
+
+\emph{Membrane machinery for filling} Multiple head-group and lyso-lipids—PC(14:0/18:2) (0.0166), PC(16:0/18:0) (0.0151), PC(14:0/14:0) (0.0127), PC(16:0/20:3) (0.0126), PC(18:1/18:1) (0.0121), PC(18:2/0:0) (0.0116), LPE(16:0) (0.0169), PE(16:0/0:0) (0.0149), DG(16:0/16:0) (0.0133)—point to active acyl editing (Lands cycle) and Kennedy-pathway flux. Practically, this is the ER/oil-body assembly line: continuous PC↔LPC/LPE cycling and a healthy DAG pool let the endosperm expand membranes and build oil-body monolayers at high throughput—directly supporting higher TGW.
+
+\emph{Oil deposition (dense mass)} A suite of TAGs—TG(14:0/18:1/18:2) (0.0160), TG(18:2/18:2/18:4) (0.0160), TG(12:0/12:0/18:1) (0.0141), TG(16:0/16:0/18:2) (0.0140), TG(16:1/20:1/20:2) (0.0134), TG(16:0/18:3/18:3) (0.0127), TG(16:0/18:2/18:3) (0.0117), TG(14:0/16:0/16:0) (0.0128)—tracks oil-body load and composition. Heavier seeds correlate with TAG profiles enriched for PUFAs (storage density) with some medium/long-chain balance that likely reflects efficient packaging and synthesis.
+
+\emph{Bioenergetics and plastid support} Cardiolipin CL(18:1) (0.0122) flags mitochondrial respiratory capacity, i.e., ATP supply for biosynthesis during filling. Plastid lipids SQDG(16:0/14:0) (0.0139) and SQDG(18:1/18:3) (0.0130) tie TGW to chloroplast function in maternal/green tissues and developing caryopses—consistent with continued photoassimilate supply and fatty-acid synthesis during grain fill.
+
+\emph{Signaling & turnover} MG(18:2) (0.0171) and MG(18:0) (0.0131) indicate active lipase/transferase cycles that feed DAG/TAG synthesis and remodel membranes, while phytosphingosine (0.0128) hints at sphingolipid-mediated stress/quality control during storage deposition.
+
+Heavy seeds come from lines that assemble oil bodies fast (PC↔lyso-PC/LPE, DAG flux), pack a lot of TAG, and defend those PUFAs with a strong antioxidant network (α-tocopherol ± carotenoids/CoQ), powered by solid mitochondrial and plastid capacity (CL, SQDG).
+
+
+\subsubsection{Grain yield per primary panicle:} 
+
+What “yield” looks like in lipids. Yield integrates the whole pipeline—source photosynthesis, developmental timing, sink capacity, and protection. Your RF + TreeSHAP profile reflects exactly that blend: plastid source strength, developmental coordination, membrane machinery, and targeted carbon allocation.
+
+\emph{Photosynthetic source strength (plastid capacity)} High importance for chloroplast lipids—DGDG(18:0/18:3) and SQDG(16:1/18:3)—together with β-carotene points to carbon fixation and thylakoid function as rate-limiting for final yield. MGDG(16:0/18:1) and Ubiquinone-9 (mitochondrial redox) reinforce the idea that robust plastid/mitochondrial energy systems underpin strong source supply to the panicle sink.
+
+\emph{Developmental signaling & coordination (the top signal)} α-Ionone is the #1 feature—an apocarotenoid volatile from carotenoid cleavage—consistent with apocarotenoid signaling coordinating development and resource allocation. Alongside gibberellic acid, LPE(16:0), and MG(20:4), the model captures a hormone–lipid signaling axis that likely tunes spikelet/grain set and filling dynamics.
+
+\emph{Cellular machinery & protection (build fast, keep it stable)} Strong PE/DG signals—PE(16:0/0:0), PE(16:0/20:4), PE(16:0/18:0), DG(16:0/18:0), DG(16:0/18:2)—indicate membrane biogenesis and acyl-editing throughput (Kennedy/Lands cycles) as constraints during filling. β-Sitosterol and phytosphingosine point to membrane stability and quality control—keeping expanding endomembranes and oil-body monolayers functional under oxidative load.
+
+\emph{Strategic carbon allocation (reproductive-biased TAGs)} The TAGs associated with yield—e.g., TG(18:0/18:2/22:0), TG(16:0/18:1/22:1), TG(16:0/16:0/18:1), TG(14:0/16:0/18:1), TG(18:1/18:3/22:0)—skew toward longer-chain/PUFA mixes typical of reproductive tissues and developing seeds. This looks less like generic “bulk fuel” (plant height) and more like targeted provisioning to the panicle for efficient oil/starch deposition.
+
+One-liner. High-yield lines pair strong plastid/mitochondrial source capacity with apocarotenoid/hormonal coordination, high-throughput membrane assembly & protection, and targeted TAG provisioning to the panicle.
 
 
 \begin{figure*}[t]
