@@ -107,10 +107,10 @@ print(changed, row.names = FALSE)
 # Our data: Plant height and Flowering Time
 # DTA
 #pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,3))
-pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,2))
+#pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select(c(1,2))
 
 # Plant Height and Stem Diameter
-#pheno <- vroom("data/phenotypes/plantheight_diameter_SAP.csv") %>% dplyr::select(c(1,2))
+#pheno <- vroom("data/phenotypes/plantheight_diameter_SAP.csv") %>% dplyr::select(c(1,3))
 
 # Grain carotenoids
 # Lutein
@@ -137,7 +137,7 @@ pheno <- vroom("data/phenotypes/control_field_phenotypes.csv") %>% dplyr::select
 #pheno <- vroom("data/phenotypes/yield_traits_Richard_E_Boyles.csv") %>% dplyr::select(c(1,3))
 
 # Grain_yield_per_primary_panicle_gm
-#pheno <- vroom("data/phenotypes/yield_traits_Richard_E_Boyles.csv") %>% dplyr::select(c(1,4))
+pheno <- vroom("data/phenotypes/yield_traits_Richard_E_Boyles.csv") %>% dplyr::select(c(1,4))
 
 
 colnames(pheno)[1] <- "Line"
@@ -404,8 +404,8 @@ cv_plot <- ggplot(df_long, aes(x = Iteration, y = Value, color = Metric)) +
   plot_theme
 
 
-quartz()
-print(cv_plot)
+# quartz()
+# print(cv_plot)
 
 # Save the plot
 # ggsave("Fig4a_CV_RF_metrics_FloweringTime_sum_ratio_rra.png",cv_plot, width = 8, height = 6, dpi = 300,
@@ -1009,7 +1009,7 @@ p_super_clean <- p_super +
 quartz()
 x <- p_super_clean | p_cor + plot_layout(widths = c(0.65, 0.35))
 x
-ggsave("Fig4e_SHAP_beeswarm_corr_PlantHeight_rra.png", x, width = 32, height = 16, dpi = 300, units = "in", bg = "white")
+# ggsave("Fig4e_SHAP_beeswarm_corr_PlantHeight_rra.png", x, width = 32, height = 16, dpi = 300, units = "in", bg = "white")
 
 ### Cut off for SHAP importance
 # shap_cum <- shap_rank %>% 
@@ -1050,7 +1050,8 @@ ggsave("Fig4e_SHAP_beeswarm_corr_PlantHeight_rra.png", x, width = 32, height = 1
 
 
 
-
+# Save correlation
+write.csv(cor_filtered, "table/supp/SuppTable_Lipid_Correlation_Grain_yield_per_primary_panicle_gm.csv", row.names = FALSE)
 
 
 
