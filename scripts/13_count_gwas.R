@@ -6,29 +6,37 @@ library(purrr)
 
 # List all .txt files in the directory
 
+# Control
+# dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/control/annotation/all_lipids/"
+# file_list <- list.files(path = dir,pattern = "*.txt")
+
 # Lowinput
-dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/annotation/New Folder With Items/"
-dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/annotation/"
-file_list <- list.files(path = dir,pattern = "*.txt")
+# dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/annotation/New Folder With Items/"
+# dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/annotation/"
+# 
+# # All
+# dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/annotation/all_lipids/"
+# 
+# file_list <- list.files(path = dir,pattern = "*.txt")
 
-## MG and DG
-file_list <- file_list[c(9:24,38:42)]
-
-# PE and DG
-file_list <- file_list[c(90:105)]
-
-# SQDG
-file_list <- file_list[c(112:117)]
-
-# Neutral lipids
-file_list <- file_list[c(38:42,9:24)]
-
-
-# Galactolipids
-file_list <- file_list[c(43:47,25:31)]
-
-# Phospholipids
-file_list <- file_list[c(48:108,110)]
+# ## MG and DG
+# file_list <- file_list[c(9:24,38:42)]
+# 
+# # PE and DG
+# file_list <- file_list[c(90:105)]
+# 
+# # SQDG
+# file_list <- file_list[c(112:117)]
+# 
+# # Neutral lipids
+# file_list <- file_list[c(38:42,9:24)]
+# 
+# 
+# # Galactolipids
+# file_list <- file_list[c(43:47,25:31)]
+# 
+# # Phospholipids
+# file_list <- file_list[c(48:108,110)]
 
 # Select only that start with TG in file_list vector
 #file_list <- file_list[str_detect(file_list, "^PG")]
@@ -42,59 +50,65 @@ file_list <- file_list[c(48:108,110)]
 
 
 ### Sums and Ratios
-# Lowinput
+
+# Control
 dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/sum_ratio/lowinput/annotation/"
 file_list <- list.files(path = dir,pattern = "*.txt")
 
-# PE DG and TG LPE
-file_list <- file_list[c(46,116)]
 
-
-# Sum MG
-file_list <- file_list[str_detect(file_list, "Sum_MG")]
-file_list <- file_list[17]
-
-
-
-# Sum SQDG
-file_list <- file_list[str_detect(file_list, "Sum_PG")]
-file_list <- file_list[14]
-
-
-# Sum PG
-file_list <- file_list[str_detect(file_list, "Sum_SQDG")]
-file_list <- file_list[17]
-
-# Sum and Ratio Galactolipids
-# Select all files with MG or MGDG in the name
-pattern <- "(?<=^Sum_)(MGDG|DGDG)(?=_)|(?<=_Sum_)(MGDG|DGDG)(?=_)"
-file_list <- file_list[str_detect(file_list, pattern)]
-# Remove all files with FA or Cer or GalCer, SM, or AEG
-file_list <- file_list[!str_detect(file_list, "FA|Cer|GalCer|SM|AEG")]
-
-
-# Sum and Ratio Sulfolipids
-# Select all files with MG or MGDG in the name
-pattern <- "(?<=^Sum_)(SQDG)(?=_)|(?<=_Sum_)(SQDG)"
-file_list <- file_list[str_detect(file_list, pattern)]
-# Remove all files with FA or Cer or GalCer, SM, or AEG
-file_list <- file_list[!str_detect(file_list, "FA|Cer|GalCer|SM|AEG")]
-
-# Sum and Ratio Phospholipids
-# Select all files with MG or MGDG in the name
-pattern <- "(?<=^Sum_)(PC|PE|PG|PA)(?=_)|(?<=_Sum_)(PC|PE|PG|PA)"
-file_list <- file_list[str_detect(file_list, pattern)]
-# Remove all files with FA or Cer or GalCer, SM, or AEG
-file_list <- file_list[!str_detect(file_list, "FA|Cer|GalCer|SM|AEG")]
-
-
-# Sum and Ratio Neutral
-# Select all files with MG or MGDG in the name
-pattern <- "(?<=^Sum_)(DG|MG|EG)(?=_)|(?<=_Sum_)(MG|DG|TG)"
-file_list <- file_list[str_detect(file_list, pattern)]
-# Remove all files with FA or Cer or GalCer, SM, or AEG
-file_list <- file_list[!str_detect(file_list, "FA|Cer|GalCer|SM|AEG")]
-
+#Lowinput
+# dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/sum_ratio/lowinput/annotation/"
+# file_list <- list.files(path = dir,pattern = "*.txt")
+# 
+# # PE DG and TG LPE
+# file_list <- file_list[c(46,116)]
+# 
+# 
+# # Sum MG
+# file_list <- file_list[str_detect(file_list, "Sum_MG")]
+# file_list <- file_list[17]
+# 
+# 
+# 
+# # Sum SQDG
+# file_list <- file_list[str_detect(file_list, "Sum_PG")]
+# file_list <- file_list[14]
+# 
+# 
+# # Sum PG
+# file_list <- file_list[str_detect(file_list, "Sum_SQDG")]
+# file_list <- file_list[17]
+# 
+# # Sum and Ratio Galactolipids
+# # Select all files with MG or MGDG in the name
+# pattern <- "(?<=^Sum_)(MGDG|DGDG)(?=_)|(?<=_Sum_)(MGDG|DGDG)(?=_)"
+# file_list <- file_list[str_detect(file_list, pattern)]
+# # Remove all files with FA or Cer or GalCer, SM, or AEG
+# file_list <- file_list[!str_detect(file_list, "FA|Cer|GalCer|SM|AEG")]
+# 
+# 
+# # Sum and Ratio Sulfolipids
+# # Select all files with MG or MGDG in the name
+# pattern <- "(?<=^Sum_)(SQDG)(?=_)|(?<=_Sum_)(SQDG)"
+# file_list <- file_list[str_detect(file_list, pattern)]
+# # Remove all files with FA or Cer or GalCer, SM, or AEG
+# file_list <- file_list[!str_detect(file_list, "FA|Cer|GalCer|SM|AEG")]
+# 
+# # Sum and Ratio Phospholipids
+# # Select all files with MG or MGDG in the name
+# pattern <- "(?<=^Sum_)(PC|PE|PG|PA)(?=_)|(?<=_Sum_)(PC|PE|PG|PA)"
+# file_list <- file_list[str_detect(file_list, pattern)]
+# # Remove all files with FA or Cer or GalCer, SM, or AEG
+# file_list <- file_list[!str_detect(file_list, "FA|Cer|GalCer|SM|AEG")]
+# 
+# 
+# # Sum and Ratio Neutral
+# # Select all files with MG or MGDG in the name
+# pattern <- "(?<=^Sum_)(DG|MG|EG)(?=_)|(?<=_Sum_)(MG|DG|TG)"
+# file_list <- file_list[str_detect(file_list, pattern)]
+# # Remove all files with FA or Cer or GalCer, SM, or AEG
+# file_list <- file_list[!str_detect(file_list, "FA|Cer|GalCer|SM|AEG")]
+# 
 
 # Empty vectors
 results <- tibble()          
@@ -178,8 +192,56 @@ combined_results <- combined_results %>%
 head(combined_results)
 
 # Save the file
-write.table(combined_results, "table/GWAS_results/All_lipids_glycero_galacto_Lowinput_common_genes_individual_logpvalue_7_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+write.table(combined_results, "table/GWAS_results/All_lipids_Control_common_genes_sum_ratio_logpvalue_7_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 getwd()
 # write.table(combined_results, "table/GWAS_results/11_14_17_Eicosatrienoic_acid__Z_Z_Z___common_genes_lowinput_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 # write.table(combined_results, "table/GWAS_results/gibberellic_acid_common_genes_lowinput_individual_logpvalue_4_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 
+
+
+
+
+
+
+
+
+###### MAKE FULL ANNOTATION
+
+# Lowinput
+# Gene pvalue file
+ind <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/table/GWAS_results/All_lipids_Lowinput_common_genes_individual_logpvalue_7_spat_fitted_BLUP.txt")
+sum_ratio <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/table/GWAS_results/All_lipids_Lowinput_common_genes_sum_ratio_logpvalue_7_spat_fitted_BLUP.txt")
+
+
+# Control
+ind <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/table/GWAS_results/All_lipids_Control_common_genes_individual_logpvalue_7_spat_fitted_BLUP.txt")
+sum_ratio <- vroom("/Users/nirwantandukar/Documents/Github/SoLD_paper/table/GWAS_results/All_lipids_Control_common_genes_sum_ratio_logpvalue_7_spat_fitted_BLUP.txt")
+
+
+# annotation file
+# Lowinput
+ind_annot <- vroom("/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/gene_annotation/annotation_All_lipids_Lowinput_common_genes_individual_logpvalue_7_spat_fitted_BLUP.txt")
+sum_ratio_annot <- vroom("/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/gene_annotation/annotation_All_lipids_Lowinput_common_genes_sum_ratio_logpvalue_7_spat_fitted_BLUP.txt")
+colnames(sum_ratio_annot)[1] <- "GeneID"
+colnames(sum_ratio_annot)[3] <- "GeneName"
+
+
+# Control
+ind_annot <- vroom("/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/control/gene_annotation/annotation_All_lipids_Control_common_genes_individual_logpvalue_7_spat_fitted_BLUP.txt")
+sum_ratio_annot <- vroom("/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/sum_ratio/control/gene_annotation/annotation_All_lipids_Control_common_genes_sum_ratio_logpvalue_7_spat_fitted_BLUP.txt")
+
+# Combine the two files for ind and sum ratio separately with gene and GeneID
+ind_full_keep <- ind %>%
+  full_join(ind_annot, by = join_by(gene == GeneID), keep = TRUE) %>%
+  dplyr::select(-GeneID)
+
+sum_ratio_full_keep <- sum_ratio %>%
+  full_join(sum_ratio_annot, by = join_by(gene == GeneID), keep = TRUE) %>%
+  dplyr::select(-GeneID)
+
+
+
+# Save the full annotation
+write.table(ind_full_keep, "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/full_annotation/All_lipids_Control_common_genes_individual_logpvalue_7_spat_fitted_BLUP_full_annotation.txt", row.names=F, quote=F, sep ="\t")
+
+write.table(sum_ratio_full_keep, "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/full_annotation/All_lipids_Control_common_genes_sum_ratio_logpvalue_7_spat_fitted_BLUP_full_annotation.txt", row.names=F, quote=F, sep = "\t")
