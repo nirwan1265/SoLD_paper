@@ -54,7 +54,15 @@ library(purrr)
 # Control
 dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/sum_ratio/lowinput/annotation/"
 file_list <- list.files(path = dir,pattern = "*.txt")
+file_list <- file_list[c(164,160,155,149,65,
+                         118,132,57,131,130,58,129,
+                         147,153,158,140,
+                         42,51,143,47,46,
+                         96,102,95,97,113,100,101,
+                         170,165,135,
+                         125,48,115,63,112,120,119, 121,41,109,50,105)]
 
+file_list <- file_list[c(164,160,155,149,65)]
 
 #Lowinput
 # dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/sum_ratio/lowinput/annotation/"
@@ -112,7 +120,7 @@ file_list <- list.files(path = dir,pattern = "*.txt")
 
 # Empty vectors
 results <- tibble()          
-p_value_threshold <- 1e-7
+p_value_threshold <- 1e-5
 -log10(p_value_threshold)
 
 # Loop through the files
@@ -192,7 +200,7 @@ combined_results <- combined_results %>%
 head(combined_results)
 
 # Save the file
-write.table(combined_results, "table/GWAS_results/All_lipids_Control_common_genes_sum_ratio_logpvalue_7_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+write.table(combined_results, "table/GWAS_results/All_lipids_OLPS-DA_common_genes_sum_ratio_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 getwd()
 # write.table(combined_results, "table/GWAS_results/11_14_17_Eicosatrienoic_acid__Z_Z_Z___common_genes_lowinput_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 # write.table(combined_results, "table/GWAS_results/gibberellic_acid_common_genes_lowinput_individual_logpvalue_4_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
