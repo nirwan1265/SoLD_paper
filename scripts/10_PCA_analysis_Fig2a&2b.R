@@ -122,11 +122,29 @@ lipid_mat <- pca_input %>%
   as.data.frame() %>%                                     # convert tibble → data.frame
   column_to_rownames("Sample_ID")                         # turn Sample_ID into rownames
 
-# 3) (Optionally) scale & center
-#lipid_mat_scaled <- scale(lipid_mat, center = TRUE, scale = TRUE)
+
+# 3) scale
+# build matrix of shared lipids (your code up to pca_input is fine)
+mat <- lipid_mat %>% dplyr::select(all_of(shared_lipids)) %>% as.matrix()
+
+# 1) per-sample TIC normalization
+tic <- rowSums(mat, na.rm = TRUE)
+rel <- sweep(mat, 1, tic, "/")
+
+# 2) per-sample pseudocount (half the smallest positive per sample)
+minpos <- apply(rel, 1, function(x) if (any(x > 0, na.rm=TRUE)) min(x[x > 0], na.rm=TRUE) else NA_real_)
+eps    <- 0.5 * minpos
+rel_eps <- rel
+for (i in seq_len(nrow(rel_eps))) {
+  if (!is.na(eps[i]) && eps[i] > 0) rel_eps[i, ] <- rel_eps[i, ] + eps[i]
+}
+
+# 3) log10 transform
+log_rel <- log10(rel_eps)
+
 
 # 4) Run PCA
-pca_res <- prcomp(lipid_mat, center = TRUE, scale. = TRUE)
+pca_res <- prcomp(log_rel, center = TRUE, scale. = TRUE)
 
 # 3) Extract scores and merge in metadata
 scores_df <- data.frame(pca_res$x[,1:2], Sample_ID = rownames(pca_res$x))
@@ -212,53 +230,53 @@ plot_theme <- theme_minimal(base_size = 24) +
 
 # 5) Plot biplot
 
-#With loadings
-# individual_PCA <- ggplot() +
-#   # samples
-#   geom_point(data = scores_df,
-#              aes(PC1, PC2, color = Condition),
-#              size = 3, alpha = 0.8) +
-#   stat_ellipse(data = scores_df,
-#                aes(PC1, PC2, fill = Condition),
-#                geom = "polygon", alpha = 0.2, colour = NA) +
-#   # loading arrows, coloured by lipid class
-#   geom_segment(data = load_df,
-#                aes(x = 0, y = 0, xend = a1, yend = a2, color = LipidClass),
-#                arrow = arrow(length = unit(0.2, "cm")),
-#                size = 0.8) +
-#   geom_text(data = load_df,
-#             aes(x = a1 * 1.05, y = a2 * 1.05, label = Class, color = LipidClass),
-#             size = 2.5) +
-# 
-# 
-#   scale_fill_manual(name   = "Condition",
-#                     values = c(Control = "#440154FF", LowInput = "#FDE725FF")
-#                     #guide  = guide_legend(override.aes = list(shape = 22, size = 4, alpha = 0.))
-#   ) +
-#   # guides & palettes
-#   scale_color_manual(
-#     name   = "Lipid Class",
-#     values = qual_cols
-#   ) +
-#   # keep your sample‐point colours as before
-# 
-#   # axes, theme
-#   geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
-#   geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
-#   labs(
-#     title = "Biplot: Individual Lipid Species",
-#     x = paste0("PC1 (", round(100 * pca_res$sdev[1]^2 / sum(pca_res$sdev^2),1), "%)"),
-#     y = paste0("PC2 (", round(100 * pca_res$sdev[2]^2 / sum(pca_res$sdev^2),1), "%)")
-#   ) +
-#   coord_fixed() +
-#   theme_bw() +
-#   theme(
-#     legend.position = "right",
-#     plot.title     = element_text(face = "bold")
-#   )
-# 
-# quartz()
-# individual_PCA
+# With loadings
+individual_PCA <- ggplot() +
+  # samples
+  geom_point(data = scores_df,
+             aes(PC1, PC2, color = Condition),
+             size = 3, alpha = 0.8) +
+  stat_ellipse(data = scores_df,
+               aes(PC1, PC2, fill = Condition),
+               geom = "polygon", alpha = 0.2, colour = NA) +
+  # loading arrows, coloured by lipid class
+  geom_segment(data = load_df,
+               aes(x = 0, y = 0, xend = a1, yend = a2, color = LipidClass),
+               arrow = arrow(length = unit(0.2, "cm")),
+               size = 0.8) +
+  geom_text(data = load_df,
+            aes(x = a1 * 1.05, y = a2 * 1.05, label = Class, color = LipidClass),
+            size = 2.5) +
+
+
+  scale_fill_manual(name   = "Condition",
+                    values = c(Control = "#440154FF", LowInput = "#FDE725FF")
+                    #guide  = guide_legend(override.aes = list(shape = 22, size = 4, alpha = 0.))
+  ) +
+  # guides & palettes
+  scale_color_manual(
+    name   = "Lipid Class",
+    values = qual_cols
+  ) +
+  # keep your sample‐point colours as before
+
+  # axes, theme
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
+  labs(
+    title = "Biplot: Individual Lipid Species",
+    x = paste0("PC1 (", round(100 * pca_res$sdev[1]^2 / sum(pca_res$sdev^2),1), "%)"),
+    y = paste0("PC2 (", round(100 * pca_res$sdev[2]^2 / sum(pca_res$sdev^2),1), "%)")
+  ) +
+  coord_fixed() +
+  theme_bw() +
+  theme(
+    legend.position = "right",
+    plot.title     = element_text(face = "bold")
+  )
+
+quartz()
+individual_PCA
 
 # Without loadings. 
 individual_PCA <- ggplot() +
@@ -314,7 +332,7 @@ quartz()
 individual_PCA
 
 # Save the plot
-ggsave("fig/main/Fig2a_individual_indv_lipid_PCA_plot.png", individual_PCA, width = 6, height = 6, dpi = 300, bg = "white")
+#ggsave("fig/main/Fig2a_individual_indv_lipid_PCA_plot.png", individual_PCA, width = 6, height = 6, dpi = 300, bg = "white")
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -424,8 +442,29 @@ mat <- wide %>%
 mat <- as.data.frame(wide %>% dplyr::select(-Sample, -Condition))
 rownames(mat) <- sample_info$Sample_ID
 
+
+# 3) Scale
+# 1) per-sample TIC normalization
+tic <- rowSums(mat, na.rm = TRUE)
+rel <- sweep(mat, 1, tic, "/")
+
+# 2) per-sample pseudocount (half the smallest positive per sample)
+minpos <- apply(rel, 1, function(x) if (any(x > 0, na.rm=TRUE)) min(x[x > 0], na.rm=TRUE) else NA_real_)
+eps    <- 0.5 * minpos
+rel_eps <- rel
+for (i in seq_len(nrow(rel_eps))) {
+  if (!is.na(eps[i]) && eps[i] > 0) rel_eps[i, ] <- rel_eps[i, ] + eps[i]
+}
+
+# 3) log10 transform
+log_rel <- log10(rel_eps)
+
+
+
+
+
 # 3) Run PCA (on scaled data)
-p <- prcomp(mat, center = TRUE, scale. = TRUE)
+p <- prcomp(log_rel, center = T, scale. = T)
 
 # 4) PCA scores (Sample positions)
 scores_df <- as.data.frame(p$x[, 1:2]) %>%
@@ -551,7 +590,7 @@ summed_pca <- ggplot() +
 summed_pca
 
 # Save
-ggsave("fig/main/Fig2b_summed_lipid_PCA_biplot.png", summed_pca,width = 8, height = 8, dpi = 300, bg = "white")
+#ggsave("fig/main/Fig2b_summed_lipid_PCA_biplot.png", summed_pca,width = 8, height = 8, dpi = 300, bg = "white")
 
 
 
@@ -564,94 +603,94 @@ ggsave("fig/main/Fig2b_summed_lipid_PCA_biplot.png", summed_pca,width = 8, heigh
 
 ### 3D PCA
 # ---- 3D PCA with loadings (plotly) ----
-# library(dplyr)
-# library(tibble)
-# library(plotly)
-# library(htmlwidgets)
-# 
-# # variance explained for axis titles
-# var_exp <- (p$sdev^2) / sum(p$sdev^2)
-# 
-# # scores (PC1:PC3)
-# scores3d <- as.data.frame(p$x[, 1:3]) %>%
-#   rownames_to_column("Sample_ID") %>%
-#   left_join(sample_info, by = "Sample_ID")
-# 
-# # loadings (PC1:PC3)
-# load3d <- as.data.frame(p$rotation[, 1:3]) %>%
-#   rownames_to_column("Class") 
-# 
-# # scale loadings to sit nicely inside the score cloud
-# score_rad <- max(sqrt(rowSums(scores3d[,c("PC1","PC2","PC3")]^2)))
-# load_rad  <- max(sqrt(rowSums(load3d[,c("PC1","PC2","PC3")]^2)))
-# sf <- 0.8 * (score_rad / load_rad)  # 0.8 keeps a little margin
-# 
-# load3d <- load3d %>%
-#   mutate(a1 = PC1 * sf, a2 = PC2 * sf, a3 = PC3 * sf)
-# 
-# pal <- c(Control = "#440154FF", LowInput = "#FDE725FF")
-# 
-# fig <- plot_ly()
-# 
-# # sample points
-# fig <- fig %>%
-#   add_markers(
-#     data = scores3d,
-#     x = ~PC1, y = ~PC2, z = ~PC3,
-#     color = ~Condition, colors = pal,
-#     marker = list(size = 4, opacity = 0.75),
-#     hoverinfo = "text",
-#     text = ~paste0(
-#       "Sample: ", Sample_ID,
-#       "<br>PC1: ", round(PC1, 2),
-#       "<br>PC2: ", round(PC2, 2),
-#       "<br>PC3: ", round(PC3, 2),
-#       "<br>Condition: ", Condition
-#     ),
-#     showlegend = TRUE,
-#     name = "Samples"
-#   )
+library(dplyr)
+library(tibble)
+library(plotly)
+library(htmlwidgets)
+
+# variance explained for axis titles
+var_exp <- (p$sdev^2) / sum(p$sdev^2)
+
+# scores (PC1:PC3)
+scores3d <- as.data.frame(p$x[, 1:3]) %>%
+  rownames_to_column("Sample_ID") %>%
+  left_join(sample_info, by = "Sample_ID")
+
+# loadings (PC1:PC3)
+load3d <- as.data.frame(p$rotation[, 1:3]) %>%
+  rownames_to_column("Class")
+
+# scale loadings to sit nicely inside the score cloud
+score_rad <- max(sqrt(rowSums(scores3d[,c("PC1","PC2","PC3")]^2)))
+load_rad  <- max(sqrt(rowSums(load3d[,c("PC1","PC2","PC3")]^2)))
+sf <- 0.8 * (score_rad / load_rad)  # 0.8 keeps a little margin
+
+load3d <- load3d %>%
+  mutate(a1 = PC1 * sf, a2 = PC2 * sf, a3 = PC3 * sf)
+
+pal <- c(Control = "#440154FF", LowInput = "#FDE725FF")
+
+fig <- plot_ly()
+
+# sample points
+fig <- fig %>%
+  add_markers(
+    data = scores3d,
+    x = ~PC1, y = ~PC2, z = ~PC3,
+    color = ~Condition, colors = pal,
+    marker = list(size = 4, opacity = 0.75),
+    hoverinfo = "text",
+    text = ~paste0(
+      "Sample: ", Sample_ID,
+      "<br>PC1: ", round(PC1, 2),
+      "<br>PC2: ", round(PC2, 2),
+      "<br>PC3: ", round(PC3, 2),
+      "<br>Condition: ", Condition
+    ),
+    showlegend = TRUE,
+    name = "Samples"
+  )
 
 # loading arrows (one trace per arrow)
-# for (i in seq_len(nrow(load3d))) {
-#   fig <- fig %>%
-#     add_trace(
-#       type = "scatter3d", mode = "lines",
-#       x = c(0, load3d$a1[i]),
-#       y = c(0, load3d$a2[i]),
-#       z = c(0, load3d$a3[i]),
-#       line = list(color = "grey20", width = 4),
-#       hoverinfo = "text",
-#       text = paste0(load3d$Class[i]),
-#       showlegend = FALSE
-#     ) %>%
-#     add_trace(
-#       type = "scatter3d", mode = "text",
-#       x = load3d$a1[i] * 1.05,
-#       y = load3d$a2[i] * 1.05,
-#       z = load3d$a3[i] * 1.05,
-#       text = load3d$Class[i],
-#       textposition = "middle right",
-#       textfont = list(color = "black", size = 10),
-#       showlegend = FALSE
-#     )
-# }
-# 
-# fig <- fig %>%
-#   layout(
-#     title = list(text = "PCA (PC1–PC3) with loading vectors"),
-#     scene = list(
-#       xaxis = list(title = paste0("PC1 (", round(100*var_exp[1],1), "%)"),
-#                    zeroline = TRUE, showspikes = FALSE),
-#       yaxis = list(title = paste0("PC2 (", round(100*var_exp[2],1), "%)"),
-#                    zeroline = TRUE, showspikes = FALSE),
-#       zaxis = list(title = paste0("PC3 (", round(100*var_exp[3],1), "%)"),
-#                    zeroline = TRUE, showspikes = FALSE)),
-#     legend = list(orientation = "h", x = 0.5, y = 1.05, xanchor = "center")
-#   )
-# 
+for (i in seq_len(nrow(load3d))) {
+  fig <- fig %>%
+    add_trace(
+      type = "scatter3d", mode = "lines",
+      x = c(0, load3d$a1[i]),
+      y = c(0, load3d$a2[i]),
+      z = c(0, load3d$a3[i]),
+      line = list(color = "grey20", width = 4),
+      hoverinfo = "text",
+      text = paste0(load3d$Class[i]),
+      showlegend = FALSE
+    ) %>%
+    add_trace(
+      type = "scatter3d", mode = "text",
+      x = load3d$a1[i] * 1.05,
+      y = load3d$a2[i] * 1.05,
+      z = load3d$a3[i] * 1.05,
+      text = load3d$Class[i],
+      textposition = "middle right",
+      textfont = list(color = "black", size = 10),
+      showlegend = FALSE
+    )
+}
+
+fig <- fig %>%
+  layout(
+    title = list(text = "PCA (PC1–PC3) with loading vectors"),
+    scene = list(
+      xaxis = list(title = paste0("PC1 (", round(100*var_exp[1],1), "%)"),
+                   zeroline = TRUE, showspikes = FALSE),
+      yaxis = list(title = paste0("PC2 (", round(100*var_exp[2],1), "%)"),
+                   zeroline = TRUE, showspikes = FALSE),
+      zaxis = list(title = paste0("PC3 (", round(100*var_exp[3],1), "%)"),
+                   zeroline = TRUE, showspikes = FALSE)),
+    legend = list(orientation = "h", x = 0.5, y = 1.05, xanchor = "center")
+  )
+
 # fig  # interactive 3D
-# 
+#
 # # Save an interactive HTML (great for supplement)
 # saveWidget(as_widget(fig), "PCA_3D_loadings.html", selfcontained = TRUE)
 
@@ -661,7 +700,7 @@ ggsave("fig/main/Fig2b_summed_lipid_PCA_biplot.png", summed_pca,width = 8, heigh
 
 # # palette (same as before)
 # pal <- c(Control = "#440154FF", LowInput = "#FDE725FF")
-# 
+#
 # # general biplot for any PC pair
 # plot_pca_pair <- function(p, sample_info, pcs = c(1, 2), arrow_scale = 0.8) {
 #   # scores on selected PCs
@@ -669,23 +708,23 @@ ggsave("fig/main/Fig2b_summed_lipid_PCA_biplot.png", summed_pca,width = 8, heigh
 #     tibble::rownames_to_column("Sample_ID") |>
 #     dplyr::left_join(sample_info, by = "Sample_ID")
 #   names(sc)[2:3] <- c("PCx", "PCy")
-#   
+#
 #   # loadings on selected PCs
 #   ld <- as.data.frame(p$rotation[, pcs, drop = FALSE]) |>
 #     tibble::rownames_to_column("Class")
 #   names(ld)[2:3] <- c("PCx", "PCy")
-#   
+#
 #   # scale loadings to fit score cloud
 #   score_rad <- max(sqrt(sc$PCx^2 + sc$PCy^2), na.rm = TRUE)
 #   load_rad  <- max(sqrt(ld$PCx^2 + ld$PCy^2), na.rm = TRUE)
 #   sf <- arrow_scale * score_rad / load_rad
 #   ld <- mutate(ld, a1 = PCx * sf, a2 = PCy * sf)
-#   
+#
 #   # axis labels with variance explained
 #   ve <- (p$sdev^2) / sum(p$sdev^2)
 #   xlab <- sprintf("PC%d (%.1f%%)", pcs[1], 100 * ve[pcs[1]])
 #   ylab <- sprintf("PC%d (%.1f%%)", pcs[2], 100 * ve[pcs[2]])
-#   
+#
 #   ggplot() +
 #     geom_point(data = sc, aes(PCx, PCy, color = Condition), size = 2.5, alpha = 0.75) +
 #     stat_ellipse(data = sc, aes(PCx, PCy, fill = Condition),
@@ -708,11 +747,11 @@ ggsave("fig/main/Fig2b_summed_lipid_PCA_biplot.png", summed_pca,width = 8, heigh
 #       legend.title     = element_blank()
 #     )
 # }
-# 
+#
 # # Make the two plots you asked for
 # p13 <- plot_pca_pair(p, sample_info, pcs = c(1, 3))  # PC1–PC3
 # p23 <- plot_pca_pair(p, sample_info, pcs = c(2, 3))  # PC2–PC3
-# 
+#
 # # (optional) show side-by-side if you use patchwork
 # # library(patchwork)
 # quartz()
@@ -731,7 +770,7 @@ ggsave("fig/main/Fig2b_summed_lipid_PCA_biplot.png", summed_pca,width = 8, heigh
 #   axis        = "tblr",                         # align top/bottom/left/right
 #   rel_widths  = c(1, 1)                         # both panels equal width
 # )
-# 
+#
 # quartz()
 # combined
 

@@ -227,7 +227,7 @@ batch_values[batch_values != "batch"] <- serial_mapping[batch_values[batch_value
 A <- rbind(batch_values, A)
 
 # Saving
-write.csv(A,"/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/results/SERRF/A_SERRF_new.csv")
+#write.csv(A,"/Users/nirwantandukar/Library/Mobile Documents/com~apple~CloudDocs/Github/SAP_lipids_GWAS/results/SERRF/A_SERRF_new.csv")
 
 # Need some post processing for the SERRF
 #batch	A	A	A	A	A	A	A	A	A	A

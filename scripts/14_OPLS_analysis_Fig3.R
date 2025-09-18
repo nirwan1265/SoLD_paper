@@ -25,6 +25,9 @@ library(ggplot2)
 library(patchwork)
 library(ggplot2)
 library(ggbreak)
+library(broom); library(effsize)
+library(lme4); library(lmerTest)
+
 
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║ 1) READ RAW INTENSITY TABLES AND CLASS                           ║
@@ -41,7 +44,7 @@ lowinput <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_low
 colnames(lowinput)[1] <- "Compound_Name"  # Rename the first column to "Compound_Name"
 
 # Valid classes
-valid_classes <- c("DGDG","MGDG",
+valid_classes <- c("DGDG","DGTS","MGDG",
                    "TG","DG","MG",
                    "PC","PE",
                    "SQDG",
@@ -307,7 +310,7 @@ quartz()
 print(opls_plot)
 
 # Save the plot
-ggsave("fig/main/Fig2c_OPLS_scores_plot.png", plot = opls_plot, width = 10, height = 6, dpi = 300, bg = "white")
+#ggsave("fig/main/Fig2c_OPLS_scores_plot.png", plot = opls_plot, width = 10, height = 6, dpi = 300, bg = "white")
 
 # 2) Run the permutation test (200 label-swaps)
 perm_res <- opls(
@@ -498,19 +501,22 @@ library(forcats)
 library(ggplot2)
 
 # --- your buckets ---
-mem_sulfolipid   <- c("PG_SQDG","PC_SQDG","PE_SQDG","PS_SQDG","DGDG_SQDG")
-mem_galactolipid <- c("DGDG_MGDG","MGDG_PG","MG_MGDG","DGDG_MG","MGDG_PE","MGDG_PC", "MGDG_PS")
-mem_phospholipid <- c("PC_PS","PE_PS","PA_PS","PG_PS")
+mem_sulfolipid   <- c("PC_SQDG","PE_SQDG","PG_SQDG","PS_SQDG","DGDG_SQDG","DG_SQDG","MG_SQDG")
+mem_galactolipid <- c("DGDG_MG","DGDG_MGDG","DGDG_PG","DGDG_PE","DGDG_PS","MG_MGDG","MGDG_PC","MGDG_PE","MGDG_PG", "MGDG_PS")
+mem_phospholipid <- c("PC_PE","PC_PS","PA_PG","PA_PS","PA_PE","PE_PS","PG_PS")
 
-turn_diacylglycerol <- c("DG_TG","DG_MG","DG_PE","DG_PC","DG_PG","PA_TG")
-turn_lysophospho    <- c("LPC_PS","LPE_PS","LPC_PE","LPC_PG","LPC_LPE","LPE_MGDG","LPC_MG")
-turn_triacylglycerol <- c("MGDG_TG","PS_TG","SQDG_TG")
+turn_diacylglycerol <- c("DG_MG","DG_PC","DG_PE","DG_PG","DG_PS","DG_TG","MG_PG","MG_PE","MG_PC","MG_PA","MG_PS")
+turn_lysophospho    <- c("LPC_LPE","LPE_PA","LPC_PE","LPC_PS","LPC_MG","LPE_PS","LPC_PG","DGDG_LPE","LPE_MG","LPE_MGDG","LPE_SQDG","DG_LPE")
+turn_triacylglycerol <- c("LPC_TG","MGDG_TG","PA_TG","PS_TG","SQDG_TG")
+
+
+
 
 group_map <- c(
   setNames(rep("Sulfolipid adjustments",   length(mem_sulfolipid)),   mem_sulfolipid),
   setNames(rep("Galactolipid dynamics",    length(mem_galactolipid)), mem_galactolipid),
   setNames(rep("Phospholipid homeostasis", length(mem_phospholipid)), mem_phospholipid),
-  setNames(rep("DG turnover / signaling",  length(turn_diacylglycerol)), turn_diacylglycerol),
+  setNames(rep("DG/MG turnover / signaling",  length(turn_diacylglycerol)), turn_diacylglycerol),
   setNames(rep("Lyso-phospho turnover",    length(turn_lysophospho)), turn_lysophospho),
   setNames(rep("TG turnover / signaling",  length(turn_triacylglycerol)), turn_triacylglycerol)
 )
@@ -522,7 +528,7 @@ vip_df <- vip_hits %>%
   mutate(Group = factor(
     Group,
     levels = c("Sulfolipid adjustments","Galactolipid dynamics",
-               "Phospholipid homeostasis","DG turnover / signaling",
+               "Phospholipid homeostasis","DG/MG turnover / signaling",
                "Lyso-phospho turnover","TG turnover / signaling","Other")
   ))
 
@@ -560,9 +566,9 @@ group_map <- c(
   setNames(rep("Sulfolipid",   length(mem_sulfolipid)),   mem_sulfolipid),
   setNames(rep("Galactolipid",    length(mem_galactolipid)), mem_galactolipid),
   setNames(rep("Phospholipid", length(mem_phospholipid)), mem_phospholipid),
-  setNames(rep("Diacylglycerol",  length(turn_diacylglycerol)), turn_diacylglycerol),
+  setNames(rep("Mono/Diacylglycerol",  length(turn_diacylglycerol)), turn_diacylglycerol),
   setNames(rep("Lyso-phospho",    length(turn_lysophospho)), turn_lysophospho),
-  setNames(rep("Triacyl",  length(turn_triacylglycerol)), turn_triacylglycerol)
+  setNames(rep("Triacylglycerol",  length(turn_triacylglycerol)), turn_triacylglycerol)
 )
 
 # ---------------------------
@@ -575,8 +581,8 @@ vip_df <- vip_hits %>%
   mutate(Group = factor(
     Group,
     levels = c("Sulfolipid","Galactolipid",
-               "Phospholipid","Diacylglycerol",
-               "Lyso-phospho","Triacyl","Other")
+               "Phospholipid","Mono/Diacylglycerol",
+               "Lyso-phospho","Triacylglycerol","Other")
   )) %>%
   group_by(Group) %>%
   mutate(Lipid_f = fct_reorder(Lipid, VIP, .desc = FALSE)) %>%
@@ -621,6 +627,8 @@ ratio_long <- ratio_tbl %>%
   left_join(lookup, by = "Lipid") %>%     # <- DO NOT recompute groups; trust VIP
   mutate(Condition = factor(Condition, levels = c("Control","LowInput"))) %>%
   filter(!is.na(Group))                   # should be none, but just in case
+
+
 
 # ---------------------------
 # 4) Plots
@@ -699,14 +707,125 @@ ggsave("VIP_by_group_boxes.png", plot = p_out,
 
 
 
-# ---------------------------
-# 5) Optional sanity checks
-# ---------------------------
-# Any VIP ratio missing from ratio_tbl?
-setdiff(gsub("/", "_", vip_df$Lipid), names(ratio_tbl))         # expect character(0)
 
-# Any VIP ratio lost before plotting?
-setdiff(vip_df$Lipid, unique(ratio_long$Lipid))                 # expect character(0)
+
+
+
+
+
+
+
+# ---------------------------
+### STATISTISTICS:
+# ---------------------------
+
+
+# ── 1) z-scores for plotting ONLY (within each Condition × Ratio) ─────────────
+ratio_long2 <- ratio_long
+
+ratio_long <- ratio_long %>%
+  group_by(Lipid, Condition) %>%
+  mutate(Z = as.numeric(scale(Value))) %>%
+  ungroup()
+
+# (use `Z` instead of `Value` in your violin/box plot if you want standardized viz)
+
+# ── 2) robust stats on raw log-ratios (Value) ─────────────────────────────────
+
+# helper that returns Wilcoxon, HL shift, AUC (prob. superiority), Cliff’s Δ,
+# and jackknife sign stability of the median difference
+one_ratio_tests <- function(df, ratio, alternative = "two.sided") {
+  xi <- df %>% filter(Condition == "LowInput", Lipid == ratio) %>% pull(Value)
+  x0 <- df %>% filter(Condition == "Control",  Lipid == ratio) %>% pull(Value)
+  
+  if (length(xi) < 3 || length(x0) < 3) return(
+    tibble(Ratio = ratio, n_LI = length(xi), n_C = length(x0),
+           median_LI = median(xi, na.rm=TRUE), median_C = median(x0, na.rm=TRUE),
+           HL_shift = NA_real_, HL_low = NA_real_, HL_high = NA_real_,
+           p_wilcox = NA_real_, AUC = NA_real_, cliffs_delta = NA_real_,
+           jackknife_stability = NA_real_)
+  )
+  
+  wt <- wilcox.test(xi, x0, alternative = alternative,
+                    conf.int = TRUE, exact = FALSE)  # HL shift + CI
+  
+  # U and AUC (probability an LI value > a C value; for 'less' interpret accordingly)
+  U   <- unname(wt$statistic)
+  auc <- as.numeric(U) / (length(xi) * length(x0))
+  
+  cd  <- tryCatch(effsize::cliff.delta(xi, x0)$estimate, error = \(e) NA_real_)
+  
+  # jackknife sign stability on medians
+  d_full <- sign(median(xi) - median(x0))
+  N      <- length(xi) + length(x0)
+  keep   <- logical(N)
+  for (i in seq_len(N)) {
+    xi2 <- xi; x0_2 <- x0
+    if (i <= length(xi)) xi2 <- xi2[-i] else x0_2 <- x0_2[-(i - length(xi))]
+    keep[i] <- sign(median(xi2) - median(x0_2)) == d_full
+  }
+  stab <- mean(keep)
+  
+  tibble(
+    Ratio   = ratio,
+    n_LI    = length(xi),
+    n_C     = length(x0),
+    median_LI = median(xi),
+    median_C  = median(x0),
+    HL_shift   = unname(wt$estimate),   # robust median (LI − C) on log10 scale
+    HL_low     = wt$conf.int[1],
+    HL_high    = wt$conf.int[2],
+    p_wilcox   = wt$p.value,
+    AUC        = auc,                   # P(LI > C)
+    cliffs_delta = cd,                  # −1..1
+    jackknife_stability = stab          # 0..1
+  )
+}
+
+# which ratios to test?
+#   - all:            unique(ratio_long$Lipid)
+#   - only VIP ones:  vip_df$Lipid
+ratios_to_test <- unique(ratio_long$Lipid)
+
+# If you want ONE-SIDED direction for a few known cases:
+greater_in_LI <- c("PS/SQDG","PG/SQDG","PE/SQDG","PC/SQDG","DGDG/SQDG")  # expect LI > C
+less_in_LI    <- c("SQDG/TG")                                            # expect LI < C
+dir_vec <- setNames(rep("two.sided", length(ratios_to_test)), ratios_to_test)
+dir_vec[intersect(ratios_to_test, greater_in_LI)] <- "greater"
+dir_vec[intersect(ratios_to_test, less_in_LI)]    <- "less"
+
+# run the tests
+ratio_stats <- map_dfr(
+  ratios_to_test,
+  \(r) one_ratio_tests(ratio_long, r, alternative = dir_vec[[r]])
+) %>%
+  mutate(p_adj_BH = p.adjust(p_wilcox, method = "BH")) %>%
+  arrange(p_adj_BH)
+
+# pretty columns
+ratio_stats_out <- ratio_stats %>%
+  mutate(
+    effect_log10 = HL_shift,
+    effect_fc    = 10^HL_shift,                    # fold-change of ratios LI/C
+    AUC_pct      = scales::percent(AUC, accuracy = 0.1)
+  ) %>%
+  select(Ratio, n_C, n_LI, median_C, median_LI,
+         effect_log10, effect_fc,
+         HL_low, HL_high,
+         p_wilcox, p_adj_BH, AUC_pct, cliffs_delta, jackknife_stability)
+
+# save + view
+write.csv(ratio_stats_out, "table/supp/SuppTable_ratio_stats_all.csv")
+print(ratio_stats_out, n = 30)
+
+
+
+
+colnames(ratio_stats_out)
+
+
+
+
 
 
 
@@ -717,66 +836,36 @@ setdiff(vip_df$Lipid, unique(ratio_long$Lipid))                 # expect charact
 
 
 # Convert to latex format:
-kable(vip_hits, format = "latex", booktabs = TRUE, linesep = "", escape = FALSE) %>%
-  kable_styling(latex_options = c("striped", "hold_position")) %>%
-  column_spec(1, bold = TRUE) %>%
-  column_spec(2, width = "3cm") %>%
-  row_spec(0, bold = TRUE, background = "#f7f7f7") %>%
-  row_spec(nrow(vip_hits), bold = TRUE, background = "#f7f7f7") %>%
-  row_spec(1:nrow(vip_hits)-1, background = "#f7f7f7") %>%
-  row_spec(1:nrow(vip_hits)-1, color = "black") %>%
-  row_spec(nrow(vip_hits), color = "black") %>%
-  row_spec(0, color = "black") %>%
-  row_spec(0, background = "#f7f7f7") %>%
-  row_spec(1:nrow(vip_hits)-1, background = "#f7f7f7") %>%
-  row_spec(1:nrow(vip_hits)-1, color = "black") %>%
-  row_spec(nrow(vip_hits), background = "#f7f7f7") %>%
-  row_spec(nrow(vip_hits), color = "black") %>%
-  row_spec(0, background = "#f7f7f7") %>%
-  row_spec(0, color = "black") %>%
-  row_spec(1:nrow(vip_hits)-1, background = "#f7f7f7") %>%
-  row_spec(1:nrow(vip_hits)-1, color = "black") %>%
-  row_spec(nrow(vip_hits), background = "#f7f7f7") %>%
-  row_spec(nrow(vip_hits), color = "black") %>%
-  row_spec(0, background = "#f7f7f7") %>%
-  row_spec(0, color = "black") %>%
-  row_spec(1:nrow(vip_hits)-1, background = "#f7f7f7")
-
+# kable(vip_hits, format = "latex", booktabs = TRUE, linesep = "", escape = FALSE) %>%
+#   kable_styling(latex_options = c("striped", "hold_position")) %>%
+#   column_spec(1, bold = TRUE) %>%
+#   column_spec(2, width = "3cm") %>%
+#   row_spec(0, bold = TRUE, background = "#f7f7f7") %>%
+#   row_spec(nrow(vip_hits), bold = TRUE, background = "#f7f7f7") %>%
+#   row_spec(1:nrow(vip_hits)-1, background = "#f7f7f7") %>%
+#   row_spec(1:nrow(vip_hits)-1, color = "black") %>%
+#   row_spec(nrow(vip_hits), color = "black") %>%
+#   row_spec(0, color = "black") %>%
+#   row_spec(0, background = "#f7f7f7") %>%
+#   row_spec(1:nrow(vip_hits)-1, background = "#f7f7f7") %>%
+#   row_spec(1:nrow(vip_hits)-1, color = "black") %>%
+#   row_spec(nrow(vip_hits), background = "#f7f7f7") %>%
+#   row_spec(nrow(vip_hits), color = "black") %>%
+#   row_spec(0, background = "#f7f7f7") %>%
+#   row_spec(0, color = "black") %>%
+#   row_spec(1:nrow(vip_hits)-1, background = "#f7f7f7") %>%
+#   row_spec(1:nrow(vip_hits)-1, color = "black") %>%
+#   row_spec(nrow(vip_hits), background = "#f7f7f7") %>%
+#   row_spec(nrow(vip_hits), color = "black") %>%
+#   row_spec(0, background = "#f7f7f7") %>%
+#   row_spec(0, color = "black") %>%
+#   row_spec(1:nrow(vip_hits)-1, background = "#f7f7f7")
+# 
 
 # pg_cv <- raw_peak_tbl %>%     # your raw species-level table
 #   filter(Class == "PG") %>% 
 #   group_by(SampleGroup) %>%   # QC or pooled injections
 #   summarise(CV = sd(Intensity) / mean(Intensity)) 
-
-quartz() 
-ggplot(vip_hits, aes(x = reorder(Lipid, VIP), y = VIP)) +
-  geom_col(
-    width    = 0.7,
-    fill     = "grey50",
-    colour   = "black",
-    linewidth = 0.2
-  ) +
-  coord_flip() +
-  geom_hline(
-    yintercept = 1,
-    linetype   = "dashed",
-    colour     = "red"
-  ) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
-  labs(
-    x     = NULL,
-    y     = "VIP score",
-    title = "Lipids driving Control vs Low-input separation\n(OPLS-DA, VIP > 1.3)"
-  ) +
-  theme_bw(base_size = 9) +
-  theme(
-    axis.line          = element_line(colour = "black"),
-    panel.grid.major.y = element_blank(),
-    panel.grid.major.x = element_line(colour = "grey90"),
-    panel.grid.minor   = element_blank(),
-    legend.position    = "none",
-    plot.title         = element_text(hjust = 0.5, face = "plain", size = 10)
-  )
 
 
 # #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -1117,8 +1206,8 @@ ggplot(stats_df, aes(x = log2FC, y = negLog10P)) +
 library(ggrepel)
 
 # define your thresholds
-fc_cut   <- 0.05
-p_cut    <- 0.05
+fc_cut   <- 0.001
+p_cut    <- 0.001
 vip_cut  <- 1.0
 
 stats_df <- stats_df %>%

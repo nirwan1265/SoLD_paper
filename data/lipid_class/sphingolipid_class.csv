@@ -1,0 +1,10 @@
+﻿Lipids,CommonName,Class,SubClass,Sub_subclass
+Cer(24:1),Cer(24:1),Sphingolipid,Cer(24:1),Ceramide
+Cer(d18:2/20:1),Cer(d18:2/20:1),Sphingolipid,Cer(d18:2/20:1),Ceramides
+GalCer(d18:2/18:1),GalCer(d18:2/18:1),Sphingolipid,GalCer(d18:2/18:1),Glycosphingolipid
+GalCer(d18:2/20:1),GalCer(d18:2/20:1),Sphingolipid,GalCer(d18:2/20:1),Glycosphingolipid
+GalCer(d18:2/22:1),GalCer(d18:2/22:1),Sphingolipid,GalCer(d18:2/22:1),Glycosphingolipid
+Phytosphingosine,Phytosphingosine,Sphingolipid,Phytosphingosine,NA
+SM(d18:1/17:0),SM(d18:1/17:0),Sphingolipid,SM(d18:1/17:0),Sphingomyelin
+SPB 18:0;2OH,SPB 18:0;2OH,Sphingolipid,SPB 18:0;2OH,NA
+SPHINGANINE,SPHINGANINE,Sphingolipid,SPHINGANINE,NA
