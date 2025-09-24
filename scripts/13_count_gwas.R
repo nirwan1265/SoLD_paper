@@ -15,9 +15,13 @@ library(purrr)
 # dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/annotation/"
 # 
 # # All
-# dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/annotation/all_lipids/"
-# 
-# file_list <- list.files(path = dir,pattern = "*.txt")
+dir <- "/Users/nirwantandukar/Documents/Research/results/SAP/GWAS_results/BLUP/final_results/lowinput/annotation/all_lipids/"
+
+file_list <- list.files(path = dir,pattern = "*.txt")
+
+
+-log10(0.05/234264)
+
 
 # ## MG and DG
 # file_list <- file_list[c(9:24,38:42)]
@@ -36,7 +40,7 @@ library(purrr)
 # file_list <- file_list[c(43:47,25:31)]
 # 
 # # Phospholipids
-# file_list <- file_list[c(48:108,110)]
+file_list <- file_list[c(74:75,77:135,137)]
 
 # Select only that start with TG in file_list vector
 #file_list <- file_list[str_detect(file_list, "^PG")]
@@ -120,7 +124,7 @@ file_list <- file_list[c(164,160,155,149,65)]
 
 # Empty vectors
 results <- tibble()          
-p_value_threshold <- 1e-5
+p_value_threshold <- 1e-7
 -log10(p_value_threshold)
 
 # Loop through the files
@@ -200,8 +204,28 @@ combined_results <- combined_results %>%
 head(combined_results)
 
 # Save the file
-write.table(combined_results, "table/GWAS_results/All_lipids_OLPS-DA_common_genes_sum_ratio_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
+write.table(combined_results, "table/GWAS_results/Phospholipids_common_genes_individual_logpvalue_7_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 getwd()
+
+
+### Make a table for latex
+combined_results <- combined_results[1:16,-c(4:7)]
+
+
+# Escape underscores in the whole dataframe
+combined_results_fixed <- combined_results %>%
+  dplyr::mutate(across(everything(), ~ gsub("_", "\\\\_", .x)))
+
+combined_results_fixed <- combine_results
+# Now use kableExtra/xtable/gt to export safely
+library(knitr)
+library(kableExtra)
+
+kable(combined_results_fixed, format = "latex", booktabs = TRUE,
+      caption = "GWAS hits with associated lipid phenotypes") %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+
+
 # write.table(combined_results, "table/GWAS_results/11_14_17_Eicosatrienoic_acid__Z_Z_Z___common_genes_lowinput_individual_logpvalue_5_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 # write.table(combined_results, "table/GWAS_results/gibberellic_acid_common_genes_lowinput_individual_logpvalue_4_spat_fitted_BLUP.txt", row.names=F, quote=F, sep="\t")
 

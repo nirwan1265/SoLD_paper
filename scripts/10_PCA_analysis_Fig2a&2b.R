@@ -775,6 +775,10 @@ fig <- fig %>%
 # combined
 
 
+
+
+
+
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ###############################################################################
 ## RATIOS OF THE LIPIDS
@@ -807,15 +811,16 @@ ratios_long <- ratios_long %>%
 unique(ratios_long$RatioName)
 
 # Subset the ratios that you got from OPLS-DA from 12_OPLS_analysis.R
-# only_vips <- c("PE/SQDG","MGDG/PC","PC/SQDG","MGDG/PE","SQDG/TG","MG/SQDG",
-#               "MGDG/TG","DGDG/MGDG","DGDG/PC","PC/PS","MG/MGDG","DGDG/PE",
-#               "DGDG/SQDG","DGDG/TG","LPE/PC","PE/PS","PS/TG","MG/PC","LPC/MGDG",
-#               "LPC/SQDG","LPE/TG","LPE/PE","PC/PE","LPC/PC")
+only_vips <- c("MG/SQDG",   "PS/SQDG"   ,"MG/MGDG"  ,"PG/SQDG"   ,"DG/MG"     ,"LPC/MG"   , "DGDG/MG"  , "MGDG/PS" , 
+"PE/SQDG",   "LPC/PS"    ,"DG/PS"   ,  "LPE/SQDG" , "DGDG/PS"   ,"PC/PS"  ,   "DGDG/SQDG" ,"LPC/LPE" , 
+"PE/PS" ,    "PG/PS"     ,"SQDG/TG"  , "MGDG/PG"   ,"MG/PG"     ,"PA/PS"   ,  "MG/PC"     ,"MGDG/PE"  ,
+"PC/SQDG",   "LPE/MGDG"  ,"DGDG/MGDG" ,"MG/PA"     ,"PS/TG"     ,"LPE/PS"   , "MG/PE"     ,"MGDG/TG"  ,
+"DG/LPE"  ,  "LPC/PE"    ,"LPE/PA"    ,"DG/TG"     ,"LPC/PG"    ,"PA/TG"    , "DG/SQDG"   ,"DG/PG"    ,
+"MGDG/PC"  , "LPC/TG"    ,"DG/PE"     ,"DGDG/PE"   ,"MG/PS"     ,"DGDG/LPE" , "PA/PG"     ,"PA/PE"    ,
+"LPE/MG"    ,"DGDG/PG"   ,"PC/PE" )
 
-# Get this all_combine from below:
-#only_vips <- vip_hits$Lipid
 ratios_long <- ratios_long %>%
-  filter(RatioName %in% all_combine)
+  filter(RatioName %in% only_vips)
 
 # 1) pivot ratios_long into a wide matrix (rows = each sample×condition, cols = each RatioName)
 wide_ratios <- ratios_long %>%
@@ -831,9 +836,6 @@ wide_ratios <- ratios_long %>%
 sample_info_ratios <- ratios_long %>% 
   distinct(Sample, Condition) %>% 
   mutate(Rep = paste(Sample, Condition, sep = "_"))
-
-
-
 
 # 2) run PCA (autoscaled)
 pca_ratios <- prcomp(wide_ratios, center = TRUE, scale. = TRUE)
@@ -851,13 +853,6 @@ load_df <- as.data.frame(pca_ratios$rotation[,1:2], check.names = FALSE) %>%
   tibble::rownames_to_column("RatioName")
 
 # compute scale so that 80% of the longest arrow matches the score‐cloud radius
-#max_score <- max(abs(c(scores_df$PC1, scores_df$PC2)))
-#max_load  <- max(sqrt(load_df$PC1^2 + load_df$PC2^2))
-#arrow_scale <- 0.8 * max_score / max_load
-
-# load_df <- load_df %>%
-#   mutate(a1 = PC1 * arrow_scale,
-#          a2 = PC2 * arrow_scale)
 scale_factor <- 5
 # compute a data‐driven scale factor
 sf <- max(abs(scores_df$PC1), abs(scores_df$PC2)) /
@@ -870,36 +865,14 @@ load_df <- load_df %>% mutate(
 
 groups_lipids <- data.frame()
 
+sulfolipid_adjustments   <- c("PC/SQDG","PE/SQDG","PG/SQDG","PS/SQDG","DGDG/SQDG","DG/SQDG","MG/SQDG")
+galactolipid_dynamics <- c("DGDG/MG","DGDG/MGDG","DGDG/PG","DGDG/PE","DGDG/PS","MG/MGDG","MGDG/PC","MGDG/PE","MGDG/PG", "MGDG/PS")
+phospholipid_homeostasis <- c("PC/PE","PC/PS","PA/PG","PA/PS","PA/PE","PE/PS","PG/PS")
 
-sulfolipid_adjustments <- c("PE/SQDG", "PC/SQDG", "MG/SQDG", "DGDG/SQDG", "LPC/SQDG")
-mem_sulfolipid     <- c("SQDG/PG","SQDG/MGDG")
+turn_diacylglycerol <- c("DG/MG","DG/PC","DG/PE","DG/PG","DG/PS","DG/TG","MG/PG","MG/PE","MG/PC","MG/PA","MG/PS")
+turnover_lysophospho    <- c("LPC/LPE","LPE/PA","LPC/PE","LPC/PS","LPC/MG","LPE/PS","LPC/PG","DGDG/LPE","LPE/MG","LPE/MGDG","LPE/SQDG","DG/LPE")
+turn_triacylglycerol <- c("LPC/TG","MGDG/TG","PA/TG","PS/TG","SQDG/TG")
 
-sulfolipid_adjustments <- unique(c(sulfolipid_adjustments,mem_sulfolipid))
-
-
-
-galactolipid_dynamics <- c("MGDG/PC", "MGDG/PE", "DGDG/MGDG", "DGDG/PC", "DGDG/PE")
-mem_galactolipid   <- c( "DGDG/PG" )
-
-galactolipid_dynamics <- unique(c(galactolipid_dynamics,mem_galactolipid))
-
-
-
-
-phospholipid_homeostasis <- c("PC/PS", "PC/PE", "PE/PS")
-mem_phospholipid   <- c("PC/PG")
-
-phospholipid_homeostasis <- unique(c(phospholipid_homeostasis,mem_phospholipid))
-
-
-
-turnover_lysophospho <- c("LPE/PC", "LPE/PE", "LPC/PC")
-
-
-turn_diacylglycerol<- c("DG/DGDG", "DG/MGDG","DG/PC","DG/PE","DG/SQDG")
-
-
-carbon_storage <- c("DG/TG","SQDG/TG","MGDG/TG","DGDG/TG")
 
 all_combine <- c(
   sulfolipid_adjustments,
@@ -907,54 +880,33 @@ all_combine <- c(
   phospholipid_homeostasis,
   turnover_lysophospho,
   turn_diacylglycerol,
-  carbon_storage)
-
+  turn_triacylglycerol)
 
 
 load_df <- load_df %>%
   mutate(
     Category = case_when(
-      RatioName %in% sulfolipid_adjustments   ~ "Sulfolipid adjustments",
-      RatioName %in% galactolipid_dynamics    ~ "Galactolipid dynamics",
-      RatioName %in% phospholipid_homeostasis ~ "Phospholipid homeostasis",
-      RatioName %in% turnover_lysophospho      ~ "Lysophospholipid turnover",
-      RatioName %in% carbon_storage           ~ "Carbon storage",
-      RatioName %in% turn_diacylglycerol ~ "Turnover of diacylglycerols",
+      RatioName %in% sulfolipid_adjustments   ~ "Sulfolipid",
+      RatioName %in% galactolipid_dynamics    ~ "Galactolipid",
+      RatioName %in% phospholipid_homeostasis ~ "Phospholipid",
+      RatioName %in% turnover_lysophospho      ~ "Lysophospholipid",
+      RatioName %in% turn_triacylglycerol           ~ "Triacylglycerol",
+      RatioName %in% turn_diacylglycerol ~ "Mono/Diacylglycerols",
       TRUE                                     ~ "Other"
     )
   )
 
 # pick a qualititative palette (one colour per category)
 cat_cols <- c(
-  "Sulfolipid adjustments"   = "#1b9e77",
-  "Galactolipid dynamics"    = "#d95f02",
-  "Phospholipid homeostasis" = "#000000",
-  "Lysophospholipid turnover" = "#e7298a",
-  "Turnover of diacylglycerols" = "#7570b3",
-  "Carbon storage"           = "#66a61e",
+  "Sulfolipid"   = "#1b9e77",
+  "Galactolipid"    = "#d95f02",
+  "Phospholipid" = "#000000",
+  "Lysophospholipid" = "#e7298a",
+  "Triacylglycerol" = "#7570b3",
+  "Mono/Diacylglycerols"           = "#66a61e",
   "Other"                    = "grey70"
 )
 
-cat_cols <- c(
-  "Sulfolipid adjustments"      = brewer.pal(7,"Set1")[1],
-  "Galactolipid dynamics"       = brewer.pal(7,"Set1")[2],
-  "Phospholipid homeostasis"    = brewer.pal(7,"Set1")[3],
-  "Lysophospholipid turnover"   = brewer.pal(7,"Set1")[4],
-  "Turnover of diacylglycerols" = brewer.pal(7,"Set1")[5],
-  "Carbon storage"              = "#000000",
-  "Other"                       = "grey70"
-)
-
-# cat_cols <- c(
-#   "Sulfolipid adjustments"     = "#1b9e77",
-#   "Galactolipid dynamics"      = "#d95f02",
-#   "Phospholipid homeostasis"   = "#000000",
-#   "Lysophospholipid turnover"  = "#e7298a",
-#   "Turnover of diacylglycerols"= "#7570b3",
-#   "Carbon storage"             = "#66a61e",
-#   "Other"                      = "grey70"
-# )
-# 5) biplot
 
 quartz()
 ratio_pca <- ggplot() +
@@ -1017,13 +969,64 @@ ratio_pca
 
 
 # Save
-ggsave("figures/ratios_lipid_PCA_biplot.png", ratio_pca, width = 8, height = 6, dpi = 300, bg = "white")
+# ggsave("figures/ratios_lipid_PCA_biplot.png", ratio_pca, width = 8, height = 6, dpi = 300, bg = "white")
 
 
+# function to plot PCA biplot for a given category
+plot_pca_loadings <- function(cat_name, scores_df, load_df, pca_ratios, cat_cols) {
+  load_sub <- load_df %>% filter(Category == cat_name)
+  
+  ggplot() +
+    # sample scores + ellipses
+    geom_point(data = scores_df,
+               aes(PC1, PC2, color = Condition),
+               size = 2.5, alpha = 0.7, show.legend = FALSE) +
+    stat_ellipse(data = scores_df,
+                 aes(PC1, PC2, fill = Condition),
+                 geom = "polygon", alpha = 0.2, colour = NA) +
+    
+    # loadings (arrows + labels)
+    geom_segment(data = load_sub,
+                 aes(x = 0, y = 0,
+                     xend = a1, yend = a2),
+                 arrow = arrow(length = unit(0.2, "cm")),
+                 color = cat_cols[cat_name], size = 0.8) +
+    geom_text(data = load_sub,
+              aes(x = a1 * 1.05, y = a2 * 1.05, label = RatioName),
+              color = cat_cols[cat_name], size = 3) +
+    
+    # axes
+    geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
+    coord_fixed() +
+    
+    # variance explained
+    labs(
+      title = paste0("Biplot: ", cat_name, " Ratios"),
+      x = paste0("PC1 (", round(100 * pca_ratios$sdev[1]^2 / sum(pca_ratios$sdev^2), 1), "%)"),
+      y = paste0("PC2 (", round(100 * pca_ratios$sdev[2]^2 / sum(pca_ratios$sdev^2), 1), "%)")
+    ) +
+    scale_fill_manual(
+      name   = "Condition",
+      values = c(Control  = "#440154FF", LowInput = "#FDE725FF")
+    ) +
+    theme_bw() +
+    theme(
+      legend.position = "right",
+      plot.title      = element_text(face = "bold")
+    ) +
+    plot_theme
+}
 
+quartz()
+p_sulfo  <- plot_pca_loadings("Sulfolipid", scores_df, load_df, pca_ratios, cat_cols)
+p_galac  <- plot_pca_loadings("Galactolipid", scores_df, load_df, pca_ratios, cat_cols)
+p_phosph <- plot_pca_loadings("Phospholipid", scores_df, load_df, pca_ratios, cat_cols)
+p_lyso   <- plot_pca_loadings("Lysophospholipid", scores_df, load_df, pca_ratios, cat_cols)
+p_mdg    <- plot_pca_loadings("Mono/Diacylglycerols", scores_df, load_df, pca_ratios, cat_cols)
+p_tg     <- plot_pca_loadings("Triacylglycerol", scores_df, load_df, pca_ratios, cat_cols)
 
+library(patchwork)
 
-
-
-
-
+quartz()
+(p_sulfo | p_galac) / (p_phosph | p_lyso) / (p_mdg | p_tg)

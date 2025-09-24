@@ -43,6 +43,8 @@ lowinput <- vroom("data/SPATS_fitted/non_normalized_intensities/Final_subset_low
   select(-c(2,3,4))
 colnames(lowinput)[1] <- "Compound_Name"  # Rename the first column to "Compound_Name"
 
+colnames(control)
+
 # Valid classes
 valid_classes <- c("DGDG","DGTS","MGDG",
                    "TG","DG","MG",
